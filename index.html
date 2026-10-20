@@ -1,0 +1,2232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="app-version" content="20261020175741">
+<meta name="theme-color" content="#15232A">
+<meta name="description" content="Calisthenics skill tree with guided workouts and progress tracking.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body><title>Skill Ladder</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#15232A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: mobile-first. Rank card + ring grid up top, ladders below; tabs live in a bottom bar on phones and a top bar on desktop. Detail opens as a bottom sheet on phones, a docked panel on desktop. */
+:root {
+  --bg: #E6EAE8;
+  --surface: #F8F9F7;
+  --raised: #FFFFFF;
+  --ink: #15232A;
+  --muted: #5A6970;
+  --line: #C8CFCC;
+  --hero: #15232A;       /* dark rank card, both themes */
+  --hero-ink: #EEF2F0;
+  --accent: #2153D0;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #DCE4F8;
+  --good: #23784B;
+  --good-soft: #D8EDE0;
+  --danger: #B4372B;
+  --push: #E05A14; --pull: #2153D0; --core: #8A3CD6; --legs: #23874A; --balance: #C98A00;
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --navh: 64px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0E1518; --surface: #162026; --raised: #1C282F; --ink: #E5EBE8; --muted: #93A2A7; --line: #2A373D;
+  --hero: #1E2D35; --hero-ink: #EEF2F0;
+  --accent: #6F96FF; --accent-ink: #0C1420; --accent-soft: #1F2C4A; --good: #5FC38C; --good-soft: #17301F; --danger: #E2665A;
+  --push: #FF8A4C; --pull: #6F96FF; --core: #B784F5; --legs: #5CC584; --balance: #F2BD3A;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0E1518; --surface: #162026; --raised: #1C282F; --ink: #E5EBE8; --muted: #93A2A7; --line: #2A373D;
+  --hero: #1E2D35; --hero-ink: #EEF2F0;
+  --accent: #6F96FF; --accent-ink: #0C1420; --accent-soft: #1F2C4A; --good: #5FC38C; --good-soft: #17301F; --danger: #E2665A;
+  --push: #FF8A4C; --pull: #6F96FF; --core: #B784F5; --legs: #5CC584; --balance: #F2BD3A;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; touch-action: manipulation; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.g-Push { --g: var(--push); } .g-Pull { --g: var(--pull); } .g-Core { --g: var(--core); } .g-Legs { --g: var(--legs); } .g-Balance { --g: var(--balance); }
+
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 16px calc(var(--navh) + 40px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+@media (min-width: 760px) { .wrap { padding-block: 24px 80px; } }
+
+/* Rank card */
+.hero { background: var(--hero); color: var(--hero-ink); border-radius: 18px; padding: 18px; display: grid; gap: 14px; position: relative; overflow: hidden; }
+.hero::after { content: ""; position: absolute; inset: auto -40px -60px auto; width: 220px; height: 220px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.10), transparent 70%); pointer-events: none; }
+.hero-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+.hero h1 { font-family: var(--display); font-weight: 900; font-size: clamp(2.2rem, 9vw, 3.4rem); line-height: .85; margin: 0; text-transform: uppercase; letter-spacing: .01em; }
+.sync { font-size: .72rem; opacity: .7; text-align: right; }
+.rank { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; }
+.badge { width: 62px; height: 62px; display: grid; place-items: center; position: relative; }
+.badge svg { position: absolute; inset: 0; }
+.badge b { font-family: var(--display); font-weight: 900; font-size: 1.6rem; position: relative; }
+.rank-name { font-family: var(--display); font-weight: 800; font-size: 1.6rem; text-transform: uppercase; line-height: 1; }
+.rank-sub { font-size: .8rem; opacity: .75; font-variant-numeric: tabular-nums; }
+.xpbar { height: 8px; border-radius: 99px; background: rgba(255,255,255,.14); overflow: hidden; margin-top: 8px; }
+.xpbar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--push), var(--balance), var(--legs), var(--pull), var(--core)); transition: width .6s; }
+.hstats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; border-top: 1px solid rgba(255,255,255,.12); padding-top: 12px; }
+.hstat b { display: block; font-family: var(--display); font-weight: 800; font-size: 1.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.hstat span { font-size: .64rem; text-transform: uppercase; letter-spacing: .08em; opacity: .7; }
+
+/* Tabs: top on desktop, bottom bar on phones */
+.tabs { display: flex; }
+.tab { background: none; border: 0; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.tab svg { width: 22px; height: 22px; }
+.tab[aria-selected="true"] { color: var(--ink); }
+@media (max-width: 759px) {
+  .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--raised); border-top: 1px solid var(--line);
+    padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));
+    box-shadow: 0 -4px 20px rgba(0,0,0,.08); }
+  .tab { flex: 1; flex-direction: column; gap: 2px; font-size: .7rem; padding: 6px 0; min-height: 52px; justify-content: center; border-radius: 12px; }
+  .tab[aria-selected="true"] { color: var(--accent); }
+  .tab[aria-selected="true"] svg { transform: translateY(-1px); }
+}
+@media (min-width: 760px) {
+  .tabs { gap: 4px; margin: 22px 0 18px; border-bottom: 1px solid var(--line); }
+  .tab { padding: 10px 14px; border-bottom: 3px solid transparent; margin-bottom: -1px; }
+  .tab[aria-selected="true"] { border-bottom-color: var(--accent); }
+  .tab svg { width: 18px; height: 18px; }
+}
+.section-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 22px 0 10px; }
+.section-h h2 { font-family: var(--display); font-weight: 800; font-size: 1.4rem; text-transform: uppercase; margin: 0; letter-spacing: .02em; }
+.section-h span { font-size: .8rem; color: var(--muted); }
+@media (min-width: 760px) { .section-h:first-child { margin-top: 0; } }
+
+/* Ring grid */
+.rings { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+@media (max-width: 420px) { .rings { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } }
+.ring { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px 6px 8px; display: grid; justify-items: center; gap: 4px; text-align: center; transition: transform .15s, border-color .15s; }
+.ring:hover { transform: translateY(-2px); border-color: var(--g); }
+.ring .rg { width: 72px; height: 72px; position: relative; }
+.ring .rg > svg { position: absolute; inset: 0; }
+.ring .fig { position: absolute; inset: 14px; }
+.ring .nm { font-size: .74rem; font-weight: 600; line-height: 1.15; }
+.ring .ct { font-family: var(--mono); font-size: .7rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ring.complete { background: color-mix(in srgb, var(--g) 12%, var(--surface)); border-color: var(--g); }
+
+.chips { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; font-size: .85rem; white-space: nowrap; min-height: 36px; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip .sw { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--g); margin-right: 6px; vertical-align: 1px; }
+
+.layout { display: grid; gap: 24px; align-items: start; }
+@media (min-width: 1000px) { .layout { grid-template-columns: minmax(0, 1fr) 370px; } }
+
+/* Ladders */
+.lanes { display: grid; gap: 12px; min-width: 0; }
+.lane { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 0 4px; min-width: 0; position: relative; overflow: hidden; }
+.lane::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--g); }
+.lane-h { display: flex; align-items: center; gap: 10px; padding: 0 14px 0 16px; }
+.lane-h .lf { width: 40px; height: 40px; flex: none; border-radius: 10px; background: color-mix(in srgb, var(--g) 14%, transparent); padding: 4px; }
+.lane-h h3 { font-family: var(--display); font-weight: 800; font-size: 1.35rem; text-transform: uppercase; margin: 0; letter-spacing: .02em; line-height: 1; }
+.tag { font-size: .66rem; text-transform: uppercase; letter-spacing: .1em; color: var(--g); font-weight: 700; }
+.count { margin-left: auto; text-align: right; font-family: var(--mono); font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.mini { width: 70px; height: 5px; border-radius: 9px; background: var(--line); overflow: hidden; margin-top: 4px; margin-left: auto; }
+.mini i { display: block; height: 100%; background: var(--g); }
+.prereq { font-size: .76rem; color: var(--muted); padding: 6px 16px 0; }
+.rail-scroll { overflow-x: auto; padding: 12px 10px 10px; scroll-snap-type: x proximity; scrollbar-width: thin; }
+.rail { list-style: none; margin: 0; padding: 0; display: flex; position: relative; width: max-content; }
+.rail li { position: relative; scroll-snap-align: start; }
+.rail li + li::before { content: ""; position: absolute; top: 19px; right: calc(50% + 19px); width: calc(100% - 38px); height: 3px; border-radius: 3px; background: var(--line); }
+.rail li.done + li::before { background: var(--g); }
+.node { display: grid; justify-items: center; gap: 6px; width: 92px; background: none; border: 0; padding: 0 4px; border-radius: 8px; }
+.dot { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-family: var(--mono); font-size: .82rem; font-weight: 500;
+  border: 2px solid var(--line); background: var(--raised); color: var(--muted); transition: transform .15s; }
+.node .nm { font-size: .74rem; line-height: 1.25; text-align: center; color: var(--muted); }
+li.done .dot { background: var(--g); border-color: var(--g); color: #fff; }
+li.done .nm { color: var(--ink); }
+li.cur .dot { background: var(--raised); border: 3px solid var(--g); color: var(--g); font-weight: 700; animation: pulse 2.2s infinite; }
+li.cur .nm { color: var(--ink); font-weight: 700; }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--g) 45%, transparent); } 60% { box-shadow: 0 0 0 9px transparent; } }
+.node:hover .dot { transform: scale(1.08); }
+.node.sel .dot { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* Detail panel / sheet */
+.scrim { position: fixed; inset: 0; background: rgba(8,14,18,.45); z-index: 40; animation: fade .2s; }
+@media (min-width: 1000px) { .scrim { display: none; } }
+@keyframes fade { from { opacity: 0; } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; display: grid; gap: 14px; min-width: 0; overflow: hidden; }
+.panel-band { background: color-mix(in srgb, var(--g) 16%, var(--surface)); padding: 16px 18px 12px; display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 10px; align-items: end; position: relative; }
+.panel-band .fig { width: 96px; height: 96px; }
+.panel-body { padding: 0 18px 18px; display: grid; gap: 14px; }
+.eyebrow { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--g); font-weight: 700; }
+.panel h2 { font-family: var(--display); font-weight: 900; font-size: 2.1rem; line-height: .95; margin: 4px 0 8px; text-transform: uppercase; text-wrap: balance; }
+.close { position: absolute; top: 10px; right: 10px; border: 0; background: var(--raised); border-radius: 50%; width: 36px; height: 36px; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+.handle { display: none; }
+@media (min-width: 1000px) { .panel { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); } .close { display: none; } }
+@media (max-width: 999px) {
+  .panel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; border-radius: 22px 22px 0 0; max-height: 86vh; overflow-y: auto; border: 0;
+    box-shadow: 0 -10px 40px rgba(0,0,0,.25); animation: up .28s cubic-bezier(.2,.8,.2,1); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .panel-band { padding-top: 22px; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); }
+  .panel-body { padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); }
+  .handle { display: block; position: absolute; top: 8px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 4px; background: var(--muted); opacity: .4; }
+  .close { top: 16px; }
+}
+@keyframes up { from { transform: translateY(100%); } }
+.status { display: inline-block; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 3px 8px; border-radius: 4px; }
+.status.done { background: var(--good-soft); color: var(--good); }
+.status.cur { background: var(--g); color: #fff; }
+.status.todo { background: var(--bg); color: var(--muted); }
+.target { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: var(--bg); }
+.target b { font-family: var(--display); font-weight: 900; font-size: 2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.target span { font-size: .8rem; color: var(--muted); line-height: 1.3; }
+.cues { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.cues li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; align-items: start; }
+.cues li::before { content: counter(c); counter-increment: c; width: 22px; height: 22px; border-radius: 50%; background: color-mix(in srgb, var(--g) 18%, transparent); color: var(--g);
+  font-size: .72rem; font-weight: 700; display: grid; place-items: center; margin-top: 1px; }
+.cues { counter-reset: c; }
+.best { font-size: .85rem; color: var(--muted); }
+.best b { color: var(--ink); font-family: var(--mono); font-weight: 500; }
+.h4 { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 0; font-weight: 600; }
+.spark { width: 100%; height: 46px; display: block; }
+
+.logform { display: grid; gap: 10px; }
+.sets { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+.sets label { display: grid; gap: 3px; font-size: .64rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.sets input { width: 66px; height: 44px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--raised); font-family: var(--mono); font-size: 1rem; font-variant-numeric: tabular-nums; }
+.sets input:focus { border-color: var(--g, var(--accent)); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--g, var(--accent)) 25%, transparent); }
+.qfill { display: flex; flex-wrap: wrap; gap: 6px; }
+.qfill .chip { font-size: .78rem; min-height: 32px; padding: 4px 12px; }
+.addset { border: 1px dashed var(--line); background: none; border-radius: 10px; width: 44px; height: 44px; color: var(--muted); font-size: 1.2rem; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { border: 1px solid var(--ink); background: var(--ink); color: var(--bg); border-radius: 10px; padding: 0 16px; min-height: 44px; font-weight: 700; font-size: .92rem; }
+.btn.alt { background: none; color: var(--ink); border-color: var(--line); }
+.btn.go { background: var(--g); border-color: var(--g); color: #fff; }
+.btn.good { background: var(--good); border-color: var(--good); color: #fff; }
+.note { font-size: .82rem; color: var(--muted); margin: 0; }
+.note.ok { color: var(--good); font-weight: 600; }
+
+/* Today */
+.timer { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; background: var(--hero); color: var(--hero-ink); border-radius: 16px; padding: 12px 16px; margin-bottom: 14px;
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + 8px); z-index: 10; box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+.timer .face { display: flex; align-items: center; gap: 12px; }
+.timer .tring { width: 46px; height: 46px; }
+.timer .clock { font-family: var(--mono); font-size: 1.8rem; font-variant-numeric: tabular-nums; min-width: 4.5ch; line-height: 1; }
+.timer .lbl { font-size: .66rem; text-transform: uppercase; letter-spacing: .1em; opacity: .7; }
+.timer .row button { background: none; border: 1px solid rgba(255,255,255,.35); color: inherit; border-radius: 8px; padding: 0 10px; min-height: 36px; font-size: .82rem; }
+.timer .row button.on { background: var(--hero-ink); color: var(--hero); border-color: var(--hero-ink); }
+.today-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: grid; gap: 12px; align-content: start; min-width: 0; position: relative; overflow: hidden; }
+.card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--g); }
+.card-h { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.card-h .fig { width: 52px; height: 52px; border-radius: 12px; background: color-mix(in srgb, var(--g) 14%, transparent); padding: 5px; }
+.card h3 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 1.35rem; text-transform: uppercase; line-height: 1.05; }
+.card .sub { font-size: .78rem; color: var(--muted); }
+.linkbtn { background: none; border: 1px solid var(--line); border-radius: 8px; padding: 0 10px; min-height: 34px; color: var(--g); font-size: .8rem; font-weight: 700; }
+.donecard { display: grid; place-items: center; text-align: center; gap: 6px; min-height: 140px; }
+
+/* Log */
+.log { display: grid; gap: 18px; max-width: 780px; }
+.heat-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; overflow-x: auto; }
+.heat { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 13px); gap: 3px; width: max-content; }
+.heat i { width: 13px; height: 13px; border-radius: 3px; background: var(--line); opacity: .55; }
+.heat i.l1 { background: var(--legs); opacity: .35; } .heat i.l2 { background: var(--legs); opacity: .6; } .heat i.l3 { background: var(--legs); opacity: .85; } .heat i.l4 { background: var(--legs); opacity: 1; }
+.heat i.today { outline: 2px solid var(--ink); outline-offset: 1px; }
+.heat-foot { display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; font-size: .76rem; color: var(--muted); flex-wrap: wrap; }
+.day h3 { font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 0 0 6px; font-weight: 700; }
+.logbtns { display: flex; gap: 2px; }
+.vals.tapedit { border: 0; background: none; padding: 6px 8px; margin: -6px -8px; border-radius: 8px; color: inherit; font: inherit; font-family: var(--mono); font-size: .84rem; cursor: text; }
+.vals.tapedit.hit { color: var(--good); }
+.vals.tapedit:hover { background: var(--bg); }
+.vals.edit { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+.vals.edit input { width: 52px; height: 36px; padding: 0 6px; border: 1px solid var(--line); border-radius: 8px; background: var(--raised); font-family: var(--mono); }
+.entry { display: grid; grid-template-columns: 6px minmax(0, 1fr) auto auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.entry .bar { width: 6px; align-self: stretch; border-radius: 3px; background: var(--g); }
+.entry .what b { display: block; line-height: 1.25; }
+.entry .what span { font-size: .78rem; color: var(--muted); }
+.entry .vals { font-family: var(--mono); font-size: .84rem; font-variant-numeric: tabular-nums; text-align: right; }
+.entry .hit { color: var(--good); }
+.x { background: none; border: 0; color: var(--muted); font-size: .78rem; padding: 0 8px; min-height: 36px; border-radius: 6px; }
+.x.arm { color: #fff; background: var(--danger); }
+.empty { padding: 28px; border: 1px dashed var(--line); border-radius: 14px; color: var(--muted); text-align: center; }
+.backup { display: grid; gap: 10px; margin-top: 18px; padding: 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
+.backup-h { display: grid; gap: 2px; }
+.backup-in { display: grid; gap: 8px; }
+.backup-text { width: 100%; min-height: 84px; resize: vertical; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--raised); font-family: var(--mono); font-size: .72rem; word-break: break-all; }
+.note.bad { color: var(--danger); font-weight: 600; }
+.danger { margin-top: 12px; padding-top: 16px; border-top: 1px solid var(--line); }
+
+/* Mastery celebration */
+.party { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; pointer-events: none; padding: 24px; }
+.party-card { background: var(--hero); color: var(--hero-ink); border-radius: 22px; padding: 22px 26px; text-align: center; display: grid; gap: 6px; justify-items: center;
+  animation: pop .5s cubic-bezier(.2,1.4,.4,1); box-shadow: 0 20px 60px rgba(0,0,0,.35); max-width: 320px; }
+.party-card .fig { width: 92px; height: 92px; }
+.party-card .k { font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; opacity: .75; }
+.party-card b { font-family: var(--display); font-weight: 900; font-size: 2rem; line-height: .95; text-transform: uppercase; }
+.party-card .xp { font-family: var(--mono); color: var(--balance); font-weight: 500; }
+.party i { position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; border-radius: 2px; animation: burst 1.1s ease-out forwards; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } }
+@keyframes burst { to { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; } }
+.party.out { animation: fade .3s reverse forwards; }
+
+/* Skill tree map */
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: none; padding: 0 14px; min-height: 34px; font-size: .82rem; font-weight: 600; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.tree-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 18px; min-width: 0; -webkit-overflow-scrolling: touch;
+  background: radial-gradient(circle, color-mix(in srgb, var(--muted) 28%, transparent) 1px, transparent 1.6px) 0 0 / 20px 20px, var(--surface); }
+.tree-scroll { touch-action: pan-x pan-y; position: relative; overflow: auto; height: min(74vh, 780px); overscroll-behavior: contain; cursor: grab; }
+.tree-scroll.dragging { cursor: grabbing; user-select: none; }
+.tree-scroll.dragging .tn { pointer-events: none; }
+.tree-sizer { position: relative; margin: 0 auto; }
+.tree { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.zoombar { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.zoombar button { min-width: 38px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-size: 1.1rem; font-weight: 600; line-height: 1; }
+.zoombar button.zt { font-size: .8rem; padding: 0 12px; }
+.zoombar #zoom-pct { font-family: var(--mono); font-size: .8rem; min-width: 4ch; text-align: center; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tree .edges { position: absolute; inset: 0; overflow: visible; }
+.edges path, .edges line { fill: none; stroke: var(--line); stroke-width: 3; stroke-dasharray: 2 7; stroke-linecap: round; }
+.edges .on { stroke: var(--g); stroke-width: 5; stroke-dasharray: none; filter: drop-shadow(0 0 4px color-mix(in srgb, var(--g) 55%, transparent)); }
+.edges .spark { fill: var(--g); stroke: none; }
+.edges .dim, .tree .dim { opacity: .18; }
+.tgroup { position: absolute; top: 12px; text-align: center; font-size: .66rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--g);
+  padding-bottom: 5px; border-bottom: 2px solid var(--g); }
+.thub { position: absolute; width: 74px; height: 74px; border-radius: 50%; transform: translate(-50%, -50%); display: grid; place-content: center; text-align: center;
+  background: var(--hero); color: var(--hero-ink); box-shadow: 0 0 0 5px var(--surface), 0 0 0 7px var(--balance), 0 8px 24px rgba(0,0,0,.25); }
+.thub b { font-family: var(--display); font-weight: 900; font-size: 1.15rem; text-transform: uppercase; line-height: 1; }
+.thub span { font-size: .58rem; letter-spacing: .08em; text-transform: uppercase; opacity: .8; margin-top: 2px; }
+.tlabel { position: absolute; transform: translateX(-50%); text-align: center; font-family: var(--display); font-weight: 800; font-size: .98rem; line-height: 1;
+  text-transform: uppercase; color: var(--g); white-space: nowrap; background: var(--surface); padding: 3px 8px; border-radius: 8px; }
+.tlabel span { display: block; font-family: var(--mono); font-weight: 500; font-size: .66rem; color: var(--muted); margin-top: 3px; }
+.tn { position: absolute; width: 84px; transform: translate(-50%, -24px); display: grid; justify-items: center; gap: 5px; background: none; border: 0; padding: 0; z-index: 1; }
+.tdot { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; font-family: var(--mono); font-size: .86rem; font-weight: 600;
+  background: var(--raised); color: var(--muted); border: 2px solid var(--line); transition: transform .15s; position: relative; }
+.tnm { font-size: .68rem; line-height: 1.2; text-align: center; color: var(--muted); max-width: 84px; background: var(--surface); border-radius: 4px; padding: 0 2px; }
+.tn:hover .tdot { transform: scale(1.08); }
+.tn.done .tdot { background: var(--g); border-color: var(--g); color: #fff; box-shadow: 0 0 12px color-mix(in srgb, var(--g) 45%, transparent); }
+.tn.done .tnm { color: var(--ink); }
+.tn.cur .tdot { border: 3px solid var(--g); color: var(--g); animation: pulse 2.2s infinite; }
+.tn.cur .tnm { color: var(--ink); font-weight: 700; }
+.tn.locked .tdot { border-style: dashed; }
+.tn.final .tdot { width: 56px; height: 56px; border-radius: 16px; transform: rotate(45deg); }
+.tn.final .tdot > span { transform: rotate(-45deg); }
+.tn.final { transform: translate(-50%, -28px); }
+.tn.final:hover .tdot { transform: rotate(45deg) scale(1.08); }
+.tn.final.todo .tdot { color: var(--g); border-color: color-mix(in srgb, var(--g) 55%, var(--line)); }
+.tn.final .tnm { font-weight: 700; color: var(--ink); }
+.tn.ready .tdot::after { content: "★"; position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: var(--good); color: #fff;
+  font-size: 11px; display: grid; place-items: center; font-family: var(--body); }
+.tn.final.ready .tdot::after { transform: rotate(-45deg); }
+.tn.sel .tdot { outline: 2px solid var(--ink); outline-offset: 4px; }
+.tree .tn.dim { pointer-events: none; }
+.tree-tip { margin-top: 8px; }
+.edges .band { fill: transparent; stroke: none; }
+.edges .band.alt { fill: color-mix(in srgb, var(--muted) 7%, transparent); }
+.edges .tierline { stroke: color-mix(in srgb, var(--muted) 45%, transparent); stroke-width: 1.5; stroke-dasharray: 6 6; }
+.tlv { position: absolute; left: 8px; transform: translateY(-50%); width: 58px; display: grid; gap: 2px; }
+.tlv b { font-size: .6rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); line-height: 1.1; }
+.tlv span { font-family: var(--mono); font-size: .66rem; color: var(--muted); }
+.status.lvl { background: var(--bg); color: var(--ink); }
+.eta { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; padding: 12px 14px; border-radius: 12px;
+  background: color-mix(in srgb, var(--g) 10%, var(--surface)); border: 1px solid color-mix(in srgb, var(--g) 25%, var(--line)); }
+.eta svg { color: var(--g); margin-top: 2px; }
+.eta b { display: block; font-size: .95rem; }
+.eta span { display: block; font-size: .78rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.eta-mini { display: flex; align-items: center; gap: 6px; }
+.eta-mini svg { color: var(--g); flex: none; width: 14px; height: 14px; }
+.tree-tip-desk { margin-top: 8px; display: none; }
+@media (hover: hover) and (pointer: fine) { .tree-tip { display: none; } .tree-tip-desk { display: block; } }
+
+/* Training plan */
+#routine { flex-wrap: wrap; }
+.plan-banner { flex-basis: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; margin-bottom: 4px;
+  border-radius: 12px; background: var(--surface); border: 1px solid var(--line); font-size: .86rem; }
+.plan-banner .linkbtn { color: var(--accent); white-space: nowrap; }
+.plan-setup { display: grid; gap: 22px; max-width: 900px; }
+.ps-step { display: grid; gap: 10px; }
+.ps-step .h4 { font-size: .8rem; color: var(--ink); }
+.goal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 132px), 1fr)); gap: 8px; }
+.goal { position: relative; display: grid; justify-items: center; gap: 4px; padding: 12px 8px 10px; text-align: center; border-radius: 14px;
+  background: var(--surface); border: 2px solid var(--line); transition: border-color .15s, transform .15s; }
+.goal:hover { transform: translateY(-2px); }
+.goal .fig { width: 54px; height: 54px; }
+.goal b { font-size: .84rem; line-height: 1.2; }
+.goal span { font-size: .7rem; color: var(--muted); }
+.goal.on { border-color: var(--g); background: color-mix(in srgb, var(--g) 12%, var(--surface)); }
+.goal-n { position: absolute; top: 6px; left: 6px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--g); color: #fff !important; font-size: .74rem !important; font-weight: 700; }
+.daypick { display: flex; gap: 6px; flex-wrap: wrap; }
+.daypick button { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); font-weight: 700; color: var(--muted); }
+.daypick button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.plan-view { display: grid; gap: 16px; max-width: 760px; }
+.goal-cards { display: grid; gap: 10px; }
+.goal-card { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; align-items: center; padding: 14px; border-radius: 16px;
+  background: color-mix(in srgb, var(--g) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--g) 35%, var(--line)); }
+.goal-card .fig { width: 64px; height: 64px; }
+.gc-body { display: grid; gap: 6px; min-width: 0; }
+.gc-body h3 { margin: 0; font-family: var(--display); font-weight: 900; font-size: 1.6rem; line-height: 1; text-transform: uppercase; }
+.gc-body .note svg { vertical-align: -3px; color: var(--g); }
+.week { display: grid; gap: 8px; }
+.week-h, .session-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.session-h h3 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 1.3rem; text-transform: uppercase; }
+.wstrip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.wd { display: grid; justify-items: center; gap: 2px; padding: 8px 0; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
+.wd span { font-weight: 700; font-size: .85rem; }
+.wd i { font-style: normal; font-family: var(--mono); font-size: .7rem; }
+.wd.on { color: var(--ink); background: var(--raised); }
+.wd.on i::after { content: " ex"; }
+.wd.today { box-shadow: inset 0 0 0 2px var(--balance); }
+.wd.sel { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.wd:disabled { opacity: .5; cursor: default; }
+.session { display: grid; gap: 10px; padding: 14px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+.warm { padding: 8px 10px; border-radius: 10px; background: var(--bg); }
+.prows { display: grid; gap: 8px; }
+.prow { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 8px 10px; border-radius: 12px; background: var(--raised);
+  border-left: 4px solid var(--g); }
+.prow .fig { width: 46px; height: 46px; }
+.prow-body { display: grid; gap: 2px; min-width: 0; }
+.prow-body b { font-size: .95rem; }
+.prow .btn.start { min-height: 40px; width: 44px; justify-content: center; padding: 0; }
+.pwhy { justify-self: start; font-size: .64rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; background: var(--bg); color: var(--muted); }
+.pwhy.k-goal { background: var(--g); color: #fff; }
+.pwhy.k-unlock { background: color-mix(in srgb, var(--g) 25%, var(--bg)); color: var(--ink); }
+.pwhy.k-support { color: var(--g); }
+
+/* Mastery check */
+.mastery { border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; background: var(--raised); }
+.m-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.m-pill { font-size: .72rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: var(--bg); color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.m-pill.ready { background: var(--good); color: #fff; }
+.m-pill.done { background: var(--good-soft); color: var(--good); }
+.m-req { margin: 0; font-size: .95rem; line-height: 1.4; }
+.m-req b { color: var(--g); }
+.m-bars { display: grid; gap: 6px; }
+.m-bar { position: relative; height: 30px; border-radius: 8px; background: var(--bg); overflow: hidden; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: .78rem; }
+.m-bar i { position: absolute; inset: 0 auto 0 0; background: color-mix(in srgb, var(--g) 30%, transparent); border-radius: 8px; transition: width .5s; }
+.m-bar.hit i { background: color-mix(in srgb, var(--good) 35%, transparent); }
+.m-bar span, .m-bar b { position: relative; }
+.m-bar span { color: var(--muted); }
+.m-bar b { font-family: var(--mono); font-weight: 500; font-variant-numeric: tabular-nums; }
+.m-bar.hit b::after { content: " ✓"; color: var(--good); }
+.m-mini { display: grid; gap: 6px; padding: 10px 12px; border-radius: 12px; background: var(--bg); }
+.m-mini-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: .82rem; }
+.m-mini-top span b { font-weight: 600; }
+.m-mini-top span b b { color: var(--g); }
+.m-pct { font-family: var(--mono); font-size: .82rem; white-space: nowrap; }
+.m-mini.ready .m-pct { color: var(--good); }
+.m-track { height: 6px; border-radius: 6px; background: var(--line); overflow: hidden; }
+.m-track i { display: block; height: 100%; background: var(--g); border-radius: 6px; transition: width .5s; }
+.m-mini.ready .m-track i { background: var(--good); }
+li.ready .dot { position: relative; }
+li.ready .dot::after { content: "★"; position: absolute; top: -7px; right: -7px; width: 18px; height: 18px; border-radius: 50%; background: var(--good); color: #fff;
+  font-size: 10px; display: grid; place-items: center; font-family: var(--body); }
+
+/* Guided exercise mode: one deliberately dark, full-screen look tinted by the muscle group */
+.focus { position: fixed; inset: 0; z-index: 90; color: #F2F5F3; color-scheme: dark;
+  background: radial-gradient(130% 75% at 50% 0%, color-mix(in srgb, var(--g) 60%, #0B1216), #0B1216 72%);
+  display: grid; grid-template-rows: auto 1fr; align-content: start; gap: 10px; overflow-y: auto;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) max(18px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 16px) max(18px, env(safe-area-inset-left, 0px)); }
+.focus.enter { animation: fade .25s; }
+.f-inner { width: 100%; max-width: 520px; margin: 0 auto; display: grid; gap: 14px; justify-items: center; align-content: center; text-align: center; }
+.f-top { width: 100%; max-width: 520px; margin: 0 auto; display: flex; align-items: center; gap: 8px; position: relative; }
+.f-x { width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.12); color: inherit; font-size: 1.05rem; flex: none; }
+.f-x.arm { background: #C0392B; width: auto; padding: 0 14px; border-radius: 22px; font-size: .82rem; font-weight: 700; }
+.f-eyebrow { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .7rem; text-transform: uppercase; letter-spacing: .12em; opacity: .75; text-align: left; line-height: 1.3; }
+.f-cuebtn { margin-left: auto; flex: none; border: 1px solid rgba(255,255,255,.35); background: none; color: inherit; border-radius: 99px; padding: 0 12px; min-height: 34px; font-size: .78rem; font-weight: 700; }
+.f-cuebtn[aria-expanded="true"] { background: #F2F5F3; color: #0B1216; border-color: #F2F5F3; }
+.f-cuebox { position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 2; background: rgba(11,18,22,.97); border: 1px solid rgba(255,255,255,.18); border-radius: 14px; padding: 12px 14px; box-shadow: 0 12px 30px rgba(0,0,0,.4); text-align: left; }
+.f-cuebox p { margin: 0 0 6px; font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; opacity: .75; font-weight: 600; }
+.f-cuebox ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: .92rem; line-height: 1.35; }
+.f-setlbl { flex: none; font-family: var(--mono); font-size: .85rem; background: rgba(255,255,255,.12); padding: 6px 12px; border-radius: 99px; white-space: nowrap; }
+.f-name { font-family: var(--display); font-weight: 900; font-size: clamp(2.2rem, 10vw, 3.4rem); line-height: .9; text-transform: uppercase; margin: 0; text-wrap: balance; }
+.f-fig { --g: #F2F5F3; --muted: #F2F5F3; width: min(44vw, 190px); height: min(44vw, 190px); }
+.f-fig.still { animation: breathe 3.2s ease-in-out infinite; }
+@keyframes breathe { 50% { transform: scale(1.04); } }
+.f-ring { position: relative; width: min(66vw, 270px); aspect-ratio: 1; max-width: 100%; display: grid; place-items: center; border: 0; background: none; color: inherit; padding: 0; border-radius: 50%; }
+.f-ring > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.f-num { position: relative; display: grid; justify-items: center; line-height: 1; }
+.f-num b { font-family: var(--display); font-weight: 900; font-size: clamp(4.6rem, 24vw, 7.4rem); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.f-num span { font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; opacity: .75; margin-top: 4px; }
+.f-hint { font-size: .82rem; opacity: .7; margin: 0; }
+.f-tapzone { width: 100%; border: 0; background: rgba(255,255,255,.04); color: inherit; border-radius: 24px; padding: 14px 10px 12px; display: grid; justify-items: center; gap: 10px;
+  touch-action: manipulation; -webkit-user-select: none; user-select: none; transition: background .08s; }
+.f-tapzone:active { background: rgba(255,255,255,.12); }
+.f-tapzone .f-hint { display: block; }
+.f-main:disabled { opacity: .5; }
+.f-quick { display: grid; gap: 8px; justify-items: center; width: 100%; }
+.f-quick > span { font-size: .75rem; opacity: .7; text-transform: uppercase; letter-spacing: .08em; }
+.f-quick .f-chips button { min-width: 44px; min-height: 44px; font-size: .95rem; font-weight: 700; font-family: var(--mono); }
+.f-sets { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.f-sets i { font-style: normal; min-width: 44px; height: 32px; padding: 0 10px; border-radius: 99px; display: grid; place-items: center; font-family: var(--mono); font-size: .85rem;
+  border: 2px solid rgba(255,255,255,.25); color: rgba(255,255,255,.55); }
+.f-sets button { font: inherit; min-width: 44px; height: 32px; padding: 0 10px; border-radius: 99px; display: grid; place-items: center; font-family: var(--mono); font-size: .85rem;
+  background: #F2F5F3; border: 2px solid #F2F5F3; color: #0B1216; font-weight: 600; }
+.f-sets button.hit::after { content: " ✓"; }
+.f-scrim { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 3; }
+.f-scrim.leaving { animation: fade .18s reverse forwards; }
+.f-sheet.leaving { animation: sheet-out .18s ease-in forwards; }
+@keyframes sheet-out { to { transform: translate(-50%, 115%); opacity: 0; } }
+.f-sheet { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 16px + var(--host-badge, 0px)); z-index: 4;
+  width: min(440px, calc(100vw - 24px)); background: #121C21; border: 1px solid rgba(255,255,255,.15); border-radius: 22px; padding: 18px; display: grid; gap: 12px;
+  text-align: center; box-shadow: 0 -10px 40px rgba(0,0,0,.45); }
+.f-sheet h3 { margin: 0; font-family: var(--display); font-weight: 900; font-size: 1.7rem; text-transform: uppercase; line-height: 1; }
+.sh-k { margin: 0; font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; opacity: .7; }
+.sh-num { display: flex; align-items: center; justify-content: center; gap: 22px; }
+.sh-num b { font-family: var(--display); font-weight: 900; font-size: 4rem; line-height: 1; font-variant-numeric: tabular-nums; min-width: 2.5ch; display: grid; }
+.sh-num small { font-family: var(--body); font-size: .75rem; font-weight: 600; opacity: .7; }
+.sh-note { margin: 0; font-size: .85rem; opacity: .8; }
+.sh-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.sh-del { border: 0; background: none; color: #FF8A80; font-weight: 700; min-height: 40px; }
+.f-sets i.d { background: #F2F5F3; border-color: #F2F5F3; color: #0B1216; font-weight: 600; }
+.f-sets i.d.hit::after { content: " ✓"; }
+.f-sets i.c { border-color: #F2F5F3; color: #F2F5F3; }
+.f-ctrl { display: flex; align-items: center; justify-content: center; gap: 14px; width: 100%; flex-wrap: wrap; }
+.f-round { width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); background: none; color: inherit; font-size: 1.6rem; line-height: 1; flex: none; }
+.f-main { flex: 1; min-width: 160px; max-width: 320px; min-height: 60px; border-radius: 30px; border: 0; background: #F2F5F3; color: #0B1216; font-weight: 700; font-size: 1.05rem; }
+.f-main.go { background: var(--g); color: #fff; }
+.f-alt { min-height: 48px; border-radius: 24px; border: 1px solid rgba(255,255,255,.35); background: none; color: inherit; padding: 0 18px; font-weight: 600; }
+.f-chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.f-chips button { min-height: 38px; padding: 0 14px; border-radius: 19px; border: 1px solid rgba(255,255,255,.3); background: none; color: inherit; font-size: .85rem; }
+.f-chips button.on { background: #F2F5F3; color: #0B1216; border-color: #F2F5F3; }
+.f-cues { width: 100%; max-width: 520px; margin: 0 auto; background: rgba(255,255,255,.08); border-radius: 14px; padding: 10px 14px; text-align: left; }
+.f-cues summary { cursor: pointer; font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; opacity: .85; font-weight: 600; list-style: none; }
+.f-cues summary::-webkit-details-marker { display: none; }
+.f-cues ol { margin: 8px 0 2px; padding-left: 20px; display: grid; gap: 4px; font-size: .9rem; }
+.f-msg { font-weight: 600; margin: 0; }
+.f-msg.ok { color: #7BE0A4; }
+.f-pill { position: fixed; left: 50%; transform: translateX(-50%); z-index: 85; width: min(440px, calc(100vw - 24px));
+  bottom: calc(var(--navh) + 14px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; align-items: center;
+  padding: 8px 8px 8px 10px; border: 0; border-radius: 16px; text-align: left; color: #F2F5F3;
+  background: color-mix(in srgb, var(--g) 35%, #0B1216); box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.12); animation: up .25s ease-out; }
+.f-pill .fig { --g: #F2F5F3; --muted: #F2F5F3; width: 40px; height: 40px; }
+.f-pill-text { display: grid; min-width: 0; }
+.f-pill-text b { font-family: var(--display); font-weight: 800; font-size: 1.05rem; text-transform: uppercase; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.f-pill-status { font-size: .76rem; opacity: .85; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.f-pill-go { background: #F2F5F3; color: #0B1216; font-weight: 700; font-size: .82rem; padding: 0 14px; min-height: 38px; display: grid; place-items: center; border-radius: 12px; }
+@media (min-width: 760px) { .f-pill { bottom: 20px; } }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); top: calc(env(safe-area-inset-top, 0px) + 14px); z-index: 99; background: var(--hero); color: var(--hero-ink);
+  padding: 10px 16px; border-radius: 12px; font-size: .88rem; box-shadow: 0 10px 30px rgba(0,0,0,.3); max-width: calc(100vw - 32px); animation: fade .2s; }
+.btn.start { display: inline-flex; align-items: center; gap: 8px; }
+.btn.start svg { width: 14px; height: 14px; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-top">
+      <h1>Skill<br>Ladder</h1>
+      <div class="sync" id="sync">Saved on this device</div>
+    </div>
+    <div class="rank" id="rank"></div>
+    <div class="hstats" id="stats"></div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-tree" data-view="tree"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 20V9M12 20V4M19 20v-7"/><circle cx="5" cy="7" r="2"/><circle cx="12" cy="3" r="1.2"/><circle cx="19" cy="11" r="2"/></svg>Skills</button>
+    <button class="tab" role="tab" id="tab-today" data-view="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 10v4M6 7v10M18 7v10M21 10v4M6 12h12"/></svg>Workout</button>
+    <button class="tab" role="tab" id="tab-plan" data-view="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 12l7-7M16 5h3v3"/></svg>Plan</button>
+    <button class="tab" role="tab" id="tab-log" data-view="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Log</button>
+  </nav>
+
+  <section id="view-tree">
+    <div class="section-h"><h2>Your ladders</h2><span>Tap a ring to jump to your current step</span></div>
+    <div class="rings" id="rings"></div>
+    <div class="section-h"><h2>Progressions</h2><span id="tree-hint"></span></div>
+    <div class="chips" id="filters"></div>
+    <div class="layout">
+      <div class="lanes" id="lanes"></div>
+      <div id="panel-host"></div>
+    </div>
+  </section>
+
+  <section id="view-today" hidden>
+    <div class="section-h"><h2>Today's workout</h2><span id="today-hint"></span></div>
+    <div class="timer" id="timer"></div>
+    <div class="chips" id="routine"></div>
+    <div class="today-grid" id="today"></div>
+  </section>
+
+  <section id="view-plan" hidden>
+    <div class="section-h"><h2>Training plan</h2><span>Built around the skill you want most</span></div>
+    <div id="plan"></div>
+  </section>
+
+  <section id="view-log" hidden>
+    <div class="section-h"><h2>Training log</h2><span>Last 16 weeks</span></div>
+    <div class="log" id="log"></div>
+  </section>
+</div>
+<div id="focus-host"></div>
+<div id="party-host"></div>
+
+<script>
+// ---- Progressions: [name, sets, target, unit, cues] — unit r=reps, rs=reps/side, s=seconds, ss=seconds/side
+const TRACKS = [
+ { id:"push", name:"Push-up", group:"Push", steps:[
+  ["Wall push-up",3,20,"r","Hands on the wall at shoulder height|Body in one line from heels to head|Touch chest to the wall, press all the way back"],
+  ["Incline push-up",3,15,"r","Hands on a bench or table near hip height|Elbows about 45° from the body|Use a lower surface as it gets easy"],
+  ["Knee push-up",3,15,"r","Knees down, hips in line with shoulders|Chest touches the floor every rep|Squeeze glutes so the hips don't sag"],
+  ["Push-up",3,15,"r","Hands just outside the shoulders|Lead with the chest, not the chin|Push the floor away at the top"],
+  ["Diamond push-up",3,12,"r","Thumbs and index fingers form a diamond under the sternum|Elbows stay close to the ribs|Builds triceps for dips and handstands"],
+  ["Archer push-up",3,8,"rs","Wide hands; shift onto one arm while the other straightens|Keep the straight arm as light as you can|Alternate sides or finish one side first"],
+  ["Pseudo planche push-up",3,10,"r","Fingers turned out, hands beside the waist|Lean the shoulders past the hands|Keep the upper back rounded the whole set"],
+  ["One-arm push-up",3,5,"rs","Feet wide, free hand behind the back|Hips stay square to the floor|Bridge the gap with an incline version"]]},
+ { id:"pull", name:"Pull-up", group:"Pull", steps:[
+  ["Dead hang",3,30,"s","Full grip with thumbs around the bar|Let the shoulders relax up to the ears|Builds grip and shoulder tolerance"],
+  ["Scapular pull",3,10,"r","From a dead hang, pull shoulders down without bending elbows|Hold the top for a second|This is the first inch of every pull-up"],
+  ["Australian row",3,15,"r","Bar at waist height, body straight underneath|Pull the chest to the bar, elbows back|Walk the feet forward to make it harder"],
+  ["Negative pull-up",3,5,"r","Jump or step to chin over bar|Lower over a slow count of five|Control it all the way to a dead hang"],
+  ["Pull-up",3,8,"r","Start each rep from a dead hang|Pull until the chin clears the bar|No kicking; legs together"],
+  ["Chest-to-bar pull-up",3,6,"r","Pull until the chest touches the bar|Drive elbows down toward the hips|Key strength for the muscle-up"],
+  ["Archer pull-up",3,5,"rs","Wide grip; pull toward one hand|The other arm stays straight and assists|Lower under control"],
+  ["One-arm negative",3,3,"rs","Pull up with both arms|Let go with one and lower over five seconds|Rest well between reps"],
+  ["One-arm pull-up",1,1,"rs","Free hand on your chest or behind the back|Start from an active hang, not a dead hang|Expect this to take years, not months"]]},
+ { id:"mu", name:"Muscle-up", group:"Pull", prereq:["pull",4], steps:[
+  ["Support hold",3,30,"s","Arms locked on parallel bars or sturdy chairs|Push shoulders down away from the ears|Body still, legs together"],
+  ["Negative dip",3,6,"r","Start at the top and lower over four seconds|Go until shoulders pass just below elbows|Step back up and repeat"],
+  ["Parallel bar dip",3,10,"r","Lean slightly forward|Shoulders just below elbows at the bottom|Lock out fully at the top"],
+  ["Straight bar dip",3,8,"r","Bar in front of the hips, chest leaning over it|Elbows travel back as you lower|This is the top half of a muscle-up"],
+  ["Explosive pull-up",3,5,"r","Pull as fast as you can, aiming for the lower chest|Try to let go of the bar for a moment at the top|Speed matters more than height at first"],
+  ["Band-assisted muscle-up",3,3,"r","Band over the bar, under the knees|Pull high and close, then lean over the bar fast|Use a false grip on rings"],
+  ["Muscle-up",3,3,"r","Pull explosively and slightly away from the bar|Snap the chest over as the bar passes the sternum|Finish with a straight bar dip"]]},
+ { id:"hs", name:"Handstand", group:"Balance", steps:[
+  ["Plank hold",3,45,"s","Shoulders over wrists, body straight|Squeeze glutes and quads|Push the floor away"],
+  ["Pike hold on box",3,30,"s","Feet on a box, hips stacked over hands|Push tall through the shoulders|Look between the hands"],
+  ["Chest-to-wall handstand",3,30,"s","Walk feet up the wall, belly facing it|Hands 10 to 20 cm from the wall|Legs squeezed, toes pointed, ribs tucked"],
+  ["Wall shoulder taps",3,10,"rs","Chest-to-wall handstand|Shift weight and tap the opposite shoulder|Keep the hips still"],
+  ["Crow pose",3,20,"s","Knees on the backs of the upper arms|Lean forward until the feet lift|Teaches balance through the fingers"],
+  ["Kick-up practice",5,10,"s","Learn to cartwheel out safely first|Kick up into free space and hold|Fingertips fix overbalance, heels of hands fix underbalance"],
+  ["Freestanding handstand",3,30,"s","Stack wrists, shoulders, hips and ankles|Open the shoulders fully|Small finger corrections, not big arm movements"],
+  ["One-minute handstand",1,60,"s","Breathe steadily through the hold|Stay tight from shoulders to toes|Film yourself to check the line"]]},
+ { id:"hspu", name:"Handstand push-up", group:"Push", prereq:["hs",2], steps:[
+  ["Pike push-up",3,10,"r","Hips high, head moves forward of the hands|Lower the crown toward the floor|Elbows at about 45°"],
+  ["Elevated pike push-up",3,8,"r","Feet on a box so the torso is near vertical|Hands and head form a triangle at the bottom|Press back to the start position"],
+  ["Wall HSPU negative",3,5,"r","Kick up to the wall|Lower to the head over four seconds|Come down and kick up again"],
+  ["Wall handstand push-up",3,5,"r","Head and hands form a tripod at the bottom|Press up and slightly back to vertical|Keep the core tight so the back doesn't arch"],
+  ["Deficit wall HSPU",3,5,"r","Hands on parallettes or plates|Lower the head below hand level|Full range of motion builds the freestanding version"],
+  ["Freestanding HSPU",3,3,"r","Hold a solid freestanding handstand first|Lower slowly, keeping the hips over the hands|Press straight back up"]]},
+ { id:"lsit", name:"L-sit", group:"Core", steps:[
+  ["Hollow body hold",3,30,"s","Lower back pressed into the floor|Arms overhead, legs low but off the floor|Bend the knees if the back lifts"],
+  ["Foot-supported L-sit",3,20,"s","Hands on parallettes, heels on the floor|Push shoulders down to lift the hips|Straight arms throughout"],
+  ["Tuck L-sit",3,15,"s","Lift both feet, knees pulled to chest|Hips stay between the hands|Push down hard through the palms"],
+  ["One-leg L-sit",3,10,"ss","One leg straight, one tucked|Switch legs between sets|Point the toes of the straight leg"],
+  ["L-sit",3,15,"s","Legs straight and level with the floor|Lock the knees, point the toes|Depress the shoulders hard"],
+  ["Straddle L-sit",3,10,"s","Legs straight and wide|Lean back slightly to lift the legs higher|Builds compression for the V-sit"],
+  ["V-sit",3,5,"s","Push the hips forward past the hands|Legs rise toward vertical|Needs strong hamstring flexibility"]]},
+ { id:"fl", name:"Front lever", group:"Pull", prereq:["pull",4], steps:[
+  ["Hanging leg raise",3,10,"r","Straight legs up to hip height or higher|No swinging between reps|Pull down on the bar to stay stable"],
+  ["Tuck front lever",3,15,"s","Pull straight arms down until the back is level|Knees tucked to the chest|Hips level with the shoulders"],
+  ["Advanced tuck front lever",3,12,"s","Flat back, thighs at 90° to the torso|Shoulders depressed|Hold before moving on"],
+  ["One-leg front lever",3,8,"ss","One leg straight, one in advanced tuck|Hips stay level|Switch legs between sets"],
+  ["Straddle front lever",3,8,"s","Legs straight and wide|Body parallel to the floor|Point the toes"],
+  ["Full front lever",3,8,"s","Legs together, body parallel to the floor|Squeeze glutes, lock the arms|A milestone skill"]]},
+ { id:"bl", name:"Back lever", group:"Pull", prereq:["pull",2], steps:[
+  ["Skin the cat",3,5,"r","On rings or a bar, tuck and rotate the legs through the arms|Go only as far as the shoulders allow|Return slowly"],
+  ["German hang",3,20,"s","The bottom position of skin the cat|Relax into the shoulder stretch|Build time gradually"],
+  ["Tuck back lever",3,15,"s","Face down, knees tucked|Hips level with the shoulders|Arms locked straight"],
+  ["Advanced tuck back lever",3,12,"s","Flat back, hips open to 90°|Keep the arms straight|Look toward the floor"],
+  ["Straddle back lever",3,8,"s","Legs straight and wide|Body parallel to the floor|Squeeze glutes"],
+  ["Full back lever",3,8,"s","Legs together, body straight|Hold level with the floor|Keep the arms straight even when tired"]]},
+ { id:"pl", name:"Planche", group:"Push", prereq:["push",3], steps:[
+  ["Planche lean",3,30,"s","Push-up position, fingers turned out|Lean until the shoulders pass the hands|Arms locked, upper back rounded"],
+  ["Frog stand",3,30,"s","Knees resting on the elbows|Lean forward until the feet lift|Teaches forward balance"],
+  ["Tuck planche",3,12,"s","Knees off the arms, tucked to the chest|Arms straight, shoulders forward of the hands|Back rounded, hips high"],
+  ["Advanced tuck planche",3,10,"s","Flat back, hips level with the shoulders|Push the floor away|Lean further than feels natural"],
+  ["Straddle planche",3,8,"s","Legs straight and wide|Body parallel to the floor|Protract and depress the shoulders"],
+  ["Full planche",3,5,"s","Legs together, body straight and level|Arms locked|One of the hardest static skills"]]},
+ { id:"legs", name:"Pistol squat", group:"Legs", steps:[
+  ["Assisted squat",3,15,"r","Hold a door frame or rail for support|Hips below the knees at the bottom|Heels stay down"],
+  ["Bodyweight squat",3,20,"r","Feet shoulder width, toes slightly out|Knees track over the toes|Chest up, full depth"],
+  ["Split squat",3,12,"rs","Long stance, back knee lowers to the floor|Front knee over the ankle|Stay tall"],
+  ["Bulgarian split squat",3,10,"rs","Back foot raised on a bench|Lower until the front thigh is level|Push through the front heel"],
+  ["Cossack squat",3,8,"rs","Wide stance, sit into one leg|The other leg stays straight, toes up|Builds the mobility a pistol needs"],
+  ["Box pistol",3,6,"rs","Sit down to a low box on one leg|Free leg straight out front, arms forward|Use a lower box over time"],
+  ["Pistol squat",3,5,"rs","Full depth on one leg|Free leg stays off the floor|Counterbalance with the arms"],
+  ["Shrimp squat",3,5,"rs","Hold the free foot behind you|Lower until the back knee touches the floor|Stand without touching down"]]},
+ { id:"df", name:"Dragon flag", group:"Core", steps:[
+  ["Lying leg raise",3,12,"r","Lie flat with hands by your sides|Raise straight legs to vertical|Lower slowly without arching the lower back"],
+  ["Candlestick hold",3,20,"s","Shoulders on the floor, hips stacked above them|Legs straight up, squeezed together|Support the lower back with your hands at first"],
+  ["Tuck dragon flag",3,6,"r","Lie on a bench and grip it behind your head|Lift onto your shoulders with knees tucked|Lower the hips slowly with a flat back"],
+  ["Single-leg dragon flag",3,5,"r","One leg straight, the other tucked|Only the shoulders touch the bench|Switch legs between sets"],
+  ["Dragon flag negative",3,5,"r","Lift to vertical with the body straight|Lower over five seconds|Don't let the hips bend"],
+  ["Dragon flag",3,5,"r","Body rigid from shoulders to toes|Lower until just above the bench, then lift back up|No piking at the hips"]]},
+ { id:"flag", name:"Human flag", group:"Core", steps:[
+  ["Side plank",3,30,"ss","Straight arm under the shoulder|Body in one line, hips high|Reach the top arm to the sky"],
+  ["Vertical flag",3,10,"s","Top hand pulls, bottom hand pushes on a sturdy pole|Body points straight up, legs together|Lock the bottom arm completely"],
+  ["Tuck flag",3,8,"s","Lower from the vertical flag into a tuck|Knees to chest, hips level with the shoulders|Push hard through the bottom arm"],
+  ["Advanced tuck flag",3,8,"s","Back flat and level with the floor|Thighs at 90° to the torso|Squeeze the obliques on the top side"],
+  ["Straddle flag",3,5,"s","Legs straight and wide|Body parallel to the floor|Top arm pulls, bottom arm pushes"],
+  ["Human flag",3,5,"s","Body straight and parallel to the floor|Legs together, toes pointed|Both arms locked straight"]]},
+ { id:"nordic", name:"Nordic curl", group:"Legs", steps:[
+  ["Glute bridge",3,15,"r","Feet flat, knees bent, arms on the floor|Drive through the heels to lift the hips|Squeeze the glutes at the top"],
+  ["Single-leg glute bridge",3,10,"rs","One foot on the floor, the other leg straight|Keep the hips level as you lift|Pause at the top"],
+  ["Bridge walkout",3,8,"r","From a bridge, walk the heels out in small steps|Go as far as you can keep the hips up|Walk back in"],
+  ["Partial Nordic negative",3,5,"r","Kneel with your ankles anchored under something sturdy|Lean forward with a straight body as far as you can control|Push back up with your hands"],
+  ["Nordic negative",3,5,"r","Lower slowly all the way to the floor|Catch yourself with your hands|Keep the hips straight, don't bend at the waist"],
+  ["Nordic curl",3,3,"r","Lower under control, then pull yourself back up with the hamstrings|Hips stay straight the whole rep|Use a small push from the hands at first"]]}
+];
+
+// ---- Stick figures for every exercise.
+// A pose is a set of absolute segment angles in degrees (0 = right, 90 = down, -90 = up), pinned at one point:
+// an "w" = first wrist, "f" = first foot, "p" = hip, at that position. t = hip→shoulder, hd = shoulder→head,
+// a = [shoulder→elbow, elbow→wrist], l = [hip→knee, knee→foot]; a2 / l2 are the far limbs. Floor is y = 90.
+// Steps with two poses (A, B) animate between them to show the rep; one pose is a hold.
+const FLOOR = "floor";
+const LN = (x1, y1, x2, y2, w = 3) => ["l", x1, y1, x2, y2, w];
+const BAR = (y, x1 = 22, x2 = 78) => LN(x1, y, x2, y, 4);
+const WALL = x => LN(x, 4, x, 90, 3);
+const BOX = (x1, y1, x2, y2) => ["r", x1, y1, x2, y2];
+const PB = (y, x1, x2) => [LN(x1, y, x2, y, 4), LN(x1 + 4, y, x1 + 4, 90), LN(x2 - 4, y, x2 - 4, 90)];
+const M = (o, x) => ({ ...o, ...x });
+
+const PU_T = { an:"w", at:[30,90], t:204, a:[90,90], l:[24,24] };
+const PU_B = { an:"w", at:[30,90], t:186, a:[12,153], l:[6,6] };
+const HANG = { an:"w", at:[50,10], t:-90, hd:-62, a:[-96,-96], l:[94,92] };
+const PTOP = { an:"w", at:[50,10], t:-90, hd:-90, a:[-23,-175.7], l:[96,92] };
+const C2B  = { an:"w", at:[50,10], t:-100, hd:-95, a:[-10,-178], l:[80,100] };
+const SUP  = y => ({ an:"w", at:[50,y], t:-88, hd:-88, a:[90,90], l:[100,95] });
+const DIPT = y => ({ an:"w", at:[50,y], t:-80, hd:-80, a:[90,90], l:[100,140] });
+const DIPB = y => ({ an:"w", at:[50,y], t:-70, hd:-60, a:[189.4,42.6], l:[100,140] });
+const HS   = { an:"w", at:[50,90], t:90, hd:72, a:[93,93], l:[-90,-90] };
+const CROW = x => ({ an:"w", at:[x,90], t:155.6, hd:160, a:[55,75], l:[128,-10] });
+const LSIT = (l, l2) => ({ an:"w", at:[40,80], t:-90, hd:-90, a:[90,90], l, l2 });
+const FLV  = (l, l2) => ({ an:"w", at:[50,10], t:180, hd:180, a:[-60,-60], l, l2 });
+const BLV  = (l, l2) => ({ an:"w", at:[50,10], t:180, hd:168, a:[-45,-45], l, l2 });
+const STAND = { an:"f", at:[50,90], t:-90, hd:-90, a:[95,95], l:[90,90] };
+const SQB  = { an:"f", at:[50,90], t:-60, hd:-55, a:[0,0], l:[-11,128] };
+const WHS_T = { an:"w", at:[48,90], t:95, hd:90, a:[90,90], l:[-80,-80] };
+const WHS_B = { an:"w", at:[48,90], t:92, hd:90, a:[189.5,90], l:[-88,-88] };
+const PISTOL_A = { an:"f", at:[52,90], t:-90, hd:-90, a:[0,0], l:[90,90], l2:[20,20] };
+const GERMAN = { an:"w", at:[50,10], t:-55, hd:-40, a:[-100,-100], l:[110,110] };
+
+// dragon flag: shoulders pinned on a bench, hands gripping it behind the head
+const BENCH = BOX(8, 80, 92, 90);
+const DFA = (t, l, l2) => ({ an:"s", at:[30,79], t, hd:180, a:[-150,120], l, l2 });
+// human flag, seen from the front: top hand pulls, bottom hand pushes on a pole
+const POLE = LN(30, 4, 30, 90, 4);
+const FLAG = (l, l2, t = 180, hd = 180) => ({ an:"w", at:[30,36], t, hd, a:[-146,-146], a2:[146,146], l, l2 });
+// glute bridges lie on the floor; Nordics kneel with the ankles anchored and lean forward by `tilt` degrees
+const GB = (t, l, l2) => ({ an:"s", at:[24,88], t, hd:180, a:[0,0], l, l2 });
+const NK = (tilt, a) => ({ an:"f", at:[34,88], t:-90 + tilt, hd:-90 + tilt, a, l:[90 + tilt, 180] });
+const ANKLE = BOX(24, 80, 36, 88);
+const SP = {
+  push: [
+    { A:{ an:"f", at:[62,90], t:-105.5, hd:-105, a:[180,180], l:[74.5,74.5] }, B:{ an:"f", at:[62,90], t:-117.7, hd:-118, a:[146.5,255], l:[62.3,62.3] }, pr:[FLOOR, WALL(22)] },
+    { A:{ an:"w", at:[28,70], t:216, a:[90,90], l:[36,36] }, B:{ an:"w", at:[28,70], t:209, a:[5,156], l:[29,29] }, pr:[FLOOR, BOX(12,70,40,90)] },
+    { A:{ an:"w", at:[30,90], t:216, a:[90,90], l:[36,-25] }, B:{ an:"w", at:[30,90], t:192, a:[12,153], l:[10,-25] }, pr:[FLOOR] },
+    { A:PU_T, B:PU_B, pr:[FLOOR] },
+    { A:PU_T, B:PU_B, pr:[FLOOR] },
+    { A:M(PU_T, { a2:[135,135] }), B:M(PU_B, { a2:[175,175] }), pr:[FLOOR] },
+    { A:{ an:"w", at:[50,90], t:204.7, a:[66.5,66.5], l:[24.7,24.7] }, B:{ an:"w", at:[50,90], t:188.4, a:[-18,92], l:[8.4,8.4] }, pr:[FLOOR] },
+    { A:M(PU_T, { a2:[28,28] }), B:M(PU_B, { a2:[8,8] }), pr:[FLOOR], ic:"A" },
+  ],
+  pull: [
+    { A:HANG, pr:[BAR(10)] },
+    { A:HANG, B:M(HANG, { t:-95, hd:-84, l:[86,86] }), pr:[BAR(10)] },
+    { A:{ an:"w", at:[30,58], t:187, a:[-90,-90], l:[7,7] }, B:{ an:"w", at:[30,58], t:200.7, a:[-42.8,-164], l:[20.7,20.7] }, pr:[FLOOR, BAR(58,12,48)] },
+    { A:PTOP, B:HANG, pr:[BAR(10)], ic:"A" },
+    { A:HANG, B:PTOP, pr:[BAR(10)] },
+    { A:HANG, B:C2B, pr:[BAR(10)] },
+    { A:M(HANG, { at:[56,10], a2:[-125,-125] }), B:M(PTOP, { at:[56,10], a2:[-170,-170] }), pr:[BAR(10,18,82)] },
+    { A:M(PTOP, { a2:[80,80] }), B:M(HANG, { a2:[80,80] }), pr:[BAR(10)], ic:"A" },
+    { A:M(HANG, { a2:[80,80] }), B:M(PTOP, { a2:[60,190] }), pr:[BAR(10)] },
+  ],
+  mu: [
+    { A:SUP(50), pr:PB(50,30,70) },
+    { A:DIPT(50), B:DIPB(50), pr:PB(50,30,70) },
+    { A:DIPT(50), B:DIPB(50), pr:PB(50,30,70) },
+    { A:{ an:"w", at:[50,50], t:-75, hd:-75, a:[80,80], l:[105,105] }, B:M(DIPB(50), { l:[105,105] }), pr:[BAR(50,26,74)] },
+    { A:HANG, B:C2B, pr:[BAR(10)] },
+    { A:HANG, B:M(DIPB(10), { l:[100,120] }), pr:[BAR(10)] },
+    { A:HANG, B:SUP(10), pr:[BAR(10)] },
+  ],
+  hs: [
+    { A:PU_T, pr:[FLOOR] },
+    { A:{ an:"w", at:[40,90], t:90, hd:90, a:[90,90], l:[0,0] }, pr:[FLOOR, BOX(66,43,86,90)] },
+    { A:{ an:"w", at:[48,90], t:93, hd:93, a:[90,90], l:[-87,-87] }, pr:[FLOOR, WALL(55)] },
+    { A:{ an:"w", at:[48,90], t:93, hd:93, a:[90,90], a2:[90,90], l:[-87,-87] }, B:{ an:"w", at:[48,90], t:93, hd:93, a:[90,90], a2:[150,-30], l:[-87,-87] }, pr:[FLOOR, WALL(55)] },
+    { A:CROW(45), pr:[FLOOR] },
+    { A:{ an:"f", at:[56,90], t:-90, hd:-90, a:[-68,-68], l:[90,90], l2:[60,120] }, B:M(HS, { l:[270,270], l2:[270,270] }), pr:[FLOOR] },
+    { A:HS, pr:[FLOOR] },
+    { A:HS, pr:[FLOOR] },
+  ],
+  hspu: [
+    { A:{ an:"w", at:[36,90], t:165, hd:115, a:[100,100], l:[74,74] }, B:{ an:"w", at:[36,90], t:140, hd:120, a:[8.3,137.7], l:[52.5,52.5] }, pr:[FLOOR] },
+    { A:{ an:"w", at:[36,90], t:110, hd:100, a:[95,95], l:[37.5,37.5] }, B:{ an:"w", at:[36,90], t:105, hd:100, a:[11.5,153], l:[5.7,5.7] }, pr:[FLOOR, BOX(64,62,90,90)] },
+    { A:WHS_T, B:WHS_B, pr:[FLOOR, WALL(66)] },
+    { A:WHS_T, B:WHS_B, pr:[FLOOR, WALL(66)], ic:"A" },
+    { A:M(WHS_T, { at:[48,80] }), B:M(WHS_B, { at:[48,80], a:[200,100] }), pr:[FLOOR, WALL(72), ...PB(80,38,58)] },
+    { A:M(HS, { at:[48,90] }), B:M(WHS_B, { t:90, l:[-90,-90] }), pr:[FLOOR], ic:"A" },
+  ],
+  lsit: [
+    { A:{ an:"p", at:[50,87], t:195, hd:200, a:[195,195], l:[-15,-15] }, pr:[FLOOR] },
+    { A:LSIT([18,18]), pr:[FLOOR, ...PB(80,30,50)] },
+    { A:LSIT([-40,100]), pr:[FLOOR, ...PB(80,30,50)] },
+    { A:LSIT([0,0],[-40,100]), pr:[FLOOR, ...PB(80,30,50)] },
+    { A:LSIT([0,0]), pr:[FLOOR, ...PB(80,30,50)] },
+    { A:LSIT([-8,-8],[-20,-20]), pr:[FLOOR, ...PB(80,30,50)] },
+    { A:{ an:"w", at:[40,80], t:-100, hd:-105, a:[80,80], l:[-50,-50] }, pr:[FLOOR, ...PB(80,30,50)] },
+  ],
+  fl: [
+    { A:HANG, B:M(HANG, { l:[0,0] }), pr:[BAR(10)] },
+    { A:FLV([-130,30]), pr:[BAR(10)] },
+    { A:FLV([-90,0]), pr:[BAR(10)] },
+    { A:FLV([0,0],[-90,0]), pr:[BAR(10)] },
+    { A:FLV([0,0],[-14,-14]), pr:[BAR(10)] },
+    { A:FLV([0,0]), pr:[BAR(10)] },
+  ],
+  bl: [
+    { A:HANG, B:{ an:"w", at:[50,10], t:-415, hd:-400, a:[-100,-100], l:[-250,-250] }, pr:[BAR(10)] },
+    { A:GERMAN, pr:[BAR(10)] },
+    { A:BLV([130,-20]), pr:[BAR(10)] },
+    { A:BLV([90,0]), pr:[BAR(10)] },
+    { A:BLV([0,0],[12,12]), pr:[BAR(10)] },
+    { A:BLV([0,0]), pr:[BAR(10)] },
+  ],
+  pl: [
+    { A:{ an:"w", at:[50,90], t:204.8, a:[70,70], l:[24.8,24.8] }, pr:[FLOOR] },
+    { A:CROW(50), pr:[FLOOR] },
+    { A:{ an:"w", at:[50,90], t:165, hd:170, a:[72,72], l:[160,-10] }, pr:[FLOOR] },
+    { A:{ an:"w", at:[50,90], t:180, a:[66,66], l:[90,0] }, pr:[FLOOR] },
+    { A:{ an:"w", at:[50,90], t:180, a:[57,57], l:[0,0], l2:[-8,-8] }, pr:[FLOOR] },
+    { A:{ an:"w", at:[50,90], t:180, a:[57,57], l:[0,0] }, pr:[FLOOR] },
+  ],
+  legs: [
+    { A:M(STAND, { a:[-5,-5] }), B:M(SQB, { a:[20,20] }), pr:[FLOOR, LN(80,6,80,90,4)] },
+    { A:M(STAND, { a:[80,80] }), B:SQB, pr:[FLOOR] },
+    { A:{ an:"f", at:[36,90], t:-90, hd:-90, a:[110,45], l:[120,120], l2:[60,60] }, B:{ an:"f", at:[36,90], t:-90, hd:-90, a:[110,45], l:[180,90], l2:[90,0] }, pr:[FLOOR] },
+    { A:{ an:"f", at:[44,90], t:-90, hd:-90, a:[110,45], l:[90,90], l2:[29.7,29.7] }, B:{ an:"f", at:[44,90], t:-80, hd:-80, a:[110,45], l:[175,104.5], l2:[75.5,-75] }, pr:[FLOOR, BOX(64,75,90,90)] },
+    { A:{ an:"f", at:[30,90], t:-90, hd:-90, a:[110,110], a2:[70,70], l:[127.9,127.9], l2:[52.1,52.1] },
+      B:{ an:"f", at:[30,90], t:-100, hd:-100, a:[110,40], a2:[70,140], l:[203.2,69.4], l2:[17.4,17.4] }, pr:[FLOOR], front:true },
+    { A:PISTOL_A, B:{ an:"f", at:[52,90], t:-65, hd:-60, a:[-5,-5], l:[4.3,112], l2:[5,5] }, pr:[FLOOR, BOX(20,78,43,90)] },
+    { A:PISTOL_A, B:{ an:"f", at:[52,90], t:-60, hd:-55, a:[-5,-5], l:[-9.4,127.6], l2:[-3,-3] }, pr:[FLOOR] },
+    { A:{ an:"f", at:[52,90], t:-90, hd:-90, a:[0,0], a2:[110,110], l:[90,90], l2:[90,-120] },
+      B:{ an:"f", at:[52,90], t:-55, hd:-50, a:[-10,-10], a2:[130,130], l:[5.4,128.7], l2:[112.5,-160] }, pr:[FLOOR] },
+  ],
+  df: [
+    { A:{ an:"p", at:[52,87], t:180, hd:180, a:[8,8], l:[0,0] }, B:{ an:"p", at:[52,87], t:180, hd:180, a:[8,8], l:[-88,-88] }, pr:[FLOOR] },
+    { A:{ an:"s", at:[30,86], t:90, hd:180, a:[0,0], l:[-90,-90] }, pr:[FLOOR] },
+    { A:DFA(95, [160,-70]), B:DFA(150, [215,-15]), pr:[FLOOR, BENCH] },
+    { A:DFA(95, [-85,-85], [160,-70]), B:DFA(155, [-25,-25], [220,-15]), pr:[FLOOR, BENCH] },
+    { A:DFA(95, [-85,-85]), B:DFA(168, [-12,-12]), pr:[FLOOR, BENCH], ic:"A" },
+    { A:DFA(100, [-80,-80]), B:DFA(162, [-18,-18]), pr:[FLOOR, BENCH] },
+  ],
+  flag: [
+    { A:{ an:"w", at:[30,90], t:204, a:[90,90], a2:[-90,-90], l:[24,24] }, pr:[FLOOR], front:true },
+    { A:FLAG([-90,-90], undefined, 90, 112), pr:[FLOOR, POLE], front:true },
+    { A:FLAG([215,40]), pr:[FLOOR, POLE], front:true },
+    { A:FLAG([90,0]), pr:[FLOOR, POLE], front:true },
+    { A:FLAG([-14,-14], [14,14]), pr:[FLOOR, POLE], front:true },
+    { A:FLAG([0,0]), pr:[FLOOR, POLE], front:true },
+  ],
+  nordic: [
+    { A:GB(180, [-55,80]), B:GB(144, [0,100]), pr:[FLOOR] },
+    { A:GB(180, [-55,80], [-35,-35]), B:GB(144, [0,100], [-15,-15]), pr:[FLOOR] },
+    { A:GB(144, [0,100]), B:GB(160, [12,25]), pr:[FLOOR] },
+    { A:NK(0, [60,180]), B:NK(35, [70,20]), pr:[FLOOR, ANKLE] },
+    { A:NK(0, [60,180]), B:NK(75, [100,60]), pr:[FLOOR, ANKLE], ic:"A" },
+    { A:NK(0, [60,180]), B:NK(68, [100,60]), pr:[FLOOR, ANKLE] },
+  ],
+};
+
+const RM = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; } })();
+const DEG = Math.PI / 180;
+const add = (o, a, len) => [o[0] + Math.cos(a * DEG) * len, o[1] + Math.sin(a * DEG) * len];
+function joints(p, hip) {
+  const S = add(hip, p.t, 24), H = add(S, p.hd ?? p.t, 8.5);
+  const arm = a => { const E = add(S, a[0], 13); return [E, add(E, a[1], 12)]; };
+  const leg = l => { const K = add(hip, l[0], 16); return [K, add(K, l[1], 16)]; };
+  return { P: hip, S, H, A1: arm(p.a), L1: leg(p.l), A2: p.a2 ? arm(p.a2) : null, L2: p.l2 ? leg(p.l2) : null };
+}
+function hipOf(p) {
+  const j = joints(p, [0, 0]);
+  const ref = p.an === "w" ? j.A1[1] : p.an === "f" ? j.L1[1] : p.an === "s" ? j.S : j.P;
+  return [p.at[0] - ref[0], p.at[1] - ref[1]];
+}
+const posed = p => joints(p, hipOf(p));
+function between(A, B, u) {
+  const m = (x, y) => x + (y - x) * u, mm = (x, y) => [m(x[0], y[0]), m(x[1], y[1])];
+  const p = { t: m(A.t, B.t), hd: m(A.hd ?? A.t, B.hd ?? B.t), a: mm(A.a, B.a), l: mm(A.l, B.l) };
+  if (A.a2 || B.a2) p.a2 = mm(A.a2 || A.a, B.a2 || B.a);
+  if (A.l2 || B.l2) p.l2 = mm(A.l2 || A.l, B.l2 || B.l);
+  if (A.an === B.an && A.at[0] === B.at[0] && A.at[1] === B.at[1]) { p.an = A.an; p.at = A.at; return posed(p); }
+  return joints(p, mm(hipOf(A), hipOf(B)));
+}
+const ease = u => u < .5 ? 2 * u * u : 1 - 2 * (1 - u) * (1 - u);
+const r1 = n => Math.round(n * 10) / 10;
+function figStep(tid, i, cls = "fig", anim = true) {
+  const e = SP[tid] && SP[tid][i]; if (!e) return "";
+  const moving = anim && !RM && e.B;
+  const frames = moving ? Array.from({ length: 7 }, (_, k) => between(e.A, e.B, ease(k / 6)))
+    : [posed(!anim && e.B && e.ic !== "A" ? e.B : e.A)];
+  // fit a square viewBox around the figure and its props
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const grow = (p, r = 4) => { x0 = Math.min(x0, p[0] - r); y0 = Math.min(y0, p[1] - r); x1 = Math.max(x1, p[0] + r); y1 = Math.max(y1, p[1] + r); };
+  frames.forEach(j => { [j.S, j.P, ...j.A1, ...j.L1, ...(j.A2 || []), ...(j.L2 || [])].forEach(p => grow(p)); grow(j.H, 8); });
+  const floor = e.pr.includes(FLOOR);
+  const fx0 = x0 - 6, fx1 = x1 + 6;
+  e.pr.forEach(p => { if (p !== FLOOR) { grow([p[1], p[2]], 3); grow([p[3], p[4]], 3); } });
+  if (floor) grow([x0, 92], 0);
+  const side = Math.max(x1 - x0, y1 - y0, 58) + 10, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  const vb = [cx - side / 2, cy - side / 2, side, side].map(r1).join(" ");
+  const seq = moving ? [0,0,1,2,3,4,5,6,6,5,4,3,2,1,0] : [0];
+  const pts = f => f.map(p => r1(p[0]) + "," + r1(p[1])).join(" ");
+  const line = (get, extra = "") => {
+    const v = seq.map(k => pts(get(frames[k])));
+    return `<polyline points="${v[0]}"${extra}>${moving ? `<animate attributeName="points" dur="3.2s" repeatCount="indefinite" values="${v.join(";")}"/>` : ""}</polyline>`;
+  };
+  const f0 = frames[0], far = e.front ? "" : ` opacity=".42"`;
+  let body = "";
+  if (f0.A2) body += line(j => [j.S, ...j.A2], far);
+  if (f0.L2) body += line(j => [j.P, ...j.L2], far);
+  body += line(j => [j.P, ...j.L1]) + line(j => [j.S, j.P]) + line(j => [j.S, ...j.A1]);
+  const hx = seq.map(k => r1(frames[k].H[0])).join(";"), hy = seq.map(k => r1(frames[k].H[1])).join(";");
+  const head = `<circle cx="${r1(f0.H[0])}" cy="${r1(f0.H[1])}" r="6.5" fill="var(--g)">${moving ? `<animate attributeName="cx" dur="3.2s" repeatCount="indefinite" values="${hx}"/><animate attributeName="cy" dur="3.2s" repeatCount="indefinite" values="${hy}"/>` : ""}</circle>`;
+  let props = floor ? `<line x1="${r1(fx0)}" y1="91.5" x2="${r1(fx1)}" y2="91.5" stroke-width="2.5"/>` : "";
+  e.pr.forEach(p => {
+    if (p === FLOOR) return;
+    if (p[0] === "l") props += `<line x1="${p[1]}" y1="${p[2]}" x2="${p[3]}" y2="${p[4]}" stroke-width="${p[5]}"/>`;
+    if (p[0] === "r") props += `<rect x="${p[1]}" y="${p[2]}" width="${p[3] - p[1]}" height="${p[4] - p[2]}" rx="2" fill="var(--muted)" fill-opacity=".14" stroke-width="2"/>`;
+  });
+  return `<svg class="${cls}" viewBox="${vb}" aria-hidden="true"><g stroke="var(--muted)" stroke-linecap="round" fill="none" opacity=".7">${props}</g>
+    <g stroke="var(--g)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" fill="none">${body}</g>${head}</svg>`;
+}
+// A ladder's icon is its final skill, drawn still
+const fig = (id, cls = "fig") => figStep(id, T[id].steps.length - 1, cls, false);
+
+const PLAY = `<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9-5.5z" fill="currentColor"/></svg>`;
+const GROUPS = ["All","Push","Pull","Core","Legs","Balance"];
+const UNIT = { r:"reps", rs:"reps / side", s:"sec", ss:"sec / side" };
+const UNIT_SHORT = { r:"reps", rs:"reps/side", s:"s", ss:"s/side" };
+const T = Object.fromEntries(TRACKS.map(t => [t.id, t]));
+const step = (tid, i) => { const s = T[tid].steps[i]; return { name:s[0], sets:s[1], target:s[2], unit:s[3], cues:s[4].split("|") }; };
+const total = TRACKS.reduce((n, t) => n + t.steps.length, 0);
+const xpFor = i => (i + 1) * 10;
+const XP_MAX = TRACKS.reduce((n, t) => n + t.steps.reduce((m, _, i) => m + xpFor(i), 0), 0);
+const RANKS = [["Novice",0],["Apprentice",.04],["Intermediate",.14],["Advanced",.32],["Elite",.55],["Master",.8]];
+
+// ---- State
+const LS = "skill-ladder-v1";
+const blank = () => ({ levels:{}, routine:["push","pull","lsit","hs","legs"], logs:[], plan:null });
+let state = blank();
+try { const s = JSON.parse(localStorage.getItem(LS)); if (s && s.levels) state = { ...blank(), ...s }; } catch (e) {}
+const lvl = tid => state.levels[tid] || 0;
+let view = "tree", filter = "All", sel = null, armed = null, justHit = null;
+const wide = () => window.matchMedia("(min-width: 1000px)").matches;
+
+// ---- Persistence: per-person doc in db when available, localStorage always
+let ref = null, saving = false, dirty = false, saveTimer = null;
+function save() {
+  try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {}
+  if (!ref) return;
+  dirty = true; clearTimeout(saveTimer); saveTimer = setTimeout(flush, 600);
+}
+async function flush() {
+  if (saving || !dirty || !ref) return;
+  saving = true; dirty = false; setSync("Saving…");
+  try { await ref.set(JSON.parse(JSON.stringify(state))); setSync("Synced to your account"); }
+  catch (e) { const fatal = e && e.code === "invalid_argument"; setSync(fatal ? "Saved on this device" : "Couldn't sync, saved on this device"); if (fatal) ref = null; }
+  saving = false; if (dirty) flush();
+}
+function setSync(t) { document.getElementById("sync").textContent = t; }
+(async () => {
+  if (!window.claude || !window.claude.use) return;
+  try {
+    const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+    if (!db || !user) return;
+    const uid = await user.id(); if (!uid) return;
+    ref = db.doc("data/users/" + uid + "/progress");
+    let first = true;
+    ref.onSnapshot(snap => {
+      if (snap.metadata.hasPendingWrites || saving || dirty) return;
+      // snapshot data arrives frozen; copy it so later edits (mastering, logging) actually apply
+      if (snap.exists) { state = { ...blank(), ...JSON.parse(JSON.stringify(snap.data())) }; try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {} render(); setSync("Synced to your account"); }
+      else if (first && (state.logs.length || Object.keys(state.levels).length)) { dirty = true; flush(); }
+      else setSync("Synced to your account");
+      first = false;
+    }, () => { setSync("Saved on this device"); });
+  } catch (e) {}
+})();
+
+// ---- Helpers
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const fmtTarget = s => `${s.sets} × ${s.target}`;
+const statusOf = (tid, i) => i < lvl(tid) ? "done" : i === lvl(tid) ? "cur" : "todo";
+const dayKey = t => new Date(t).toLocaleDateString(undefined, { weekday:"long", month:"short", day:"numeric" });
+const startOfDay = d => { const x = new Date(d); x.setHours(0,0,0,0); return x.getTime(); };
+function best(tid, i) {
+  let b = null;
+  for (const l of state.logs) if (l.tr === tid && l.st === i) { const m = Math.max(...l.sets); if (b === null || m > b) b = m; }
+  return b;
+}
+function hitTarget(tid, i, sets) { const s = step(tid, i); return sets.filter(v => v >= s.target).length >= s.sets; }
+
+// ---- Mastery: what the step asks for, and how close your best session got
+const isSide = u => u === "rs" || u === "ss";
+function requirement(s) {
+  const side = isSide(s.unit) ? " on each side" : "";
+  if (isTime(s.unit)) return s.sets === 1 ? `Hold for <b>${s.target} seconds</b>${side} in one go.` : `Hold for <b>${s.target} seconds</b>${side}, <b>${s.sets} times</b> in one session.`;
+  return s.sets === 1 ? `Do <b>${s.target} rep${s.target === 1 ? "" : "s"}</b>${side} with clean form.` : `Do <b>${s.sets} sets of ${s.target} reps</b>${side} in one session.`;
+}
+function mastery(tid, i) {
+  const s = step(tid, i), unit = isTime(s.unit) ? "s" : " rep";
+  let best = null, score = -1, when = 0, readyAt = 0, logged = 0;
+  for (const l of state.logs) {
+    if (l.tr !== tid || l.st !== i) continue;
+    const top = [...l.sets].sort((a, b) => b - a).slice(0, s.sets), n = top.length;
+    while (top.length < s.sets) top.push(0);
+    const sc = top.reduce((n, v) => n + Math.min(v, s.target), 0) / (s.sets * s.target);
+    if (sc >= 1 && !readyAt) readyAt = l.t;
+    if (sc > score || (sc === score && l.t > when)) { score = sc; best = top; when = l.t; logged = n; }
+  }
+  if (!best) return { pct: 0, best: null, ready: false, msg: "Log a session and you'll see how close you are." };
+  const ready = score >= 1, done = best.filter(v => v >= s.target).length;
+  const plural = n => isTime(s.unit) ? `${n}s` : `${n}${unit}${n === 1 ? "" : "s"}`;
+  const shorts = best.slice(0, logged).filter(v => v < s.target).map(v => plural(s.target - v));
+  const missing = s.sets - logged;
+  const msg = ready ? `You hit the target on ${new Date(readyAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}. Mark it as mastered to move up.`
+    : s.sets === 1 ? `Your best is ${best[0]}${isTime(s.unit) ? "s" : ""}. ${plural(s.target - best[0])} to go.`
+    : `${done} of ${s.sets} sets at target.` + (shorts.length ? ` ${shorts.length === 1 ? "One set was" : "Sets were"} short by ${shorts.join(", ").replace(/, ([^,]*)$/, " and $1")}.` : "")
+      + (missing ? ` Do ${missing} more set${missing === 1 ? "" : "s"} in the same session.` : "");
+  return { pct: Math.min(1, score), best, ready, msg };
+}
+function masteryCard(tid, i) {
+  const s = step(tid, i), m = mastery(tid, i), st = statusOf(tid, i);
+  const pill = st === "done" ? `<span class="m-pill done">Mastered</span>` : m.ready ? `<span class="m-pill ready">Ready to master</span>`
+    : m.best ? `<span class="m-pill">${Math.round(m.pct * 100)}% there</span>` : `<span class="m-pill">Not started</span>`;
+  const bars = Array.from({ length: s.sets }, (_, k) => {
+    const v = m.best ? m.best[k] : 0, w = Math.min(1, v / s.target) * 100;
+    return `<div class="m-bar${v >= s.target ? " hit" : ""}"><i style="width:${w}%"></i><span>${s.sets > 1 ? `Set ${k + 1}` : "Best"}</span><b>${v}/${s.target}${isTime(s.unit) ? "s" : ""}</b></div>`;
+  }).join("");
+  return `<div class="mastery">
+    <div class="m-head"><p class="h4">How to master this</p>${pill}</div>
+    <p class="m-req">${requirement(s)} Keep good form the whole way (see the cues).</p>
+    <div class="m-bars">${bars}</div>
+    <p class="note${m.ready && st !== "done" ? " ok" : ""}">${st === "done" ? "You've mastered this step." : m.msg}</p>
+  </div>`;
+}
+function xp() { return TRACKS.reduce((n, t) => { let m = 0; for (let i = 0; i < Math.min(lvl(t.id), t.steps.length); i++) m += xpFor(i); return n + m; }, 0); }
+function rankInfo() {
+  const x = xp(), f = x / XP_MAX; let r = 0;
+  RANKS.forEach((k, i) => { if (f >= k[1]) r = i; });
+  const lo = RANKS[r][1] * XP_MAX, hi = r + 1 < RANKS.length ? RANKS[r + 1][1] * XP_MAX : XP_MAX;
+  return { x, r, name: RANKS[r][0], next: RANKS[r + 1] ? RANKS[r + 1][0] : null, toNext: Math.ceil(hi - x), pct: hi > lo ? Math.min(1, (x - lo) / (hi - lo)) : 1 };
+}
+function streak() {
+  const days = new Set(state.logs.map(l => startOfDay(l.t)));
+  let d = startOfDay(Date.now()), n = 0;
+  if (!days.has(d)) d -= 864e5;
+  while (days.has(d)) { n++; d = startOfDay(d - 864e5 + 3600e3 * 2); }
+  return n;
+}
+function ringSvg(pct, size, sw, color, track = "var(--line)") {
+  const r = (size - sw) / 2, c = 2 * Math.PI * r;
+  return `<svg viewBox="0 0 ${size} ${size}" aria-hidden="true"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${track}" stroke-width="${sw}"/>
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"
+      stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct)}" transform="rotate(-90 ${size/2} ${size/2})" style="transition:stroke-dashoffset .6s"/></svg>`;
+}
+
+// ---- Training plan: a weekly schedule built around the skill you want most
+// What each goal leans on: the ladders that build its strength, in order of importance
+const GOAL_SUPPORT = {
+  push: ["lsit", "legs"], pl: ["push", "hs", "lsit"], hspu: ["hs", "push", "lsit"], hs: ["push", "lsit"],
+  lsit: ["df", "pull"], df: ["lsit", "pull"], flag: ["pull", "push", "lsit"], pull: ["df", "push"],
+  mu: ["pull", "push", "lsit"], fl: ["pull", "df", "lsit"], bl: ["pull", "lsit", "push"],
+  legs: ["nordic", "lsit"], nordic: ["legs", "lsit"],
+};
+const BALANCE = ["push", "pull", "legs", "lsit", "df", "nordic"];
+const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const DAY_SHORT = ["M", "T", "W", "T", "F", "S", "S"];
+const DAY_PATTERNS = { 1: [2], 2: [0, 3], 3: [0, 2, 4], 4: [0, 1, 3, 4], 5: [0, 1, 2, 4, 5], 6: [0, 1, 2, 3, 4, 5], 7: [0, 1, 2, 3, 4, 5, 6] };
+const SLOTS = { 30: 3, 45: 4, 60: 5 };
+const todayIdx = () => (new Date().getDay() + 6) % 7;
+const goalName = id => T[id].steps[T[id].steps.length - 1][0];
+const lockedBy = id => { const p = T[id].prereq; return p && lvl(p[0]) <= p[1] && lvl(id) === 0 ? p : null; };
+function restFor(id, i) {
+  const s = step(id, i), L = LEVEL[id][i];
+  return isTime(s.unit) ? (L >= 4 ? 120 : 60) : (L >= 5 ? 120 : 90);
+}
+function planItem(id, why, kind) {
+  const i = Math.min(lvl(id), T[id].steps.length - 1), s = step(id, i);
+  return { id, i, why, kind, sets: s.sets, target: s.target, unit: s.unit, rest: restFor(id, i) };
+}
+// Builds the week from current levels, so the plan moves up by itself as steps are mastered
+function buildWeek(plan) {
+  const slots = SLOTS[plan.minutes] || 4;
+  const [g1, g2] = plan.goals;
+  // ladders that must be climbed first to unlock a goal; one item even when it unlocks both goals
+  const unlocks = [];
+  plan.goals.forEach(g => {
+    const lock = lockedBy(g); if (!lock) return;
+    const have = unlocks.find(u => u.id === lock[0]);
+    if (have) have.why += ` & ${T[g].name}`; else unlocks.push(planItem(lock[0], `Unlocks ${T[g].name}`, "unlock"));
+  });
+  const taken = new Set([...plan.goals, ...unlocks.map(u => u.id)]);
+  const pool = [...new Set(plan.goals.flatMap(g => GOAL_SUPPORT[g] || []).concat(BALANCE))].filter(id => !taken.has(id));
+  const why = id => plan.goals.some(g => (GOAL_SUPPORT[g] || []).includes(id)) ? `Builds ${T[plan.goals.find(g => (GOAL_SUPPORT[g] || []).includes(id))].name}` : "Balance";
+  const order = { goal: 0, unlock: 1, support: 2, balance: 3 };
+  const tail = id => ["lsit", "df", "legs", "nordic"].includes(id) ? 1 : 0;
+  let ptr = 0;
+  const week = {};
+  [...plan.days].sort((a, b) => a - b).forEach((d, k) => {
+    // main goal every session; the second goal every session in long sessions, every other one otherwise
+    const session = [planItem(g1, "Main goal", "goal"), ...unlocks];
+    if (g2 && (slots >= 5 || k % 2 === 0 || plan.days.length <= 2)) session.splice(1, 0, planItem(g2, "Second goal", "goal"));
+    // always leave at least one slot for supporting or balancing work
+    while (session.length > slots - 1 && session.length > 1 && session[session.length - 1].kind === "unlock" && unlocks.length > 1) session.pop();
+    const used = new Set(session.map(x => x.id));
+    if (session.length >= slots) { session.length = Math.max(1, slots - 1); used.clear(); session.forEach(x => used.add(x.id)); }
+    for (let n = 0; session.length < slots && n < pool.length * 2; n++) {
+      const id = pool[ptr % pool.length]; ptr++;
+      if (used.has(id)) continue;
+      used.add(id);
+      const w = why(id);
+      session.push(planItem(id, w, w === "Balance" ? "balance" : "support"));
+    }
+    session.sort((a, b) => order[a.kind] - order[b.kind] || tail(a.id) - tail(b.id));
+    week[d] = session;
+  });
+  return week;
+}
+// Time to the goal skill from where you are now, adjusted for how often the plan trains it
+function goalEta(g, days) {
+  const last = T[g].steps.length - 1;
+  if (lvl(g) > last) return null;
+  let sum = 0;
+  const lock = lockedBy(g);
+  if (lock) for (let k = lvl(lock[0]); k <= lock[1]; k++) sum += etaWeeks(lock[0], k);
+  for (let k = lvl(g); k <= last; k++) sum += etaWeeks(g, k);
+  const f = Math.min(1.4, Math.max(.75, Math.sqrt(3 / Math.max(1, days))));
+  return fmtSpan(sum * f * .7, sum * f * 1.4);
+}
+function planToday() {
+  if (!state.plan) return null;
+  const d = todayIdx();
+  return state.plan.days.includes(d) ? buildWeek(state.plan)[d] : [];
+}
+let planDraft = null, planDay = null, planArmed = false;
+function renderPlan() {
+  const host = $("plan");
+  if (!state.plan || planDraft) {
+    const dr = planDraft || (planDraft = { goals: [], days: [0, 2, 4], minutes: 45 });
+    host.innerHTML = `<div class="plan-setup">
+      <div class="ps-step"><p class="h4">1 · What do you want to learn most?</p><p class="note">Pick up to two. The first one gets the most practice.</p>
+        <div class="goal-grid">${TRACKS.map(t => {
+          const k = dr.goals.indexOf(t.id), done = lvl(t.id) >= t.steps.length;
+          return `<button type="button" class="goal g-${t.group}${k >= 0 ? " on" : ""}" data-goal="${t.id}" aria-pressed="${k >= 0}">
+            ${k >= 0 ? `<span class="goal-n">${k + 1}</span>` : ""}${fig(t.id)}<b>${esc(goalName(t.id))}</b><span>${done ? "Already mastered" : `${esc(t.name)} ladder`}</span></button>`;
+        }).join("")}</div></div>
+      <div class="ps-step"><p class="h4">2 · Which days can you train?</p>
+        <div class="row"><span class="seg">${[2, 3, 4, 5, 6].map(n => `<button type="button" data-pdays="${n}" aria-pressed="${dr.days.length === n}">${n} days</button>`).join("")}</span></div>
+        <div class="daypick">${DAY_SHORT.map((s, d) => `<button type="button" data-pday="${d}" aria-pressed="${dr.days.includes(d)}" aria-label="${DAY_NAMES[d]}">${s}</button>`).join("")}</div></div>
+      <div class="ps-step"><p class="h4">3 · How long is each session?</p>
+        <span class="seg">${[30, 45, 60].map(n => `<button type="button" data-pmin="${n}" aria-pressed="${dr.minutes === n}">${n} min</button>`).join("")}</span></div>
+      <div class="row"><button type="button" class="btn go" data-plan="create"${dr.goals.length && dr.days.length ? "" : " disabled style=\"opacity:.5\""}>${state.plan ? "Update my plan" : "Create my plan"}</button>
+        ${state.plan ? `<button type="button" class="btn alt" data-plan="cancel">Cancel</button>` : ""}</div>
+      ${!dr.goals.length ? `<p class="note">Pick a goal to continue.</p>` : !dr.days.length ? `<p class="note">Pick at least one training day.</p>` : ""}
+    </div>`;
+    return;
+  }
+  const p = state.plan, week = buildWeek(p), td = todayIdx();
+  if (planDay === null || !p.days.includes(planDay)) planDay = p.days.includes(td) ? td : ([...p.days].sort((a, b) => a - b).find(d => d > td) ?? Math.min(...p.days));
+  const goals = p.goals.map((g, k) => {
+    const t = T[g], L = Math.min(lvl(g), t.steps.length), eta = goalEta(g, p.days.length), lock = lockedBy(g);
+    return `<div class="goal-card g-${t.group}">${fig(g)}<div class="gc-body">
+      <span class="eyebrow">${k === 0 ? "Main goal" : "Second goal"} · ${esc(t.name)}</span><h3>${esc(goalName(g))}</h3>
+      <div class="m-track"><i style="width:${L / t.steps.length * 100}%"></i></div>
+      <p class="note">${eta ? `${CLOCK} About <b>${eta}</b> from now, training ${p.days.length} days a week.` : "Mastered. Keep practising to hold on to it."}
+        ${lock ? `<br>First, unlock it on the ${esc(T[lock[0]].name)} ladder (${esc(step(lock[0], lock[1]).name)}).` : L < t.steps.length ? `<br>Now working on: ${esc(step(g, L).name)}.` : ""}</p></div></div>`;
+  }).join("");
+  const strip = DAY_SHORT.map((s, d) => {
+    const on = p.days.includes(d);
+    return `<button type="button" class="wd${on ? " on" : ""}${d === td ? " today" : ""}${d === planDay ? " sel" : ""}" ${on ? `data-pday-view="${d}"` : "disabled"} aria-label="${DAY_NAMES[d]}${on ? ", training day" : ", rest day"}">
+      <span>${s}</span><i>${on ? week[d].length : "–"}</i></button>`;
+  }).join("");
+  const sess = week[planDay] || [];
+  const rows = sess.map(it => {
+    const t = T[it.id], s = step(it.id, it.i), u = isTime(it.unit) ? "s" : " reps", side = isSide(it.unit) ? " per side" : "";
+    return `<div class="prow g-${t.group}">${figStep(it.id, it.i, "fig", false)}<div class="prow-body">
+      <span class="pwhy k-${it.kind}">${esc(it.why)}</span><b>${esc(s.name)}</b>
+      <span class="note">${it.sets} × ${it.target}${u}${side} · rest ${it.rest}s · ${esc(t.name)} step ${it.i + 1}</span></div>
+      <button type="button" class="btn go start" data-focus="${it.id}:${it.i}" aria-label="Start ${esc(s.name)}">${PLAY}</button></div>`;
+  }).join("");
+  host.innerHTML = `<div class="plan-view">
+    <div class="goal-cards">${goals}</div>
+    <div class="week"><div class="week-h"><p class="h4">Your week</p><span class="note">${p.days.length} days · ${p.minutes} min sessions</span></div><div class="wstrip">${strip}</div></div>
+    <div class="session">
+      <div class="session-h"><h3>${DAY_NAMES[planDay]}${planDay === td ? " · today" : ""}</h3><span class="note">${sess.length} exercises · about ${p.minutes} min</span></div>
+      <p class="note warm">Warm up for 5 minutes first: wrist circles, arm swings, scapular pulls and a few easy push-ups. Do the exercises in this order.</p>
+      <div class="prows">${rows}</div>
+      ${planDay === td ? `<button type="button" class="btn go" data-view="today" style="justify-content:center">Go to today's workout</button>` : ""}
+    </div>
+    <p class="note">The plan follows your progress: when you master a step, it switches to the next one automatically.</p>
+    <div class="row"><button type="button" class="btn alt" data-plan="edit">Change goals or days</button>
+      <button type="button" class="btn alt" data-plan="remove">${planArmed ? "Tap again to remove the plan" : "Remove plan"}</button></div>
+  </div>`;
+}
+function planClick(el) {
+  const dr = planDraft;
+  if (el.dataset.goal && dr) {
+    const id = el.dataset.goal, k = dr.goals.indexOf(id);
+    if (k >= 0) dr.goals.splice(k, 1); else { if (dr.goals.length >= 2) dr.goals.pop(); dr.goals.push(id); }
+  } else if (el.dataset.pdays && dr) dr.days = DAY_PATTERNS[+el.dataset.pdays].slice();
+  else if (el.dataset.pday && dr) { const d = +el.dataset.pday; dr.days = dr.days.includes(d) ? dr.days.filter(x => x !== d) : [...dr.days, d].sort((a, b) => a - b); }
+  else if (el.dataset.pmin && dr) dr.minutes = +el.dataset.pmin;
+  else if (el.dataset.pdayView) planDay = +el.dataset.pdayView;
+  else if (el.dataset.plan) {
+    const a = el.dataset.plan;
+    if (a === "create" && dr && dr.goals.length && dr.days.length) {
+      state.plan = { goals: dr.goals.slice(), days: dr.days.slice(), minutes: dr.minutes, created: Date.now() };
+      planDraft = null; planDay = null; save(); toast(`Plan ready: ${goalName(state.plan.goals[0])} is your main goal`);
+    } else if (a === "cancel") planDraft = null;
+    else if (a === "edit") planDraft = { goals: state.plan.goals.slice(), days: state.plan.days.slice(), minutes: state.plan.minutes };
+    else if (a === "remove") { if (planArmed) { state.plan = null; planArmed = false; planDraft = null; save(); } else { planArmed = true; renderPlan(); return true; } }
+  } else return false;
+  planArmed = false;
+  renderPlan();
+  return true;
+}
+
+// ---- Render
+function render() {
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", b.dataset.view === view));
+  ["tree","today","plan","log"].forEach(v => $("view-" + v).hidden = v !== view);
+  renderHero();
+  if (view === "tree") { renderRings(); renderTree(); renderPanel(); }
+  if (view === "today") renderToday();
+  if (view === "plan") renderPlan();
+  if (view === "log") renderLog();
+  restoreDrafts();
+}
+
+function renderHero() {
+  const R = rankInfo();
+  const mastered = TRACKS.reduce((n, t) => n + Math.min(lvl(t.id), t.steps.length), 0);
+  const weekAgo = Date.now() - 7 * 864e5, week = state.logs.filter(l => l.t > weekAgo);
+  $("rank").innerHTML = `
+    <div class="badge">${ringSvg(R.pct, 62, 5, "var(--balance)", "rgba(255,255,255,.14)")}<b>${R.r + 1}</b></div>
+    <div><div class="rank-name">${R.name}</div>
+      <div class="rank-sub">${R.x} XP · ${R.next ? `${R.toNext} XP to ${R.next}` : "Top rank reached"}</div>
+      <div class="xpbar"><i style="width:${(R.pct * 100).toFixed(1)}%"></i></div></div>`;
+  $("stats").innerHTML = `
+    <div class="hstat"><b>${mastered}</b><span>of ${total} steps</span></div>
+    <div class="hstat"><b>${streak()}</b><span>day streak</span></div>
+    <div class="hstat"><b>${new Set(week.map(l => startOfDay(l.t))).size}</b><span>days / wk</span></div>
+    <div class="hstat"><b>${week.reduce((n, l) => n + l.sets.length, 0)}</b><span>sets / wk</span></div>`;
+}
+
+function renderRings() {
+  $("rings").innerHTML = TRACKS.map(t => {
+    const L = Math.min(lvl(t.id), t.steps.length), pct = L / t.steps.length;
+    return `<button class="ring g-${t.group}${pct >= 1 ? " complete" : ""}" data-ring="${t.id}" aria-label="${esc(t.name)}: ${L} of ${t.steps.length} steps mastered">
+      <div class="rg">${ringSvg(pct, 72, 6, "var(--g)")}${fig(t.id)}</div>
+      <div class="nm">${esc(t.name)}</div><div class="ct">${pct >= 1 ? "Complete" : `${L}/${t.steps.length}`}</div></button>`;
+  }).join("");
+}
+
+// ---- Skill tree map: each ladder is a branch; advanced ladders sprout from the step that unlocks them
+const LOCK = `<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>`;
+const TREE_COLS = ["push","pl","hspu","hs","lsit","df","flag","pull","mu","fl","bl","legs","nordic"];
+const TG = { colW: 88, unit: 172, minGap: 86, padL: 70, padR: 16, hubY: 70, row0: 210 };
+// Difficulty of every step on one shared 1–10 scale (roughly the levels coaches use); the tree places each node this far from Start
+const LEVEL = {
+  push: [1, 1.5, 2, 2.5, 3.5, 5, 5.5, 7],
+  pull: [1, 1.5, 2, 2.5, 3.5, 4.5, 6, 7.5, 9.5],
+  mu:   [2, 2.5, 3.5, 4, 5, 5.5, 6.5],
+  hs:   [1, 2, 3, 3.5, 4, 5, 6.5, 8],
+  hspu: [3.5, 4.5, 5, 6, 7, 9],
+  lsit: [1.5, 2, 2.5, 3.5, 4.5, 6, 8],
+  fl:   [3, 4, 5, 6.5, 8, 9],
+  bl:   [2.5, 3, 3.5, 4.5, 6, 7],
+  pl:   [3, 3.5, 5, 6.5, 8.5, 10],
+  legs: [1, 1.5, 2, 3, 3.5, 4, 5, 6],
+  df:   [1.5, 2.5, 4, 5, 6, 7],
+  flag: [1.5, 4, 5.5, 6.5, 7.5, 8.5],
+  nordic: [1, 2, 3, 4, 5.5, 7.5],
+};
+const TIERS = [[1, "Beginner"], [3, "Novice"], [5, "Intermediate"], [7, "Advanced"], [9, "Elite"]];
+const tierOf = L => TIERS.reduce((n, t) => L >= t[0] ? t[1] : n, "Beginner");
+// Estimated time to learn a step, training about 3× a week. Harder levels take exponentially longer,
+// scaled by the size of the jump from the step before (calibrated so a first pull-up ≈ 2 months, muscle-up ≈ 4, full planche ≈ 1 year).
+function etaWeeks(tid, i) {
+  const L = LEVEL[tid][i], pre = T[tid].prereq;
+  const prevL = i ? LEVEL[tid][i - 1] : pre ? LEVEL[pre[0]][pre[1]] : L - .5;
+  return Math.max(.5, L - prevL) * 3.57 * Math.exp(.231 * L);
+}
+function fmtSpan(lo, hi) {
+  const r = n => Math.max(1, Math.round(n));
+  if (hi < 14) return `${r(lo)}–${r(hi)} weeks`;
+  if (hi < 100) return `${r(lo / 4.35)}–${r(hi / 4.35)} months`;
+  const y = n => (Math.round(n / 52 * 2) / 2).toString();
+  return lo < 52 ? `${r(lo / 4.35)} months–${y(hi)} years` : `${y(lo)}–${y(hi)} years`;
+}
+const etaText = (tid, i) => { const m = etaWeeks(tid, i); return fmtSpan(m * .6, m * 1.6); };
+function etaFromCurrent(tid, i) {
+  const L = lvl(tid); if (i <= L) return null;
+  let sum = 0; for (let k = L; k <= i; k++) sum += etaWeeks(tid, k);
+  return fmtSpan(sum * .7, sum * 1.4);
+}
+const CLOCK = `<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 4.5V8l2.5 1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+let treeMode = "tree";
+try { treeMode = localStorage.getItem("skill-ladder-mode") || "tree"; } catch (e) {}
+function renderSkillTree() {
+  const host = $("lanes"), prev = host.querySelector(".tree-scroll"), keepX = prev ? prev.scrollLeft : null, keepY = prev ? prev.scrollTop : 0;
+  const colX = c => TG.padL + c * TG.colW + TG.colW / 2, levelY = L => TG.row0 + (L - 1) * TG.unit;
+  // place parents before the branches that sprout from them
+  const order = TREE_COLS.filter(id => !T[id].prereq).concat(TREE_COLS.filter(id => T[id].prereq));
+  const pos = {};
+  order.forEach(id => {
+    const c = TREE_COLS.indexOf(id), pre = T[id].prereq;
+    let last = -Infinity;
+    pos[id] = T[id].steps.map((_, i) => {
+      let y = levelY(LEVEL[id][i]);
+      if (i === 0 && pre) y = Math.max(y, pos[pre[0]][pre[1]][1] + 96);
+      y = Math.max(y, last + TG.minGap); last = y;
+      return [colX(c), y];
+    });
+  });
+  const W = TG.padL + TG.padR + TREE_COLS.length * TG.colW;
+  const H = Math.max(...TREE_COLS.map(id => pos[id][pos[id].length - 1][1]), levelY(10)) + 80;
+  const hubX = colX(6);
+  const dimmed = id => filter !== "All" && T[id].group !== filter;
+  let edges = "", nodes = "", labels = "";
+  // difficulty bands: one per level, labelled on the left, tier names where a tier begins
+  for (let L = 1; L <= 10; L++) {
+    const top = levelY(L) - TG.unit / 2, tier = TIERS.find(t => t[0] === L);
+    edges += `<rect class="band${L % 2 ? "" : " alt"}" x="0" y="${top}" width="${W}" height="${TG.unit}"/>`;
+    if (tier) edges += `<line class="tierline" x1="0" x2="${W}" y1="${top}" y2="${top}"/>`;
+    labels += `<div class="tlv" style="top:${levelY(L)}px">${tier ? `<b>${tier[1]}</b>` : ""}<span>Lv ${L}</span></div>`;
+  }
+  // group headers across their columns
+  const groups = [];
+  TREE_COLS.forEach((id, c) => { const g = T[id].group, last = groups[groups.length - 1]; if (last && last.g === g) last.c1 = c; else groups.push({ g, c0: c, c1: c }); });
+  groups.forEach(({ g, c0, c1 }) => { labels += `<div class="tgroup g-${g}${filter !== "All" && g !== filter ? " dim" : ""}" style="left:${colX(c0) - TG.colW / 2 + 6}px;width:${(c1 - c0 + 1) * TG.colW - 12}px">${g}</div>`; });
+  TREE_COLS.forEach(id => {
+    const t = T[id], P = pos[id], L = lvl(id), dim = dimmed(id) ? " dim" : "";
+    const [x0, y0] = P[0];
+    // branch label above the first node
+    labels += `<div class="tlabel g-${t.group}${dim}" style="left:${x0}px;top:${y0 - 62}px" title="${esc(t.name)}">${id === "hspu" ? "HSPU" : esc(t.name)}<span>${Math.min(L, t.steps.length)}/${t.steps.length}</span></div>`;
+    // link into the branch: from the hub, or from the step that unlocks it
+    if (t.prereq) {
+      const [px, py] = pos[t.prereq[0]][t.prereq[1]], on = lvl(t.prereq[0]) > t.prereq[1];
+      const sx = px + (x0 > px ? 24 : -24);
+      edges += `<path class="g-${t.group}${on ? " on" : ""}${dim}" d="M${sx},${py} C${x0},${py} ${x0},${py} ${x0},${y0 - 66}"/>`;
+      if (on) edges += `<circle class="g-${t.group} spark${dim}" r="4" cx="${sx}" cy="${py}"/>`;
+    } else {
+      edges += `<path class="g-${t.group} on${dim}" d="M${hubX},${TG.hubY + 32} C${hubX},${TG.hubY + 80} ${x0},${TG.hubY + 60} ${x0},${y0 - 66}"/>`;
+    }
+    // trunk between steps
+    for (let i = 0; i + 1 < P.length; i++) edges += `<line class="g-${t.group}${i < L ? " on" : ""}${dim}" x1="${P[i][0]}" y1="${P[i][1] + 26}" x2="${P[i + 1][0]}" y2="${P[i + 1][1] - 26}"/>`;
+    // nodes
+    const locked = t.prereq && lvl(t.prereq[0]) <= t.prereq[1] && L === 0;
+    t.steps.forEach((s, i) => {
+      const st = statusOf(id, i), ready = st === "cur" && mastery(id, i).ready, isSel = sel && sel.t === id && sel.i === i, final = i === t.steps.length - 1;
+      const icon = st === "done" ? "✓" : locked && i === 0 ? LOCK : final ? "★" : i + 1;
+      nodes += `<button class="tn g-${t.group} ${st}${ready ? " ready" : ""}${final ? " final" : ""}${locked ? " locked" : ""}${isSel ? " sel" : ""}${dim}" style="left:${P[i][0]}px;top:${P[i][1]}px"
+        data-t="${id}" data-i="${i}" aria-label="${esc(t.name)}: ${esc(s[0])}, ${st === "done" ? "mastered" : st === "cur" ? "current step" : "upcoming"}">
+        <span class="tdot"><span>${icon}</span></span><span class="tnm">${esc(s[0])}</span></button>`;
+    });
+  });
+  const R = rankInfo();
+  const z = treeZoom;
+  host.innerHTML = `<div class="zoombar" role="group" aria-label="Zoom">
+      <button data-zoom="out" aria-label="Zoom out">−</button><span id="zoom-pct">${Math.round(z * 100)}%</span><button data-zoom="in" aria-label="Zoom in">+</button>
+      <button data-zoom="fit" class="zt">Fit all</button><button data-zoom="reset" class="zt">Actual size</button></div>
+    <div class="tree-scroll"><div class="tree-sizer" data-w="${W}" data-h="${H}" style="width:${W * z}px;height:${H * z}px">
+    <div class="tree" style="width:${W}px;height:${H}px;transform:scale(${z})">
+    <svg class="edges" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${edges}</svg>
+    <div class="thub" style="left:${hubX}px;top:${TG.hubY}px"><b>Start</b><span>${R.name}</span></div>
+    ${labels}${nodes}</div></div></div><p class="note tree-tip">Swipe to move around, pinch to zoom. Tap any node for details.</p><p class="note tree-tip-desk">Drag to move around, scroll inside the map to zoom. Click any node for details.</p>`;
+  const sc = host.querySelector(".tree-scroll");
+  // keep the view where it was: from the last render, or from the previous visit
+  let saved = null;
+  if (keepX === null) { try { saved = JSON.parse(localStorage.getItem("skill-ladder-pan")); } catch (e) {} }
+  if (keepX !== null) { sc.scrollLeft = keepX; sc.scrollTop = keepY; }
+  else if (saved) { sc.scrollLeft = saved.x; sc.scrollTop = saved.y; }
+  else if (sc.scrollWidth > sc.clientWidth) sc.scrollLeft = Math.max(0, hubX * z - sc.clientWidth / 2);
+  bindZoomGestures(sc);
+}
+
+// ---- Tree map: wheel or pinch to zoom, drag or swipe to move
+const ZMIN = .2, ZMAX = 1.6;
+let treeZoom = 1;
+try { treeZoom = Math.min(ZMAX, Math.max(ZMIN, +localStorage.getItem("skill-ladder-zoom") || 1)); } catch (e) {}
+// fx, fy: focal point in screen coordinates. The spot under it stays put while zooming.
+function applyZoom(z, fx, fy) {
+  const sc = document.querySelector(".tree-scroll"); if (!sc) return;
+  const sizer = sc.querySelector(".tree-sizer"), tree = sc.querySelector(".tree");
+  z = Math.min(ZMAX, Math.max(ZMIN, z));
+  const old = treeZoom; if (Math.abs(z - old) < .001) return;
+  const r = sc.getBoundingClientRect();
+  const px = (fx ?? r.left + r.width / 2) - r.left, py = (fy ?? r.top + r.height / 2) - r.top;
+  const cx = (px + sc.scrollLeft - sizer.offsetLeft) / old, cy = (py + sc.scrollTop - sizer.offsetTop) / old;
+  treeZoom = z;
+  sizer.style.width = sizer.dataset.w * z + "px"; sizer.style.height = sizer.dataset.h * z + "px";
+  tree.style.transform = `scale(${z})`;
+  sc.scrollLeft = cx * z + sizer.offsetLeft - px;
+  sc.scrollTop = cy * z + sizer.offsetTop - py;
+  const pct = document.getElementById("zoom-pct"); if (pct) pct.textContent = Math.round(z * 100) + "%";
+  try { localStorage.setItem("skill-ladder-zoom", String(Math.round(z * 100) / 100)); } catch (e) {}
+}
+function fitZoom() {
+  const sc = document.querySelector(".tree-scroll"); if (!sc) return;
+  const sz = sc.querySelector(".tree-sizer");
+  applyZoom(Math.min((sc.clientWidth - 8) / +sz.dataset.w, (sc.clientHeight - 8) / +sz.dataset.h));
+  sc.scrollLeft = 0; sc.scrollTop = 0;
+}
+let panSaveTimer = null;
+// mouse drag to move the map; a drag never counts as a click on a node
+let treeDrag = null;
+window.addEventListener("pointermove", e => {
+  const d = treeDrag; if (!d) return;
+  const dx = e.clientX - d.x, dy = e.clientY - d.y;
+  if (!d.moved && Math.hypot(dx, dy) > 5) { d.moved = true; d.sc.classList.add("dragging"); }
+  if (d.moved) { d.sc.scrollLeft = d.l - dx; d.sc.scrollTop = d.t - dy; e.preventDefault(); }
+});
+window.addEventListener("pointerup", () => {
+  const d = treeDrag; if (!d) return;
+  treeDrag = null; d.sc.classList.remove("dragging");
+  if (d.moved) {
+    const stop = ev => { ev.stopPropagation(); ev.preventDefault(); };
+    d.sc.addEventListener("click", stop, { capture: true, once: true });
+    setTimeout(() => d.sc.removeEventListener("click", stop, true), 60);
+  }
+});
+function bindZoomGestures(sc) {
+  sc.addEventListener("scroll", () => {
+    clearTimeout(panSaveTimer);
+    panSaveTimer = setTimeout(() => { try { localStorage.setItem("skill-ladder-pan", JSON.stringify({ x: Math.round(sc.scrollLeft), y: Math.round(sc.scrollTop) })); } catch (e) {} }, 300);
+  }, { passive: true });
+  sc.addEventListener("pointerdown", e => {
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
+    treeDrag = { sc, x: e.clientX, y: e.clientY, l: sc.scrollLeft, t: sc.scrollTop, moved: false };
+  });
+  let pinch = null;
+  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  sc.addEventListener("touchstart", e => { if (e.touches.length === 2) pinch = { d: dist(e.touches), z: treeZoom }; }, { passive: true });
+  sc.addEventListener("touchmove", e => {
+    if (!pinch || e.touches.length !== 2) return;
+    e.preventDefault();
+    const t = e.touches;
+    applyZoom(pinch.z * dist(t) / pinch.d, (t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2);
+  }, { passive: false });
+  sc.addEventListener("touchend", e => { if (e.touches.length < 2) pinch = null; });
+  // wheel inside the map zooms around the cursor (pinch on a trackpad too)
+  sc.addEventListener("wheel", e => {
+    e.preventDefault();
+    const d = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+    applyZoom(treeZoom * Math.exp(-d * (e.ctrlKey ? .01 : .0013)), e.clientX, e.clientY);
+  }, { passive: false });
+}
+
+function renderTree() {
+  $("tree-hint").innerHTML = `<span class="seg" role="group" aria-label="Layout"><button data-mode="tree" aria-pressed="${treeMode === "tree"}">Tree</button><button data-mode="list" aria-pressed="${treeMode === "list"}">List</button></span>`;
+  $("filters").innerHTML = GROUPS.map(g => `<button class="chip g-${g}" aria-pressed="${g === filter}" data-filter="${g}">${g === "All" ? "" : `<span class="sw"></span>`}${g}</button>`).join("");
+  if (treeMode === "tree") return renderSkillTree();
+  $("lanes").innerHTML = TRACKS.filter(t => filter === "All" || t.group === filter).map(t => {
+    const L = lvl(t.id), done = L >= t.steps.length;
+    const pre = t.prereq && lvl(t.prereq[0]) < t.prereq[1] + 1 && L === 0
+      ? `<div class="prereq">Best started after ${esc(step(t.prereq[0], t.prereq[1]).name)} on the ${esc(T[t.prereq[0]].name)} ladder</div>` : "";
+    return `<section class="lane g-${t.group}" id="lane-${t.id}">
+      <div class="lane-h"><div class="lf">${fig(t.id)}</div><div><div class="tag">${t.group}</div><h3>${esc(t.name)}</h3></div>
+        <div class="count">${done ? "Complete" : `${L} / ${t.steps.length}`}<div class="mini"><i style="width:${Math.min(1, L / t.steps.length) * 100}%"></i></div></div></div>
+      ${pre}
+      <div class="rail-scroll"><ol class="rail">${t.steps.map((s, i) => {
+        const st = statusOf(t.id, i), isSel = sel && sel.t === t.id && sel.i === i;
+        return `<li class="${st}${st === "cur" && mastery(t.id, i).ready ? " ready" : ""}"><button class="node${isSel ? " sel" : ""}" data-t="${t.id}" data-i="${i}" aria-label="${esc(s[0])}, ${st === "done" ? "mastered" : st === "cur" ? "current step" : "upcoming"}">
+          <span class="dot">${st === "done" ? "✓" : i + 1}</span><span class="nm">${esc(s[0])}</span></button></li>`;
+      }).join("")}</ol></div>
+    </section>`;
+  }).join("");
+  // keep the current step in view on each ladder
+  document.querySelectorAll(".lane").forEach(lane => {
+    const cur = lane.querySelector("li.cur"), sc = lane.querySelector(".rail-scroll");
+    if (cur && sc) sc.scrollLeft = Math.max(0, cur.offsetLeft - 20);
+  });
+}
+
+function setInputs(tid, i, prefix) {
+  const s = step(tid, i);
+  return `<div class="sets" data-sets="${prefix}">${Array.from({ length: s.sets }, (_, k) =>
+    `<label for="${prefix}-${k}">Set ${k + 1}<input id="${prefix}-${k}" type="number" inputmode="numeric" pattern="[0-9]*" min="0" placeholder="${s.target}"></label>`).join("")}
+    <button class="addset rm" type="button" data-rmset="${prefix}" data-min="${s.sets}" aria-label="Remove the last set" hidden>−</button><button class="addset" type="button" data-add="${prefix}" aria-label="Add a set">+</button></div>
+    ${quickFill(tid, i, prefix)}`;
+}
+// "All 15" fills every set with the target; "Same as last time" copies your last session of this step
+function quickFill(tid, i, prefix) {
+  const s = step(tid, i), u = isTime(s.unit) ? "s" : "";
+  const last = [...state.logs].reverse().find(l => l.tr === tid && l.st === i);
+  return `<div class="qfill"><button type="button" class="chip" data-fill="${prefix}" data-vals="${Array(s.sets).fill(s.target).join(",")}">All ${s.target}${u}</button>${last ?
+    `<button type="button" class="chip" data-fill="${prefix}" data-vals="${last.sets.join(",")}">Same as last time: ${last.sets.join(" · ")}</button>` : ""}</div>`;
+}
+
+function sparkline(tid, i) {
+  const pts = state.logs.filter(l => l.tr === tid && l.st === i).slice(-12).map(l => Math.max(...l.sets));
+  if (pts.length < 2) return "";
+  const target = step(tid, i).target, max = Math.max(target, ...pts) * 1.1, W = 300, H = 46;
+  const xy = pts.map((v, k) => [k * (W - 8) / (pts.length - 1) + 4, H - 4 - v / max * (H - 8)]);
+  const ty = H - 4 - target / max * (H - 8), last = xy[xy.length - 1];
+  return `<div><p class="h4">Best set per session</p><svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+    <line x1="0" x2="${W}" y1="${ty}" y2="${ty}" stroke="var(--good)" stroke-dasharray="4 4" stroke-width="1.5"/>
+    <polygon points="4,${H} ${xy.map(p => p.join(",")).join(" ")} ${last[0]},${H}" fill="var(--g)" opacity=".14"/>
+    <polyline points="${xy.map(p => p.join(",")).join(" ")}" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="${last[0]}" cy="${last[1]}" r="4" fill="var(--g)"/></svg>
+    <p class="note">Dashed line is the target (${target} ${UNIT_SHORT[step(tid, i).unit]})</p></div>`;
+}
+
+function renderPanel() {
+  const host = $("panel-host");
+  if (!sel) { host.innerHTML = ""; document.body.style.overflow = ""; return; }
+  const { t: tid, i } = sel, s = step(tid, i), st = statusOf(tid, i), b = best(tid, i), track = T[tid];
+  const statusTxt = { done:"Mastered", cur:"Current step", todo:"Upcoming" }[st];
+  const hit = (justHit && justHit.t === tid && justHit.i === i) || mastery(tid, i).ready;
+  let actions = "";
+  if (st === "cur") actions = `<button class="btn ${hit ? "good" : "alt"}" data-act="master">${hit ? "Mark as mastered" : "I've mastered it already"} · +${xpFor(i)} XP</button>`;
+  if (st === "todo") actions = `<button class="btn alt" data-act="jump">I can already do the steps before this</button>`;
+  if (st === "done") actions = `<button class="btn alt" data-act="jump">Go back to this step</button>`;
+  host.innerHTML = `${wide() ? "" : `<div class="scrim" data-act="close"></div>`}
+  <aside class="panel g-${track.group}" role="dialog" aria-label="${esc(s.name)}">
+    <div class="panel-band"><span class="handle"></span>
+      <div><div class="eyebrow">${esc(track.name)} · Step ${i + 1} of ${track.steps.length}</div><h2>${esc(s.name)}</h2><span class="status ${st}">${statusTxt}</span> <span class="status lvl">Lv ${LEVEL[tid][i]} · ${tierOf(LEVEL[tid][i])}</span></div>
+      ${figStep(tid, i)}
+      <button class="close" data-act="close" aria-label="Close">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="eta">${CLOCK}<div><b>${st === "done" ? "Usually takes" : "Estimated time to learn:"} ${etaText(tid, i)}</b>
+        <span>${etaFromCurrent(tid, i) ? `From your current step: about ${etaFromCurrent(tid, i)}. ` : ""}Based on training about 3 times a week; everyone progresses at their own pace.</span></div></div>
+      ${masteryCard(tid, i)}
+      ${st === "cur" && hit ? `<div class="row">${actions}</div><p class="note">Next up: ${i + 1 < track.steps.length ? esc(step(tid, i + 1).name) : "nothing, this is the top of the ladder"}.</p>` : ""}
+      <button class="btn go start" data-focus="${tid}:${i}" style="justify-content:center">${PLAY}Start exercise</button>
+      <div><p class="h4" style="margin-bottom:8px">Form cues</p><ol class="cues">${s.cues.map(c => `<li>${esc(c)}</li>`).join("")}</ol></div>
+      ${sparkline(tid, i)}
+      <form class="logform" data-form="panel" data-t="${tid}" data-i="${i}">
+        <p class="h4">Or log a session by hand</p>
+        ${setInputs(tid, i, "p")}
+        <div class="row"><button class="btn alt" type="submit">Log sets</button></div>
+      </form>
+      ${st === "cur" && hit ? "" : `<div class="row">${actions}</div>`}
+    </div>
+  </aside>`;
+  document.body.style.overflow = wide() ? "" : "hidden";
+  restoreDrafts();
+}
+
+// ---- Timer
+let tick = null, clock = { mode:null, start:0, dur:0 };
+function clockSecs() {
+  if (clock.mode === "rest") return Math.max(0, Math.ceil((clock.start + clock.dur - Date.now()) / 1000));
+  if (clock.mode === "hold") return Math.floor((Date.now() - clock.start) / 1000);
+  return 0;
+}
+const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+function clockPct() { return clock.mode === "rest" ? Math.max(0, (clock.start + clock.dur - Date.now()) / clock.dur) : clock.mode === "hold" ? (clockSecs() % 60) / 60 : 0; }
+function renderTimer() {
+  const label = clock.mode === "rest" ? "Resting" : clock.mode === "hold" ? "Holding" : "Rest timer";
+  $("timer").innerHTML = `<div class="face"><div class="tring">${ringSvg(clockPct(), 46, 5, "var(--balance)", "rgba(255,255,255,.14)")}</div>
+      <div><div class="lbl">${label}</div><div class="clock">${mmss(clockSecs())}</div></div></div>
+    <div class="row">
+      ${[60, 90, 120, 180].map(d => `<button data-rest="${d}" class="${clock.mode === "rest" && clock.dur === d * 1000 ? "on" : ""}">${d}s</button>`).join("")}
+      <button data-hold class="${clock.mode === "hold" ? "on" : ""}">${clock.mode === "hold" ? "Stop" : "Time a hold"}</button>
+      ${clock.mode ? `<button data-stop>Reset</button>` : ""}
+    </div>`;
+}
+// Update only the digits and ring so buttons aren't replaced mid-tap
+function renderTimerFace() {
+  const c = document.querySelector("#timer .clock"), r = document.querySelector("#timer .tring");
+  if (c) c.textContent = mmss(clockSecs());
+  if (r) r.innerHTML = ringSvg(clockPct(), 46, 5, "var(--balance)", "rgba(255,255,255,.14)");
+}
+// Phones only allow sound after a tap, so the audio is unlocked on the first tap and reused for every chime
+let audioCtx = null;
+function unlockAudio() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  } catch (e) {}
+}
+document.addEventListener("pointerdown", unlockAudio, { capture: true, passive: true });
+document.addEventListener("keydown", unlockAudio, { capture: true });
+function tone(freq, at, len, vol) {
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = "sine"; o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(vol, at + .02); g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+  o.connect(g); g.connect(audioCtx.destination); o.start(at); o.stop(at + len + .05);
+}
+// "rest": rising three-note chime played twice (rest is over). "hold": two quick notes (hold target reached).
+function beep(kind = "hold") {
+  try {
+    unlockAudio();
+    if (audioCtx) {
+      const t = audioCtx.currentTime + .05;
+      if (kind === "rest") [0, .9].forEach(r => [[784, 0], [988, .16], [1319, .32]].forEach(([f, d]) => tone(f, t + r + d, .45, .35)));
+      else [[880, 0], [1175, .18]].forEach(([f, d]) => tone(f, t + d, .3, .3));
+    }
+  } catch (e) {}
+  try { navigator.vibrate && navigator.vibrate(kind === "rest" ? [300, 120, 300, 120, 500] : [150, 80, 150]); } catch (e) {}
+}
+// In the installed app: a system notification when rest ends while the app is in the background
+const canNotify = () => { try { return "Notification" in window && window.isSecureContext && window.self === window.top; } catch (e) { return false; } };
+function restOver(text) {
+  beep("rest");
+  if (!canNotify() || Notification.permission !== "granted" || document.visibilityState === "visible") return;
+  const opts = { body: text, tag: "rest", renotify: true, vibrate: [300, 120, 300], icon: "icon-192.png", badge: "icon-192.png" };
+  try {
+    (navigator.serviceWorker ? navigator.serviceWorker.getRegistration() : Promise.resolve(null))
+      .then(r => r ? r.showNotification("Rest is over", opts) : new Notification("Rest is over", opts)).catch(() => {});
+  } catch (e) {}
+}
+function runClock() {
+  clearInterval(tick);
+  renderTimer();
+  if (!clock.mode) return;
+  tick = setInterval(() => {
+    if (clock.mode === "rest" && Date.now() >= clock.start + clock.dur) { clock = { mode:null }; restOver("Time for your next set."); clearInterval(tick); if (view === "today") renderTimer(); return; }
+    if (view === "today") renderTimerFace();
+  }, 250);
+}
+
+function renderToday() {
+  renderTimer();
+  // with a plan, today's session comes from it; on rest days (or without a plan) you pick ladders yourself
+  const planned = planToday(), usePlan = planned && planned.length;
+  const chips = TRACKS.map(t => `<button class="chip g-${t.group}" aria-pressed="${state.routine.includes(t.id)}" data-routine="${t.id}"><span class="sw"></span>${esc(t.name)}</button>`).join("");
+  let banner = "";
+  if (usePlan) {
+    $("today-hint").textContent = `From your plan · ${DAY_NAMES[todayIdx()]}`;
+    banner = `<div class="plan-banner"><span>Today's session for <b>${esc(goalName(state.plan.goals[0]))}</b>: do these in order, about ${state.plan.minutes} min.</span><button type="button" class="linkbtn" data-view="plan">See week</button></div>`;
+  } else if (state.plan) {
+    const next = [...state.plan.days].sort((a, b) => a - b).find(d => d > todayIdx()) ?? Math.min(...state.plan.days);
+    $("today-hint").textContent = "Rest day in your plan";
+    banner = `<div class="plan-banner"><span>Rest day. Your next planned session is <b>${DAY_NAMES[next]}</b>. Want to train anyway? Pick ladders below.</span><button type="button" class="linkbtn" data-view="plan">See week</button></div>`;
+  } else {
+    $("today-hint").textContent = `${state.routine.length} ladder${state.routine.length === 1 ? "" : "s"} in your routine`;
+    banner = `<div class="plan-banner"><span>Want a schedule built around the skill you want most?</span><button type="button" class="linkbtn" data-view="plan">Make a plan</button></div>`;
+  }
+  $("routine").innerHTML = banner + (usePlan ? "" : chips);
+  const list = usePlan ? planned.map(it => T[it.id]) : TRACKS.filter(t => state.routine.includes(t.id));
+  if (!list.length) { $("today").innerHTML = `<div class="empty">Tap ladders above to add them to today's workout.</div>`; return; }
+  $("today").innerHTML = list.map(t => {
+    const L = lvl(t.id);
+    if (L >= t.steps.length) return `<div class="card g-${t.group} donecard">${fig(t.id)}<h3>${esc(t.name)}</h3><p class="note ok">Ladder complete. Keep it sharp with regular practice.</p></div>`;
+    const s = step(t.id, L), m = mastery(t.id, L), hit = m.ready;
+    return `<form class="card g-${t.group}" data-form="today" data-t="${t.id}" data-i="${L}">
+      <div class="card-h">${figStep(t.id, L)}<div><div class="sub">${esc(t.name)} · step ${L + 1} of ${t.steps.length}</div><h3>${esc(s.name)}</h3></div>
+        <button type="button" class="linkbtn" data-open="${t.id}">Details</button></div>
+      <div class="m-mini${hit ? " ready" : ""}">
+        <div class="m-mini-top"><span>To master: <b>${requirement(s)}</b></span><b class="m-pct">${hit ? "Ready ★" : `${Math.round(m.pct * 100)}%`}</b></div>
+        <div class="m-track"><i style="width:${m.pct * 100}%"></i></div>
+        <p class="note${hit ? " ok" : ""}">${m.msg}</p>
+        <p class="note eta-mini">${CLOCK} Usually takes ${etaText(t.id, L)}</p>
+      </div>
+      ${setInputs(t.id, L, "d-" + t.id)}
+      <div class="row"><button type="button" class="btn go start" data-focus="${t.id}:${L}">${PLAY}Start exercise</button>
+        <button class="btn alt" type="submit">Log sets</button>
+        ${hit ? `<button type="button" class="btn good" data-master="${t.id}">Mark as mastered</button>` : ""}</div>
+    </form>`;
+  }).join("");
+}
+
+function heatmap() {
+  const counts = {};
+  state.logs.forEach(l => { const d = startOfDay(l.t); counts[d] = (counts[d] || 0) + l.sets.length; });
+  const today = new Date(); today.setHours(0,0,0,0);
+  const end = new Date(today); end.setDate(end.getDate() + (6 - end.getDay()));
+  const start = new Date(end); start.setDate(start.getDate() - 16 * 7 + 1);
+  let cells = "", active = 0;
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    const k = d.getTime(), n = counts[k] || 0, future = k > today.getTime();
+    if (n) active++;
+    const lv = n === 0 ? "" : n < 4 ? "l1" : n < 8 ? "l2" : n < 13 ? "l3" : "l4";
+    cells += `<i class="${lv}${k === today.getTime() ? " today" : ""}" style="${future ? "visibility:hidden" : ""}" title="${d.toLocaleDateString()}: ${n} sets"></i>`;
+  }
+  return `<div class="heat-wrap"><div class="heat">${cells}</div>
+    <div class="heat-foot"><span>${active} training day${active === 1 ? "" : "s"} in 16 weeks</span><span>Darker squares mean more sets</span></div></div>`;
+}
+
+let logEditing = null;
+// ---- Backup & restore: move progress between the Claude version and the apps (or to a new phone)
+const BACKUP_PREFIX = "SKILLLADDER1:";
+function makeBackup() {
+  const data = { v: 1, at: Date.now(), levels: state.levels, routine: state.routine, logs: state.logs, plan: state.plan || null };
+  return BACKUP_PREFIX + btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+}
+function readBackup(text) {
+  const t = (text || "").trim(), i = t.indexOf(BACKUP_PREFIX);
+  if (i < 0) throw new Error("That doesn't look like a Skill Ladder backup. Copy the whole code, starting with SKILLLADDER1.");
+  const data = JSON.parse(decodeURIComponent(escape(atob(t.slice(i + BACKUP_PREFIX.length).replace(/\s+/g, "")))));
+  if (!data || typeof data.levels !== "object" || !Array.isArray(data.logs)) throw new Error("The backup code is incomplete. Copy it again and paste the whole thing.");
+  return data;
+}
+// Restoring merges instead of overwriting: the higher level wins on each ladder and logs from both are kept
+function mergeBackup(data) {
+  const levels = { ...state.levels };
+  Object.entries(data.levels).forEach(([k, v]) => { if (T[k] && Number.isFinite(v)) levels[k] = Math.max(levels[k] || 0, Math.min(v, T[k].steps.length)); });
+  const seen = new Set(state.logs.map(l => l.id));
+  const logs = state.logs.concat(data.logs.filter(l => l && l.id && !seen.has(l.id) && T[l.tr] && Array.isArray(l.sets))).sort((a, b) => a.t - b.t).slice(-600);
+  const added = logs.length - state.logs.length;
+  state = { ...state, levels, logs, routine: state.routine.length ? state.routine : (data.routine || state.routine), plan: state.plan || data.plan || null };
+  save();
+  return added;
+}
+let backupOpen = false, backupMsg = "";
+function backupHTML() {
+  return `<div class="backup">
+    <div class="backup-h"><p class="h4">Backup &amp; restore</p><span class="note">Move your progress to another version of Skill Ladder or a new phone.</span></div>
+    <div class="row"><button type="button" class="btn alt" data-backup="copy">Copy backup</button>
+      <button type="button" class="btn alt" data-backup="open" aria-expanded="${backupOpen}">Restore from backup</button></div>
+    <textarea id="backup-out" class="backup-text" readonly hidden aria-label="Your backup code"></textarea>
+    ${backupOpen ? `<div class="backup-in"><label for="backup-in" class="note">Paste a backup code from the other version, then tap Restore. Your current progress is kept and combined with it.</label>
+      <textarea id="backup-in" class="backup-text" placeholder="SKILLLADDER1:…"></textarea>
+      <div class="row"><button type="button" class="btn go" data-backup="restore">Restore</button><button type="button" class="btn alt" data-backup="close">Cancel</button></div></div>` : ""}
+    ${backupMsg ? `<p class="note ${backupMsg.startsWith("!") ? "bad" : "ok"}">${esc(backupMsg.replace(/^!/, ""))}</p>` : ""}
+  </div>`;
+}
+function backupClick(a) {
+  if (a === "copy") {
+    const code = makeBackup(), out = document.getElementById("backup-out");
+    const fallback = () => { out.hidden = false; out.value = code; out.focus(); out.select(); backupMsg = "Copy the code below (it's selected), then paste it into the other version."; showMsg(); };
+    try { navigator.clipboard.writeText(code).then(() => { backupMsg = `Backup copied: ${Object.keys(state.levels).length} ladders and ${state.logs.length} logged sessions. Paste it into the other version's Restore box.`; showMsg(); }, fallback); }
+    catch (e) { fallback(); }
+    return;
+  }
+  if (a === "open") { backupOpen = !backupOpen; backupMsg = ""; return render(); }
+  if (a === "close") { backupOpen = false; backupMsg = ""; return render(); }
+  if (a === "restore") {
+    try {
+      const added = mergeBackup(readBackup(document.getElementById("backup-in").value));
+      backupOpen = false; backupMsg = `Restored. Added ${added} logged session${added === 1 ? "" : "s"} and updated your levels.`;
+    } catch (e) { backupMsg = "!" + (e && e.message && !/atob|JSON|URI/i.test(e.message) ? e.message : "That code couldn't be read. Copy the whole backup again and paste it."); }
+    return render();
+  }
+}
+function showMsg() {
+  const el = document.querySelector(".backup"); if (!el) return;
+  let p = el.querySelector("p.note.ok, p.note.bad");
+  if (!p) { p = document.createElement("p"); el.appendChild(p); }
+  p.className = "note ok"; p.textContent = backupMsg;
+}
+function renderLog() {
+  let html = heatmap();
+  if (!state.logs.length) { $("log").innerHTML = html + `<div class="empty">No sessions yet. Log sets from a skill or from today's workout and they show up here.</div>` + backupHTML(); return; }
+  const byDay = {};
+  [...state.logs].sort((a, b) => b.t - a.t).slice(0, 150).forEach(l => (byDay[dayKey(l.t)] ||= []).push(l));
+  html += Object.entries(byDay).map(([d, ls]) => `<div class="day"><h3>${esc(d)}</h3>${ls.map(l => {
+    const t = T[l.tr]; if (!t || !t.steps[l.st]) return "";
+    const s = step(l.tr, l.st), ok = hitTarget(l.tr, l.st, l.sets);
+    return `<div class="entry g-${t.group}"><span class="bar"></span><div class="what"><b>${esc(s.name)}</b><span>${esc(t.name)} · target ${fmtTarget(s)} ${UNIT_SHORT[s.unit]}</span></div>
+      ${logEditing === l.id
+        ? `<div class="vals edit" data-logbox="${l.id}">${l.sets.map((v, k) => `<input type="number" inputmode="numeric" min="0" value="${v}" aria-label="Set ${k + 1}">`).join("")}<input type="number" inputmode="numeric" min="0" placeholder="+" aria-label="Add a set"></div>
+          <span class="logbtns"><button class="x" data-logsave="${l.id}">Save</button><button class="x" data-logcancel>Cancel</button></span>`
+        : `<button type="button" class="vals tapedit ${ok ? "hit" : ""}" data-logedit="${l.id}" aria-label="Edit sets: ${l.sets.join(", ")}">${l.sets.join(" · ")}${ok ? " ✓" : ""}</button>
+          <span class="logbtns"><button class="x${armed === l.id ? " arm" : ""}" data-del="${l.id}">${armed === l.id ? "Delete?" : "Remove"}</button></span>`}</div>`;
+  }).join("")}</div>`).join("");
+  html += backupHTML();
+  html += `<div class="danger"><button class="btn alt" data-reset>${armed === "reset" ? "Tap again to erase all progress and logs" : "Reset all progress"}</button></div>`;
+  $("log").innerHTML = html;
+}
+
+// ---- Celebration
+function celebrate(tid, i) {
+  const t = T[tid], colors = ["var(--push)","var(--pull)","var(--core)","var(--legs)","var(--balance)"];
+  const bits = Array.from({ length: 28 }, (_, k) => {
+    const a = Math.random() * Math.PI * 2, d = 120 + Math.random() * 160;
+    return `<i style="background:${colors[k % 5]};--x:${Math.cos(a) * d}px;--y:${Math.sin(a) * d}px;--r:${Math.random() * 720}deg"></i>`;
+  }).join("");
+  $("party-host").innerHTML = `<div class="party g-${t.group}" role="status">${bits}<div class="party-card">${fig(tid)}
+    <span class="k">Step mastered</span><b>${esc(step(tid, i).name)}</b><span class="xp">+${xpFor(i)} XP</span>
+    ${i + 1 < t.steps.length ? `<span class="note" style="color:inherit;opacity:.75">Next up: ${esc(step(tid, i + 1).name)}</span>` : `<span class="note" style="color:inherit;opacity:.75">${esc(t.name)} ladder complete</span>`}</div></div>`;
+  const el = $("party-host").firstChild;
+  setTimeout(() => el && el.classList.add("out"), 2200);
+  setTimeout(() => { $("party-host").innerHTML = ""; }, 2550);
+}
+function master(tid, i) {
+  state.levels = { ...state.levels, [tid]: i + 1 }; justHit = null; save(); celebrate(tid, i);
+}
+
+// ---- Guided exercise mode
+let fo = null, foTick = null, wake = null;
+const isTime = u => u === "s" || u === "ss";
+const RING_W = 270;
+function lockWake() { try { navigator.wakeLock && navigator.wakeLock.request("screen").then(w => { wake = w; }).catch(() => {}); } catch (e) {} }
+// The running session is saved on every change, so closing the app or switching away never loses it
+const SESSION_KEY = "skill-ladder-session";
+function saveFo() { try { fo ? localStorage.setItem(SESSION_KEY, JSON.stringify(fo)) : localStorage.removeItem(SESSION_KEY); } catch (e) {} }
+function logSession(tid, i, sets) {
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  state.logs = [...state.logs, { id, t: Date.now(), tr: tid, st: i, sets: sets.slice() }];
+  if (state.logs.length > 600) state.logs = state.logs.slice(-600);
+  save();
+  return id;
+}
+// keep a saved session's log entry in step with edits made afterwards
+function syncLogged() {
+  if (!fo || !fo.loggedId) return;
+  state.logs = fo.sets.length ? state.logs.map(l => l.id === fo.loggedId ? { ...l, sets: fo.sets.slice() } : l) : state.logs.filter(l => l.id !== fo.loggedId);
+  if (!fo.sets.length) fo.loggedId = null;
+  fo.hit = hitTarget(fo.tid, fo.i, fo.sets);
+  save();
+}
+function toast(msg) {
+  const el = document.createElement("div"); el.className = "toast"; el.setAttribute("role", "status"); el.textContent = msg;
+  document.body.appendChild(el); setTimeout(() => el.remove(), 3200);
+}
+function startFocus(tid, i) {
+  // same exercise already running: just bring it back
+  if (fo && fo.tid === tid && fo.i === i) { fo.min = false; document.body.style.overflow = "hidden"; lockWake(); return renderFocus(); }
+  // another exercise in progress: keep its sets by saving them to the log first
+  if (fo && fo.sets.length && fo.phase !== "saved") { logSession(fo.tid, fo.i, fo.sets); toast(`Saved ${fo.sets.length} set${fo.sets.length === 1 ? "" : "s"} of ${step(fo.tid, fo.i).name} to your log`); }
+  fo = { tid, i, sets: [], cur: 0, phase: "work", running: false, t0: 0, acc: 0, beeped: false, restDur: 90, restStart: 0, arm: false, hit: false, min: false, started: Date.now() };
+  sel = null; renderPanel(); clock = { mode:null }; clearInterval(tick);
+  document.body.style.overflow = "hidden"; lockWake(); renderFocus();
+  clearInterval(foTick); foTick = setInterval(focusTick, 200);
+}
+function exitFocus() {
+  fo = null; saveFo(); clearInterval(foTick); try { wake && wake.release(); } catch (e) {} wake = null;
+  $("focus-host").innerHTML = ""; document.body.style.overflow = ""; render();
+}
+function pillStatus() {
+  const s = step(fo.tid, fo.i), n = fo.sets.length;
+  if (fo.phase === "rest") return `Resting · ${mmss(restLeft())} · next set ${n + 1} of ${s.sets}`;
+  if (fo.phase === "work" && fo.running) return `Holding · ${mmss(elapsed())} · set ${n + 1} of ${Math.max(s.sets, n + 1)}`;
+  if (fo.phase === "done") return `${n} sets done · tap to save`;
+  if (fo.phase === "saved") return "Saved · tap to finish";
+  return `Set ${n + 1} of ${Math.max(s.sets, n + 1)}${fo.cur ? ` · ${fo.cur} reps so far` : ""}`;
+}
+const elapsed = () => Math.floor((fo.acc + (fo.running ? Date.now() - fo.t0 : 0)) / 1000);
+const restLeft = () => Math.max(0, Math.ceil((fo.restStart + fo.restDur * 1000 - Date.now()) / 1000));
+function focusRing(pct, color = "#F2F5F3") { return ringSvg(Math.max(0, Math.min(1, pct)), RING_W, 12, color, "rgba(255,255,255,.14)"); }
+function focusTick() {
+  if (!fo) return;
+  const s = step(fo.tid, fo.i);
+  if (fo.min) {
+    if (fo.phase === "work" && fo.running && !fo.beeped && elapsed() >= s.target) { fo.beeped = true; beep(); saveFo(); }
+    if (fo.phase === "rest" && restLeft() <= 0) { restOver(`Next: set ${fo.sets.length + 1} of ${step(fo.tid, fo.i).name}.`); fo.phase = "work"; return renderFocus(); }
+    const p = document.querySelector(".f-pill-status"); if (p) p.textContent = pillStatus();
+    return;
+  }
+  if (fo.phase === "work" && fo.running) {
+    const e = elapsed();
+    if (!fo.beeped && e >= s.target) { fo.beeped = true; beep(); }
+    const b = document.querySelector(".f-num b"), r = document.querySelector(".f-ring");
+    if (b) b.textContent = mmss(e);
+    if (r) r.firstElementChild.outerHTML = focusRing(e / s.target, e >= s.target ? "#7BE0A4" : "#F2F5F3");
+  }
+  if (fo.phase === "rest") {
+    const left = restLeft();
+    if (left <= 0) { restOver(`Next: set ${fo.sets.length + 1} of ${step(fo.tid, fo.i).name}.`); fo.phase = "work"; return renderFocus(); }
+    const b = document.querySelector(".f-num b"), r = document.querySelector(".f-ring");
+    if (b) b.textContent = mmss(left);
+    if (r) r.firstElementChild.outerHTML = focusRing(left / fo.restDur);
+  }
+}
+const focusFig = () => figStep(fo.tid, fo.i, "fig f-fig" + (SP[fo.tid][fo.i].B ? "" : " still"));
+function renderFocus() {
+  if (!fo) return;
+  saveFo();
+  const t = T[fo.tid], s = step(fo.tid, fo.i), timed = isTime(s.unit), n = fo.sets.length;
+  if (fo.min) {
+    // minimized: a floating bar that keeps the session running while you look around
+    $("focus-host").innerHTML = `<button class="f-pill g-${t.group}" data-f="resume" aria-label="Resume ${esc(s.name)} session">
+      ${figStep(fo.tid, fo.i, "fig", false)}<span class="f-pill-text"><b>${esc(s.name)}</b><span class="f-pill-status">${pillStatus()}</span></span><span class="f-pill-go">Resume</span></button>`;
+    document.body.style.overflow = "";
+    return;
+  }
+  document.body.style.overflow = "hidden";
+  const side = s.unit === "rs" || s.unit === "ss" ? " per side" : "";
+  const pills = Array.from({ length: Math.max(s.sets, n + (fo.phase === "work" ? 1 : 0)) }, (_, k) =>
+    k < n ? `<button type="button" class="d${fo.sets[k] >= s.target ? " hit" : ""}" data-f="editset" data-k="${k}" aria-label="Edit set ${k + 1}: ${fo.sets[k]}">${fo.sets[k]}</button>` : `<i class="${k === n && fo.phase === "work" ? "c" : ""}">${k + 1}</i>`).join("");
+  const setLbl = fo.phase === "work" ? `Set ${n + 1} of ${Math.max(s.sets, n + 1)}` : fo.phase === "rest" ? `Rest · ${n} of ${s.sets} done` : `${n} sets`;
+  let mid = "";
+  if (fo.phase === "work") {
+    if (timed) {
+      const e = elapsed();
+      mid = `<h2 class="f-name">${esc(s.name)}</h2>${focusFig()}
+        <button class="f-ring" data-f="go" aria-label="${fo.running ? "Stop hold" : "Start hold"}">${focusRing(e / s.target, e >= s.target ? "#7BE0A4" : "#F2F5F3")}
+          <span class="f-num"><b>${mmss(e)}</b><span>Target ${s.target}s${side}</span></span></button>
+        <p class="f-hint">${fo.running ? "Tap the ring or Stop when you come down" : e ? "Adjust if needed, then finish the set" : "Get in position, then tap Start"}</p>
+        <div class="f-sets">${pills}</div>
+        <div class="f-ctrl">
+          ${fo.running ? "" : `<button class="f-round" data-f="tminus" aria-label="Minus one second">−</button>`}
+          ${fo.running ? `<button class="f-main" data-f="go">Stop</button>`
+            : e ? `<button class="f-main go" data-f="done">Finish set</button>` : `<button class="f-main go" data-f="go">Start hold</button>`}
+          ${fo.running ? "" : `<button class="f-round" data-f="tplus" aria-label="Plus one second">+</button>`}
+        </div>
+        ${!fo.running && e ? `<button class="f-alt" data-f="go">Resume timer</button>` : ""}`;
+    } else {
+      const lo = Math.max(1, s.target - 4), quick = Array.from({ length: 7 }, (_, k) => lo + k);
+      mid = `<h2 class="f-name">${esc(s.name)}</h2>
+        <button class="f-tapzone" data-f="plus" aria-label="Count a rep. ${fo.cur} of ${s.target} so far">
+          ${focusFig()}
+          <span class="f-ring">${focusRing(fo.cur / s.target, fo.cur >= s.target ? "#7BE0A4" : "#F2F5F3")}
+            <span class="f-num"><b>${fo.cur}</b><span>of ${s.target} reps${side}</span></span></span>
+          <span class="f-hint">Tap anywhere here after each rep</span>
+        </button>
+        <div class="f-sets">${pills}</div>
+        <div class="f-ctrl">
+          <button class="f-round" data-f="minus" aria-label="Remove a rep">−</button>
+          <button class="f-main go" data-f="done"${fo.cur ? "" : " disabled"}>${fo.cur ? `Finish set · ${fo.cur} reps` : "Finish set"}</button>
+          <button class="f-round" data-f="plus" aria-label="Add a rep">+</button>
+        </div>
+        <div class="f-quick"><span>Or tap how many you did</span>
+          <div class="f-chips">${quick.map(n => `<button data-f="quick" data-v="${n}" class="${n === s.target ? "on" : ""}">${n}</button>`).join("")}</div></div>`;
+    }
+  } else if (fo.phase === "rest") {
+    const left = restLeft();
+    mid = `<h2 class="f-name">Rest</h2>
+      <div class="f-ring" role="timer">${focusRing(left / fo.restDur)}<span class="f-num"><b>${mmss(left)}</b><span>Next: set ${n + 1} · ${s.target}${timed ? "s" : " reps"}${side}</span></span></div>
+      <div class="f-sets">${pills}</div>
+      <div class="f-chips">${[60, 90, 120, 180].map(d => `<button data-f="rest" data-d="${d}" class="${fo.restDur === d ? "on" : ""}">${d}s</button>`).join("")}<button data-f="rest30">+30s</button></div>
+      <div class="f-ctrl"><button class="f-main" data-f="skip">Start next set</button></div>
+      <button class="f-alt" data-f="undo">Undo last set (${fo.sets[fo.sets.length - 1]}${timed ? "s" : ""})</button>
+      ${canNotify() && Notification.permission === "default" ? `<button class="f-alt" data-f="notify">Alert me when rest ends, even if I switch apps</button>` : ""}`;
+  } else if (fo.phase === "done") {
+    const hit = hitTarget(fo.tid, fo.i, fo.sets);
+    mid = `${focusFig()}<h2 class="f-name">${hit ? "Target hit" : "Session done"}</h2>
+      <div class="f-sets">${pills}</div>
+      <p class="f-msg ${hit ? "ok" : ""}">${hit ? `Every set reached ${s.target}${timed ? "s" : ""}. Save it and you can mark this step as mastered.` : (() => {
+        const shorts = [...fo.sets].sort((a, b) => b - a).slice(0, s.sets).filter(v => v < s.target).map(v => s.target - v);
+        const missing = Math.max(0, s.sets - fo.sets.length);
+        return `To master: ${requirement(s).replace(/<\/?b>/g, "")} ${shorts.length ? `Today you were short by ${shorts.join(", ")}${timed ? "s" : " reps"}.` : ""}${missing ? ` ${missing} more set${missing === 1 ? "" : "s"} needed.` : ""}`;
+      })()}</p>
+      <div class="f-ctrl"><button class="f-main go" data-f="save">Save to log</button></div>
+      <button class="f-alt" data-f="more">Add another set</button>`;
+  } else if (fo.phase === "saved") {
+    const canMaster = fo.hit && statusOf(fo.tid, fo.i) === "cur";
+    mid = `${focusFig()}<h2 class="f-name">Saved</h2>
+      <div class="f-sets">${pills}</div>
+      <p class="f-msg ${canMaster ? "ok" : ""}">${canMaster ? `Ready to move up to ${fo.i + 1 < t.steps.length ? esc(step(fo.tid, fo.i + 1).name) : "the top of the ladder"}?` : "Logged. See it in your training log."}</p>
+      <div class="f-ctrl">${canMaster ? `<button class="f-main go" data-f="master">Mark as mastered · +${xpFor(fo.i)} XP</button>` : `<button class="f-main" data-f="close">Done</button>`}</div>
+      ${canMaster ? `<button class="f-alt" data-f="close">Not yet</button>` : ""}`;
+  }
+  const unsaved = fo.sets.length && fo.phase !== "saved";
+  const fresh = !document.querySelector(".focus");
+  $("focus-host").innerHTML = `<div class="focus g-${t.group}${fresh ? " enter" : ""}" role="dialog" aria-label="${esc(s.name)} session">
+    <div class="f-top"><button class="f-x" data-f="min" aria-label="Minimize, keep the session running" title="Minimize"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="f-x${fo.arm ? " arm" : ""}" data-f="exit" aria-label="End session">${fo.arm ? "Discard sets?" : "✕"}</button>
+      <div class="f-eyebrow">${esc(t.name)}<br>Step ${fo.i + 1} of ${t.steps.length}</div>
+      <button class="f-cuebtn" data-f="cues" aria-expanded="${!!fo.cues}">Cues</button><span class="f-setlbl">${setLbl}</span>
+      ${fo.cues ? `<div class="f-cuebox" role="region" aria-label="Form cues"><p>Form cues</p><ol>${s.cues.map(c => `<li>${esc(c)}</li>`).join("")}</ol></div>` : ""}</div>
+    <div class="f-inner">${mid}</div>
+    ${sheetHTML(s, timed, n)}
+  </div>`;
+  if (!unsaved) fo.arm = false;
+}
+function repTick(hitTarget) {
+  if (hitTarget) return beep();
+  try { unlockAudio(); if (audioCtx) tone(1500, audioCtx.currentTime + .01, .07, .18); } catch (e) {}
+  try { navigator.vibrate && navigator.vibrate(18); } catch (e) {}
+}
+function sheetHTML(s, timed, n) {
+  const u = timed ? "s" : " reps", side = isSide(s.unit) ? " per side" : "";
+  const stepper = (v, minus, plus) => `<div class="sh-num"><button type="button" class="f-round" data-f="${minus}" aria-label="Less">−</button>
+    <b>${v}<small>${u}${side}</small></b><button type="button" class="f-round" data-f="${plus}" aria-label="More">+</button></div>`;
+  if (fo.pending != null) return `<div class="f-scrim"></div><div class="f-sheet" role="dialog" aria-label="Confirm set">
+    <p class="sh-k">Set ${n + 1} of ${Math.max(s.sets, n + 1)}</p><h3>Did you do this set?</h3>
+    ${stepper(fo.pending, "pend-minus", "pend-plus")}
+    <p class="sh-note">${fo.pending >= s.target ? "That hits the target." : `Target is ${s.target}${u}.`} Change the number if it's not right.</p>
+    <div class="sh-row"><button type="button" class="f-main go" data-f="pend-ok"${fo.pending ? "" : " disabled"}>Yes, log ${fo.pending}${u}</button>
+      <button type="button" class="f-alt" data-f="pend-cancel">Not yet</button></div></div>`;
+  if (fo.edit != null) return `<div class="f-scrim" data-f="edit-cancel"></div><div class="f-sheet" role="dialog" aria-label="Edit set">
+    <p class="sh-k">${fo.loggedId ? "Already saved · changes update your log" : "Finished set"}</p><h3>Edit set ${fo.edit + 1}</h3>
+    ${stepper(fo.editV, "edit-minus", "edit-plus")}
+    <div class="sh-row"><button type="button" class="f-main go" data-f="edit-save"${fo.editV ? "" : " disabled"}>Save</button>
+      <button type="button" class="f-alt" data-f="edit-cancel">Cancel</button></div>
+    <button type="button" class="sh-del" data-f="edit-del">${fo.delArm ? "Tap again to erase this set" : "Erase this set"}</button></div>`;
+  return "";
+}
+function updateReps() {
+  const s = step(fo.tid, fo.i), hit = fo.cur >= s.target;
+  const b = document.querySelector(".f-num b"), ring = document.querySelector(".f-tapzone .f-ring"), fin = document.querySelector('.focus [data-f="done"]');
+  if (b) b.textContent = fo.cur;
+  if (ring) ring.firstElementChild.outerHTML = focusRing(fo.cur / s.target, hit ? "#7BE0A4" : "#F2F5F3");
+  if (fin) { fin.disabled = !fo.cur; fin.textContent = fo.cur ? `Finish set · ${fo.cur} reps` : "Finish set"; }
+  const z = document.querySelector(".f-tapzone"); if (z) z.setAttribute("aria-label", `Count a rep. ${fo.cur} of ${s.target} so far`);
+  saveFo();
+}
+// update the open panel's number in place
+function updateSheet() {
+  const s = step(fo.tid, fo.i), timed = isTime(s.unit), u = timed ? "s" : " reps";
+  const v = fo.pending != null ? fo.pending : fo.editV;
+  const num = document.querySelector(".sh-num b"); if (num) num.firstChild.textContent = v;
+  const ok = document.querySelector('[data-f="pend-ok"], [data-f="edit-save"]');
+  if (ok) { ok.disabled = !v; if (fo.pending != null) ok.textContent = `Yes, log ${v}${u}`; }
+  const note = document.querySelector(".sh-note");
+  if (note) note.textContent = `${v >= s.target ? "That hits the target." : `Target is ${s.target}${u}.`} Change the number if it's not right.`;
+  saveFo();
+}
+let sheetClosing = false;
+function focusAction(a, el) {
+  const s = step(fo.tid, fo.i);
+  // closing the panel: let it slide away, then apply the choice
+  const closes = ["pend-ok", "pend-cancel", "edit-save", "edit-cancel"].includes(a) || (a === "edit-del" && fo.delArm);
+  if (closes && !sheetClosing) {
+    const sh = document.querySelector(".f-sheet");
+    if (sh) {
+      if (sh.classList.contains("leaving")) return;
+      sh.classList.add("leaving"); document.querySelector(".f-scrim")?.classList.add("leaving");
+      setTimeout(() => { sheetClosing = true; try { if (fo) focusAction(a, el); } finally { sheetClosing = false; } }, 170);
+      return;
+    }
+  }
+  if (a !== "exit") fo.arm = false;
+  switch (a) {
+    case "plus": fo.cur++; repTick(fo.cur === s.target); return updateReps();
+    case "minus": fo.cur = Math.max(0, fo.cur - 1); return updateReps();
+    case "quick": fo.cur = +el.dataset.v; fo.pending = fo.cur; break;
+    case "undo": { const v = fo.sets.pop(); if (v == null) break; if (isTime(s.unit)) fo.acc = v * 1000; else fo.cur = v; fo.phase = "work"; break; }
+    case "go":
+      if (fo.running) { fo.acc += Date.now() - fo.t0; fo.running = false; }
+      else { fo.t0 = Date.now(); fo.running = true; }
+      break;
+    case "tminus": fo.acc = Math.max(0, fo.acc - 1000); break;
+    case "tplus": fo.acc += 1000; break;
+    case "done": {
+      if (fo.running) { fo.acc += Date.now() - fo.t0; fo.running = false; }
+      const v = isTime(s.unit) ? Math.floor(fo.acc / 1000) : fo.cur;
+      if (!v) break;
+      fo.pending = v;   // ask first; nothing is recorded until confirmed
+      break;
+    }
+    case "pend-minus": fo.pending = Math.max(0, fo.pending - 1); return updateSheet();
+    case "pend-plus": fo.pending++; return updateSheet();
+    case "pend-cancel": if (isTime(s.unit)) fo.acc = fo.pending * 1000; else fo.cur = fo.pending; fo.pending = null; break;
+    case "pend-ok": {
+      const v = fo.pending; fo.pending = null; if (!v) break;
+      fo.sets.push(v); fo.cur = 0; fo.acc = 0; fo.beeped = false;
+      if (fo.sets.length >= s.sets) fo.phase = "done";
+      else { fo.phase = "rest"; fo.restStart = Date.now(); }
+      break;
+    }
+    case "editset": fo.edit = +el.dataset.k; fo.editV = fo.sets[fo.edit]; fo.delArm = false; break;
+    case "edit-minus": fo.editV = Math.max(0, fo.editV - 1); return updateSheet();
+    case "edit-plus": fo.editV++; return updateSheet();
+    case "edit-cancel": fo.edit = null; fo.delArm = false; break;
+    case "edit-save": if (fo.editV) { fo.sets[fo.edit] = fo.editV; syncLogged(); } fo.edit = null; break;
+    case "edit-del":
+      if (!fo.delArm) { fo.delArm = true; break; }
+      fo.sets.splice(fo.edit, 1); fo.edit = null; fo.delArm = false;
+      if (fo.phase === "done" && fo.sets.length < s.sets) fo.phase = "work";
+      syncLogged();
+      break;
+    case "rest": fo.restDur = +el.dataset.d; break;
+    case "rest30": fo.restDur += 30; break;
+    case "skip": case "more": fo.phase = "work"; break;
+    case "save":
+      fo.loggedId = logSession(fo.tid, fo.i, fo.sets);
+      fo.hit = hitTarget(fo.tid, fo.i, fo.sets); fo.phase = "saved";
+      break;
+    case "min": fo.min = true; renderFocus(); return render();
+    case "resume": fo.min = false; lockWake(); break;
+    case "cues": fo.cues = !fo.cues; break;
+    case "notify": try { Notification.requestPermission().then(() => renderFocus()); } catch (e) {} return;
+    case "master": { const { tid, i } = fo; exitFocus(); master(tid, i); return render(); }
+    case "close": return exitFocus();
+    case "exit":
+      if (fo.sets.length && fo.phase !== "saved" && !fo.arm) { fo.arm = true; break; }
+      return exitFocus();
+  }
+  renderFocus();
+}
+
+// ---- Set boxes you've typed into but not logged yet survive re-renders and closing the app
+const DRAFT_KEY = "skill-ladder-drafts";
+let drafts = {};
+try { drafts = JSON.parse(localStorage.getItem(DRAFT_KEY)) || {}; } catch (e) {}
+const draftKey = (f, k) => `${f.dataset.form}:${f.dataset.t}:${f.dataset.i}:${k}`;
+function saveDrafts() { try { localStorage.setItem(DRAFT_KEY, JSON.stringify(drafts)); } catch (e) {} }
+function restoreDrafts() {
+  document.querySelectorAll("form[data-form]").forEach(f => f.querySelectorAll("input").forEach((inp, k) => {
+    const v = drafts[draftKey(f, k)]; if (v != null && inp.value === "") inp.value = v;
+  }));
+}
+function clearDrafts(f) { Object.keys(drafts).forEach(key => { if (key.startsWith(`${f.dataset.form}:${f.dataset.t}:${f.dataset.i}:`)) delete drafts[key]; }); saveDrafts(); }
+document.addEventListener("input", e => {
+  const f = e.target.closest("form[data-form]"); if (!f || e.target.tagName !== "INPUT") return;
+  const k = [...f.querySelectorAll("input")].indexOf(e.target);
+  if (e.target.value === "") delete drafts[draftKey(f, k)]; else drafts[draftKey(f, k)] = e.target.value;
+  saveDrafts();
+});
+// ask the browser to keep this app's saved data even when the phone is low on space
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist().catch(() => {}); } catch (e) {}
+
+// ---- Events
+document.addEventListener("click", e => {
+  const el = e.target.closest("button, .scrim"); if (!el) return;
+  if (el.dataset.f && fo) return focusAction(el.dataset.f, el);
+  if ((el.dataset.goal || el.dataset.pdays || el.dataset.pday || el.dataset.pmin || el.dataset.pdayView || el.dataset.plan) && planClick(el)) return;
+  if (el.dataset.focus) { const [tid, i] = el.dataset.focus.split(":"); return startFocus(tid, +i); }
+  if (el.dataset.view) { view = el.dataset.view; armed = null; try { localStorage.setItem("skill-ladder-view", view); } catch (x) {} sel = wide() ? sel : null; try { history.replaceState(null, "", "#" + view); } catch (x) {} window.scrollTo(0, 0); return render(); }
+  if (el.dataset.filter) { filter = el.dataset.filter; return renderTree(); }
+  if (el.dataset.mode) { treeMode = el.dataset.mode; try { localStorage.setItem("skill-ladder-mode", treeMode); } catch (x) {} return renderTree(); }
+  if (el.dataset.zoom) { const k = el.dataset.zoom;
+    if (k === "in") applyZoom(treeZoom * 1.25); else if (k === "out") applyZoom(treeZoom / 1.25);
+    else if (k === "fit") fitZoom(); else applyZoom(1); return; }
+  if (el.classList.contains("tn")) { sel = { t: el.dataset.t, i: +el.dataset.i }; justHit = null; renderTree(); return renderPanel(); }
+  if (el.dataset.ring) { const id = el.dataset.ring; filter = "All"; sel = { t: id, i: Math.min(lvl(id), T[id].steps.length - 1) }; justHit = null; renderTree(); renderPanel();
+    const lane = $("lane-" + id); if (lane && wide()) lane.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
+  if (el.dataset.t && el.classList.contains("node")) { sel = { t: el.dataset.t, i: +el.dataset.i }; justHit = null; renderTree(); return renderPanel(); }
+  if (el.dataset.fill) {
+    const box = document.querySelector(`[data-sets="${el.dataset.fill}"]`), vals = el.dataset.vals.split(",");
+    while (box.querySelectorAll("input").length < vals.length) box.querySelector("[data-add]").click();
+    box.querySelectorAll("input").forEach((inp, k) => { inp.value = vals[Math.min(k, vals.length - 1)]; inp.dispatchEvent(new Event("input", { bubbles: true })); });
+    return;
+  }
+  if (el.dataset.add) { const box = document.querySelector(`[data-sets="${el.dataset.add}"]`), n = box.querySelectorAll("input").length;
+    box.querySelector("[data-rmset]").insertAdjacentHTML("beforebegin", `<label for="${el.dataset.add}-${n}">Set ${n + 1}<input id="${el.dataset.add}-${n}" type="number" inputmode="numeric" pattern="[0-9]*" min="0"></label>`);
+    box.querySelector("[data-rmset]").hidden = false;
+    return box.querySelectorAll("input")[n].focus(); }
+  if (el.dataset.rmset) {
+    const box = document.querySelector(`[data-sets="${el.dataset.rmset}"]`), labels = box.querySelectorAll("label"), min = +el.dataset.min;
+    if (labels.length > min) {
+      const inp = labels[labels.length - 1].querySelector("input"), f = box.closest("form[data-form]");
+      if (f) { delete drafts[draftKey(f, labels.length - 1)]; saveDrafts(); }
+      labels[labels.length - 1].remove(); void inp;
+    }
+    el.hidden = box.querySelectorAll("label").length <= min;
+    return;
+  }
+  const act = el.dataset.act;
+  if (act === "close") { sel = null; renderTree(); return renderPanel(); }
+  if (act === "master") { const { t, i } = sel; master(t, i);
+    if (i + 1 < T[t].steps.length) sel = { t, i: i + 1 }; return render(); }
+  if (act === "jump") { state.levels = { ...state.levels, [sel.t]: sel.i }; justHit = null; save(); return render(); }
+  if (el.dataset.master) { const tid = el.dataset.master; master(tid, lvl(tid)); return render(); }
+  if (el.dataset.open) { const id = el.dataset.open; sel = { t: id, i: lvl(id) }; view = "tree"; window.scrollTo(0, 0); return render(); }
+  if (el.dataset.routine) { const id = el.dataset.routine; state.routine = state.routine.includes(id) ? state.routine.filter(x => x !== id) : [...state.routine, id]; save(); renderToday(); return restoreDrafts(); }
+  if (el.dataset.rest) { clock = { mode:"rest", start: Date.now(), dur: +el.dataset.rest * 1000 }; return runClock(); }
+  if (el.hasAttribute("data-hold")) { clock = clock.mode === "hold" ? { mode:null } : { mode:"hold", start: Date.now() }; return runClock(); }
+  if (el.hasAttribute("data-stop")) { clock = { mode:null }; return runClock(); }
+  if (el.dataset.logedit) { logEditing = el.dataset.logedit; armed = null; render(); const b = document.querySelector(`[data-logbox="${logEditing}"] input`); if (b) { b.focus(); b.select(); } return; }
+  if (el.hasAttribute("data-logcancel")) { logEditing = null; return render(); }
+  if (el.dataset.logsave) {
+    const id = el.dataset.logsave, box = document.querySelector(`[data-logbox="${id}"]`);
+    const sets = [...box.querySelectorAll("input")].map(x => x.value.trim()).filter(v => v !== "").map(Number).filter(n => n > 0);
+    // clearing every box erases the whole entry
+    state.logs = sets.length ? state.logs.map(l => l.id === id ? { ...l, sets } : l) : state.logs.filter(l => l.id !== id);
+    logEditing = null; save(); toast(sets.length ? "Sets updated" : "Entry erased"); return render();
+  }
+  if (el.dataset.del) { const id = el.dataset.del;
+    if (armed === id) { state.logs = state.logs.filter(l => l.id !== id); armed = null; save(); } else armed = id; return render(); }
+  if (el.dataset.backup) return backupClick(el.dataset.backup);
+  if (el.hasAttribute("data-reset")) { if (armed === "reset") { state = blank(); armed = null; sel = null; save(); } else armed = "reset"; return render(); }
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && sel && !wide() && !fo) { sel = null; renderTree(); renderPanel(); } });
+document.addEventListener("visibilitychange", () => { if (fo && document.visibilityState === "visible") lockWake(); });
+
+document.addEventListener("submit", e => {
+  const f = e.target.closest("form[data-form]"); if (!f) return;
+  e.preventDefault();
+  const tid = f.dataset.t, i = +f.dataset.i;
+  const sets = [...f.querySelectorAll("input")].map(x => x.value.trim()).filter(v => v !== "").map(Number).filter(n => n >= 0);
+  if (!sets.length) { const first = f.querySelector("input"); first && first.focus(); return; }
+  state.logs = [...state.logs, { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), t: Date.now(), tr: tid, st: i, sets }];
+  if (state.logs.length > 600) state.logs = state.logs.slice(-600);
+  justHit = hitTarget(tid, i, sets) && statusOf(tid, i) === "cur" ? { t: tid, i } : null;
+  clearDrafts(f);
+  save(); render();
+});
+
+let lastWide = wide();
+window.addEventListener("resize", () => { if (wide() !== lastWide) { lastWide = wide(); if (view === "tree") renderPanel(); } });
+
+// ---- Boot
+const h = (location.hash || "").slice(1);
+// reopen where you left off: a #tab in the link wins, otherwise the last tab you used
+let lastView = null; try { lastView = localStorage.getItem("skill-ladder-view"); } catch (e) {}
+if (["tree","today","plan","log"].includes(h)) view = h; else if (["tree","today","plan","log"].includes(lastView)) view = lastView;
+if (wide()) sel = { t: "pull", i: Math.min(lvl("pull"), T.pull.steps.length - 1) };
+render();
+// bring back a guided session that was running when the app was closed (kept for 12 hours)
+try {
+  const saved = JSON.parse(localStorage.getItem(SESSION_KEY));
+  if (saved && T[saved.tid] && T[saved.tid].steps[saved.i] && Date.now() - (saved.started || 0) < 12 * 3600e3) {
+    fo = { ...saved, min: true, arm: false };
+    foTick = setInterval(focusTick, 200);
+    renderFocus();
+  } else if (saved) localStorage.removeItem(SESSION_KEY);
+} catch (e) {}
+</script>
+
+<style>
+.app-update { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--navh, 64px) + 18px + env(safe-area-inset-bottom, 0px)); z-index: 95;
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 16px; border-radius: 14px; background: var(--hero, #15232A); color: var(--hero-ink, #EEF2F0);
+  box-shadow: 0 10px 30px rgba(0,0,0,.3); font-size: .9rem; max-width: calc(100vw - 32px); }
+.app-update button { border: 0; border-radius: 10px; padding: 0 14px; min-height: 38px; font-weight: 700; background: var(--balance, #F2BD3A); color: #15232A; }
+@media (min-width: 760px) { .app-update { bottom: 24px; } }
+/* Netlify's free plan adds a "Powered by Netlify" badge in the bottom corner. Keep a strip clear for it
+   so it never sits on top of the app's buttons. --host-badge is set only while the badge is on the page. */
+:root { --host-badge: 0px; }
+.wrap { padding-bottom: calc(var(--navh) + 40px + env(safe-area-inset-bottom, 0px) + var(--host-badge)); }
+.f-pill { bottom: calc(var(--navh) + 14px + env(safe-area-inset-bottom, 0px) + var(--host-badge)); }
+.focus { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px + var(--host-badge)); }
+.app-update { bottom: calc(var(--navh, 64px) + 18px + env(safe-area-inset-bottom, 0px) + var(--host-badge)); }
+@media (max-width: 759px) {
+  .tabs { padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px) + var(--host-badge)); }
+}
+@media (max-width: 999px) {
+  .panel { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--host-badge)); }
+}
+@media (min-width: 760px) {
+  .wrap { padding-bottom: calc(80px + var(--host-badge)); }
+  .f-pill, .app-update { bottom: calc(20px + var(--host-badge)); }
+}
+.app-install { border: 1px solid rgba(255,255,255,.35); background: none; color: inherit; border-radius: 10px; padding: 0 12px; min-height: 34px; font-size: .78rem; font-weight: 700; margin-top: 6px; }
+</style>
+<script>
+// ---- Android app shell: offline support, install button, and update notice
+(() => {
+  const current = document.querySelector('meta[name="app-version"]')?.content;
+
+  // make room for the host's badge while it's on the page
+  const badgeRoom = () => document.documentElement.style.setProperty("--host-badge", document.getElementById("nl-badge-frame") ? "56px" : "0px");
+  new MutationObserver(badgeRoom).observe(document.body, { childList: true });
+  badgeRoom();
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+  // "Install app" button while running in a browser tab
+  let deferred = null;
+  window.addEventListener("beforeinstallprompt", e => {
+    e.preventDefault(); deferred = e;
+    if (document.querySelector(".app-install")) return;
+    const b = document.createElement("button");
+    b.className = "app-install"; b.textContent = "Install app";
+    b.onclick = async () => { deferred.prompt(); await deferred.userChoice.catch(() => {}); deferred = null; b.remove(); };
+    document.getElementById("sync")?.after(b);
+  });
+  window.addEventListener("appinstalled", () => document.querySelector(".app-install")?.remove());
+
+  // tell the user when a newer version has been published while the app is open
+  let shown = false;
+  async function check() {
+    if (shown || !navigator.onLine || !current) return;
+    try {
+      const html = await (await fetch("index.html", { cache: "no-store" })).text();
+      const v = (html.match(/name="app-version" content="([^"]+)"/) || [])[1];
+      if (v && v !== current) {
+        shown = true;
+        const bar = document.createElement("div");
+        bar.className = "app-update"; bar.setAttribute("role", "status");
+        bar.innerHTML = `<span>A new version of Skill Ladder is ready.</span><button type="button">Update</button>`;
+        bar.querySelector("button").onclick = () => location.reload();
+        document.body.appendChild(bar);
+      }
+    } catch (e) {}
+  }
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") check(); });
+  setInterval(check, 15 * 60 * 1000);
+  setTimeout(check, 5000);
+})();
+</script>
+
+</body>
+</html>
