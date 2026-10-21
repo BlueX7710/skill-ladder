@@ -7,7 +7,7 @@ Everything below describes the project as of **2026-10-21**.
 
 ## Prompt to start the new session
 
-> I'm continuing work on **Skill Ladder**, my calisthenics skill-tree app. Clone https://github.com/BlueX7710/skill-ladder (the `gh` CLI is signed in as BlueX7710) and read `HANDOFF.md` first; it explains the files, how the app is built and how to publish updates. Then help me with: **[describe the change]**. After changing the app, test it, then publish to all three places listed under "Publishing an update".
+> I'm continuing work on **Skill Ladder**, my calisthenics skill-tree app. Clone https://github.com/BlueX7710/skill-ladder (the `gh` CLI is signed in as BlueX7710) and read `HANDOFF.md` first; it explains the files, how the app is built and how to publish updates. Then help me with: **[describe the change]**. After changing the app, test it, then publish to both places listed under "Publishing an update".
 
 ---
 
@@ -36,7 +36,7 @@ A single-page calisthenics trainer:
 |---|---|---|
 | Claude artifact | https://claude.ai/artifact/451vnBYdQJVh2MRFVyBKQQ | Synced to the Claude account (artifact `db` capability) plus localStorage |
 | **Android app (main)** | **https://bluex7710.github.io/skill-ladder/** — repo **github.com/BlueX7710/skill-ladder** (public, GitHub Pages from `main` /) | On the phone (localStorage) |
-| Old Android app | https://skill-ladder-app.netlify.app (Netlify project `skill-ladder-app`, site id `3843e79d-4e09-46fc-946d-607d94b2b3ed`) | On the phone; being replaced by the GitHub version |
+| Old Android app | https://skill-ladder-app.netlify.app (Netlify project `skill-ladder-app`, site id `3843e79d-4e09-46fc-946d-607d94b2b3ed`) | On the phone. **No longer updated**; replaced by the GitHub version |
 
 Each address has its own separate storage. Use **Log → Backup & restore** to move progress between them.
 
@@ -90,7 +90,7 @@ The repo is the source of truth. The temporary folder from the first session is 
 - In guided mode: −/+ updates the number in place with no animation. Panels open instantly and only slide when closing.
 - Keep it one self-contained file. External scripts only from approved CDNs; the app currently uses none.
 
-## Publishing an update (all three)
+## Publishing an update (both places)
 
 1. **Claude artifact:** publish `skill-ladder.html` with the Artifact tool, passing `url: https://claude.ai/artifact/451vnBYdQJVh2MRFVyBKQQ` so it updates the same link.
 2. **GitHub app (main):** from the repo root:
@@ -101,7 +101,9 @@ The repo is the source of truth. The temporary folder from the first session is 
    git push
    ```
    Pages redeploys in about a minute. Check that `https://bluex7710.github.io/skill-ladder/` shows the new `app-version` meta tag. The GitHub CLI (`gh`) is installed and signed in as **BlueX7710**; Node.js is installed too.
-3. **Netlify app (optional, being retired):** run `source/build-app.ps1`, ask the Netlify connector's `deploy-site` for site `3843e79d-4e09-46fc-946d-607d94b2b3ed`, and run the `npx @netlify/mcp …` command it returns from inside `source/app/`.
+
+
+**Do not deploy to Netlify anymore.** The Netlify site is frozen at version 20261021030938 (the equipment-filter update) and no longer gets updates, even though `build-app.ps1` still writes `netlify.toml` into `source/app/`.
 
 The installed app checks `app-version` on open and every 15 minutes, and shows **"A new version is ready · Update"**. If you change `sw.js`, bump the `CACHE` name.
 
