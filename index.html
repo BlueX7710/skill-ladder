@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="20261021030153">
+<meta name="app-version" content="20261021030938">
 <meta name="theme-color" content="#15232A">
 <meta name="description" content="Calisthenics skill tree with guided workouts and progress tracking.">
 <meta name="mobile-web-app-capable" content="yes">
@@ -360,6 +360,7 @@ li.cur .nm { color: var(--ink); font-weight: 700; }
 .goal .fig { width: 54px; height: 54px; }
 .goal b { font-size: .84rem; line-height: 1.2; }
 .goal span { font-size: .7rem; color: var(--muted); }
+.goal:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 .goal.on { border-color: var(--g); background: color-mix(in srgb, var(--g) 12%, var(--surface)); }
 .goal-n { position: absolute; top: 6px; left: 6px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
   background: var(--g); color: #fff !important; font-size: .74rem !important; font-weight: 700; }
@@ -394,6 +395,7 @@ li.cur .nm { color: var(--ink); font-weight: 700; }
 .prow .fig { width: 46px; height: 46px; }
 .prow-body { display: grid; gap: 2px; min-width: 0; }
 .prow-body b { font-size: .95rem; }
+.prow-body .swap { font-style: italic; }
 .prow .btn.start { min-height: 40px; width: 44px; justify-content: center; padding: 0; }
 .pwhy { justify-self: start; font-size: .64rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; background: var(--bg); color: var(--muted); }
 .pwhy.k-goal { background: var(--g); color: #fff; }
@@ -1045,6 +1047,19 @@ const GOAL_SUPPORT = {
   legs: ["nordic", "lsit"], nordic: ["legs", "lsit"],
 };
 const BALANCE = ["push", "pull", "legs", "lsit", "df", "nordic"];
+// Equipment the plan can count on: hanging ladders need a bar or rings
+const EQUIP = [["bar", "Pull-up bar"], ["rings", "Rings"], ["par", "Parallettes"]];
+const NEEDS = { pull: ["bar", "rings"], mu: ["bar", "rings"], fl: ["bar", "rings"], bl: ["bar", "rings"] };
+// plans made before the equipment question assume everything is at hand
+const planEquip = plan => plan.equip || EQUIP.map(e => e[0]);
+const canDo = (id, equip) => !NEEDS[id] || NEEDS[id].some(e => equip.includes(e));
+const canHang = equip => equip.includes("bar") || equip.includes("rings");
+// steps written for parallettes, with what to use instead
+function parSwap(id, i) {
+  if (id === "lsit" && i > 0) return "No parallettes: use two sturdy chairs or stacks of books, or press into the floor";
+  if (id === "hspu" && i === 4) return "No parallettes: put your hands on two stacks of books or weight plates";
+  return "";
+}
 const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const DAY_SHORT = ["M", "T", "W", "T", "F", "S", "S"];
 const DAY_PATTERNS = { 1: [2], 2: [0, 3], 3: [0, 2, 4], 4: [0, 1, 3, 4], 5: [0, 1, 2, 4, 5], 6: [0, 1, 2, 3, 4, 5], 7: [0, 1, 2, 3, 4, 5, 6] };
@@ -1071,8 +1086,8 @@ function buildWeek(plan) {
     const have = unlocks.find(u => u.id === lock[0]);
     if (have) have.why += ` & ${T[g].name}`; else unlocks.push(planItem(lock[0], `Unlocks ${T[g].name}`, "unlock"));
   });
-  const taken = new Set([...plan.goals, ...unlocks.map(u => u.id)]);
-  const pool = [...new Set(plan.goals.flatMap(g => GOAL_SUPPORT[g] || []).concat(BALANCE))].filter(id => !taken.has(id));
+  const taken = new Set([...plan.goals, ...unlocks.map(u => u.id)]), eq = planEquip(plan);
+  const pool = [...new Set(plan.goals.flatMap(g => GOAL_SUPPORT[g] || []).concat(BALANCE))].filter(id => !taken.has(id) && canDo(id, eq));
   const why = id => plan.goals.some(g => (GOAL_SUPPORT[g] || []).includes(id)) ? `Builds ${T[plan.goals.find(g => (GOAL_SUPPORT[g] || []).includes(id))].name}` : "Balance";
   const order = { goal: 0, unlock: 1, support: 2, balance: 3 };
   const tail = id => ["lsit", "df", "legs", "nordic"].includes(id) ? 1 : 0;
@@ -1118,18 +1133,20 @@ let planDraft = null, planDay = null, planArmed = false;
 function renderPlan() {
   const host = $("plan");
   if (!state.plan || planDraft) {
-    const dr = planDraft || (planDraft = { goals: [], days: [0, 2, 4], minutes: 45 });
+    const dr = planDraft || (planDraft = { goals: [], days: [0, 2, 4], minutes: 45, equip: ["bar"] });
     host.innerHTML = `<div class="plan-setup">
-      <div class="ps-step"><p class="h4">1 · What do you want to learn most?</p><p class="note">Pick up to two. The first one gets the most practice.</p>
+      <div class="ps-step"><p class="h4">1 · What equipment do you have?</p><p class="note">Pick all that apply. With none, the plan sticks to floor exercises.</p>
+        <div class="row"><span class="seg">${EQUIP.map(([k, n]) => `<button type="button" data-pequip="${k}" aria-pressed="${dr.equip.includes(k)}">${n}</button>`).join("")}</span></div></div>
+      <div class="ps-step"><p class="h4">2 · What do you want to learn most?</p><p class="note">Pick up to two. The first one gets the most practice.</p>
         <div class="goal-grid">${TRACKS.map(t => {
-          const k = dr.goals.indexOf(t.id), done = lvl(t.id) >= t.steps.length;
-          return `<button type="button" class="goal g-${t.group}${k >= 0 ? " on" : ""}" data-goal="${t.id}" aria-pressed="${k >= 0}">
-            ${k >= 0 ? `<span class="goal-n">${k + 1}</span>` : ""}${fig(t.id)}<b>${esc(goalName(t.id))}</b><span>${done ? "Already mastered" : `${esc(t.name)} ladder`}</span></button>`;
+          const k = dr.goals.indexOf(t.id), done = lvl(t.id) >= t.steps.length, ok = canDo(t.id, dr.equip);
+          return `<button type="button" class="goal g-${t.group}${k >= 0 ? " on" : ""}" data-goal="${t.id}" aria-pressed="${k >= 0}"${ok ? "" : " disabled"}>
+            ${k >= 0 ? `<span class="goal-n">${k + 1}</span>` : ""}${fig(t.id)}<b>${esc(goalName(t.id))}</b><span>${!ok ? "Needs a bar or rings" : done ? "Already mastered" : `${esc(t.name)} ladder`}</span></button>`;
         }).join("")}</div></div>
-      <div class="ps-step"><p class="h4">2 · Which days can you train?</p>
+      <div class="ps-step"><p class="h4">3 · Which days can you train?</p>
         <div class="row"><span class="seg">${[2, 3, 4, 5, 6].map(n => `<button type="button" data-pdays="${n}" aria-pressed="${dr.days.length === n}">${n} days</button>`).join("")}</span></div>
         <div class="daypick">${DAY_SHORT.map((s, d) => `<button type="button" data-pday="${d}" aria-pressed="${dr.days.includes(d)}" aria-label="${DAY_NAMES[d]}">${s}</button>`).join("")}</div></div>
-      <div class="ps-step"><p class="h4">3 · How long is each session?</p>
+      <div class="ps-step"><p class="h4">4 · How long is each session?</p>
         <span class="seg">${[30, 45, 60].map(n => `<button type="button" data-pmin="${n}" aria-pressed="${dr.minutes === n}">${n} min</button>`).join("")}</span></div>
       <div class="row"><button type="button" class="btn go" data-plan="create"${dr.goals.length && dr.days.length ? "" : " disabled style=\"opacity:.5\""}>${state.plan ? "Update my plan" : "Create my plan"}</button>
         ${state.plan ? `<button type="button" class="btn alt" data-plan="cancel">Cancel</button>` : ""}</div>
@@ -1137,7 +1154,7 @@ function renderPlan() {
     </div>`;
     return;
   }
-  const p = state.plan, week = buildWeek(p), td = todayIdx();
+  const p = state.plan, week = buildWeek(p), td = todayIdx(), eq = planEquip(p);
   if (planDay === null || !p.days.includes(planDay)) planDay = p.days.includes(td) ? td : ([...p.days].sort((a, b) => a - b).find(d => d > td) ?? Math.min(...p.days));
   const goals = p.goals.map((g, k) => {
     const t = T[g], L = Math.min(lvl(g), t.steps.length), eta = goalEta(g, p.days.length), lock = lockedBy(g);
@@ -1155,14 +1172,17 @@ function renderPlan() {
   const sess = week[planDay] || [];
   const rows = sess.map(it => {
     const t = T[it.id], s = step(it.id, it.i), u = isTime(it.unit) ? "s" : " reps", side = isSide(it.unit) ? " per side" : "";
+    const swap = eq.includes("par") ? "" : parSwap(it.id, it.i);
     return `<div class="prow g-${t.group}">${figStep(it.id, it.i, "fig", false)}<div class="prow-body">
       <span class="pwhy k-${it.kind}">${esc(it.why)}</span><b>${esc(s.name)}</b>
-      <span class="note">${it.sets} × ${it.target}${u}${side} · rest ${it.rest}s · ${esc(t.name)} step ${it.i + 1}</span></div>
+      <span class="note">${it.sets} × ${it.target}${u}${side} · rest ${it.rest}s · ${esc(t.name)} step ${it.i + 1}</span>
+      ${swap ? `<span class="note swap">${swap}</span>` : ""}</div>
       <button type="button" class="btn go start" data-focus="${it.id}:${it.i}" aria-label="Start ${esc(s.name)}">${PLAY}</button></div>`;
   }).join("");
   host.innerHTML = `<div class="plan-view">
     <div class="goal-cards">${goals}</div>
-    <div class="week"><div class="week-h"><p class="h4">Your week</p><span class="note">${p.days.length} days · ${p.minutes} min sessions</span></div><div class="wstrip">${strip}</div></div>
+    <div class="week"><div class="week-h"><p class="h4">Your week</p><span class="note">${p.days.length} days · ${p.minutes} min sessions · ${eq.length ? EQUIP.filter(e => eq.includes(e[0])).map(e => e[1]).join(", ") : "No equipment"}</span></div><div class="wstrip">${strip}</div>
+      ${canHang(eq) ? "" : `<p class="note">No bar or rings, so the pulling ladders are left out. Rows under a sturdy table keep your back working until you get a bar.</p>`}</div>
     <div class="session">
       <div class="session-h"><h3>${DAY_NAMES[planDay]}${planDay === td ? " · today" : ""}</h3><span class="note">${sess.length} exercises · about ${p.minutes} min</span></div>
       <p class="note warm">Warm up for 5 minutes first: wrist circles, arm swings, scapular pulls and a few easy push-ups. Do the exercises in this order.</p>
@@ -1170,7 +1190,7 @@ function renderPlan() {
       ${planDay === td ? `<button type="button" class="btn go" data-view="today" style="justify-content:center">Go to today's workout</button>` : ""}
     </div>
     <p class="note">The plan follows your progress: when you master a step, it switches to the next one automatically.</p>
-    <div class="row"><button type="button" class="btn alt" data-plan="edit">Change goals or days</button>
+    <div class="row"><button type="button" class="btn alt" data-plan="edit">Change plan</button>
       <button type="button" class="btn alt" data-plan="remove">${planArmed ? "Tap again to remove the plan" : "Remove plan"}</button></div>
   </div>`;
 }
@@ -1182,14 +1202,19 @@ function planClick(el) {
   } else if (el.dataset.pdays && dr) dr.days = DAY_PATTERNS[+el.dataset.pdays].slice();
   else if (el.dataset.pday && dr) { const d = +el.dataset.pday; dr.days = dr.days.includes(d) ? dr.days.filter(x => x !== d) : [...dr.days, d].sort((a, b) => a - b); }
   else if (el.dataset.pmin && dr) dr.minutes = +el.dataset.pmin;
+  else if (el.dataset.pequip && dr) {
+    const k = el.dataset.pequip;
+    dr.equip = dr.equip.includes(k) ? dr.equip.filter(x => x !== k) : [...dr.equip, k];
+    dr.goals = dr.goals.filter(g => canDo(g, dr.equip));
+  }
   else if (el.dataset.pdayView) planDay = +el.dataset.pdayView;
   else if (el.dataset.plan) {
     const a = el.dataset.plan;
     if (a === "create" && dr && dr.goals.length && dr.days.length) {
-      state.plan = { goals: dr.goals.slice(), days: dr.days.slice(), minutes: dr.minutes, created: Date.now() };
+      state.plan = { goals: dr.goals.slice(), days: dr.days.slice(), minutes: dr.minutes, equip: dr.equip.slice(), created: Date.now() };
       planDraft = null; planDay = null; save(); toast(`Plan ready: ${goalName(state.plan.goals[0])} is your main goal`);
     } else if (a === "cancel") planDraft = null;
-    else if (a === "edit") planDraft = { goals: state.plan.goals.slice(), days: state.plan.days.slice(), minutes: state.plan.minutes };
+    else if (a === "edit") planDraft = { goals: state.plan.goals.slice(), days: state.plan.days.slice(), minutes: state.plan.minutes, equip: planEquip(state.plan).slice() };
     else if (a === "remove") { if (planArmed) { state.plan = null; planArmed = false; planDraft = null; save(); } else { planArmed = true; renderPlan(); return true; } }
   } else return false;
   planArmed = false;
@@ -2063,7 +2088,7 @@ try { navigator.storage && navigator.storage.persist && navigator.storage.persis
 document.addEventListener("click", e => {
   const el = e.target.closest("button, .scrim"); if (!el) return;
   if (el.dataset.f && fo) return focusAction(el.dataset.f, el);
-  if ((el.dataset.goal || el.dataset.pdays || el.dataset.pday || el.dataset.pmin || el.dataset.pdayView || el.dataset.plan) && planClick(el)) return;
+  if ((el.dataset.goal || el.dataset.pdays || el.dataset.pday || el.dataset.pmin || el.dataset.pequip || el.dataset.pdayView || el.dataset.plan) && planClick(el)) return;
   if (el.dataset.focus) { const [tid, i] = el.dataset.focus.split(":"); return startFocus(tid, +i); }
   if (el.dataset.view) { view = el.dataset.view; armed = null; try { localStorage.setItem("skill-ladder-view", view); } catch (x) {} sel = wide() ? sel : null; try { history.replaceState(null, "", "#" + view); } catch (x) {} window.scrollTo(0, 0); return render(); }
   if (el.dataset.filter) { filter = el.dataset.filter; return renderTree(); }

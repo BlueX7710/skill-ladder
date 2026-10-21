@@ -26,7 +26,7 @@ A single-page calisthenics trainer:
   - Automatic rest countdown with a chime, vibration and an optional notification in the installed app.
   - Minimize to a floating bar; the session is saved on every change and survives closing the app for 12 hours.
   - The Cues button sits in the top bar.
-- **Plan tab:** pick up to 2 goal skills, training days and session length. It builds a weekly schedule (goal first, then unlock work, then support, then balance), shows a time-to-goal estimate, and moves up automatically when steps are mastered.
+- **Plan tab:** pick your equipment (pull-up bar, rings, parallettes; none = floor only), up to 2 goal skills, training days and session length. Without a bar or rings, the hanging ladders (Pull-up, Muscle-up, Front lever, Back lever) can't be chosen as goals and are left out of the plan. Without parallettes, L-sit and deficit HSPU rows show what to use instead. Plans saved before this setting existed count as having everything. It builds a weekly schedule (goal first, then unlock work, then support, then balance), shows a time-to-goal estimate, and moves up automatically when steps are mastered.
 - **Log tab:** a 16-week heatmap and sessions by day. Tap the numbers to edit a session (no Edit button); clearing a box erases that set. Also has **Backup & restore** (code starting `SKILLLADDER1:`, merged on restore) and Reset.
 - **Ranks and XP** (Novice → Master), a day streak and a celebration when a step is mastered.
 
@@ -73,7 +73,7 @@ The repo is the source of truth. The temporary folder from the first session is 
 | `LEVEL`, `TIERS`, `etaWeeks` | Difficulty 1–10 per step; the time estimate is `max(.5, gap) × 3.57 × e^(0.231·L)` weeks |
 | `State`, `Persistence` | `state = {levels, routine, logs, plan}`; `save()` writes localStorage and, in Claude, the db doc `data/users/<id>/progress` (snapshot data is frozen, so it's always deep-copied) |
 | `Mastery` | `requirement()`, `mastery()`, `masteryCard()` |
-| `Training plan` | `GOAL_SUPPORT`, `BALANCE`, `buildWeek(plan)`, `goalEta()`, `renderPlan()`, `planClick()` |
+| `Training plan` | `GOAL_SUPPORT`, `BALANCE`, `EQUIP`/`NEEDS`/`canDo()`/`parSwap()` (equipment filter; `plan.equip`), `buildWeek(plan)`, `goalEta()`, `renderPlan()`, `planClick()` |
 | `Skill tree map`, `Tree map` | `TREE_COLS` column order, `TG` layout, `renderSkillTree()`, zoom/pan (`applyZoom`, wheel/pinch/drag) |
 | `Timer` | Workout-tab rest timer, `beep(kind)`, `restOver()`, the shared `audioCtx` (unlocked on first tap) |
 | `Backup & restore` | `makeBackup()`, `readBackup()`, `mergeBackup()` |
@@ -121,4 +121,5 @@ The installed app checks `app-version` on open and every 15 minutes, and shows *
 ## Ideas not done yet
 
 - Retire the Netlify site once progress has been moved.
-- Equipment filter for the plan (no bar, rings, parallettes); voice rep counting; per-exercise video links.
+- Voice rep counting; per-exercise video links.
+- Equipment for the Human flag (a vertical pole) isn't part of the plan filter yet.
