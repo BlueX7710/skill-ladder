@@ -1,0 +1,70 @@
+<style>
+.app-update { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--navh, 64px) + 18px + env(safe-area-inset-bottom, 0px)); z-index: 95;
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 16px; border-radius: 14px; background: var(--hero, #15232A); color: var(--hero-ink, #EEF2F0);
+  box-shadow: 0 10px 30px rgba(0,0,0,.3); font-size: .9rem; max-width: calc(100vw - 32px); }
+.app-update button { border: 0; border-radius: 10px; padding: 0 14px; min-height: 38px; font-weight: 700; background: var(--balance, #F2BD3A); color: #15232A; }
+@media (min-width: 760px) { .app-update { bottom: 24px; } }
+/* Netlify's free plan adds a "Powered by Netlify" badge in the bottom corner. Keep a strip clear for it
+   so it never sits on top of the app's buttons. --host-badge is set only while the badge is on the page. */
+:root { --host-badge: 0px; }
+.wrap { padding-bottom: calc(var(--navh) + 40px + env(safe-area-inset-bottom, 0px) + var(--host-badge)); }
+.f-pill { bottom: calc(var(--navh) + 14px + env(safe-area-inset-bottom, 0px) + var(--host-badge)); }
+.focus { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px + var(--host-badge)); }
+.app-update { bottom: calc(var(--navh, 64px) + 18px + env(safe-area-inset-bottom, 0px) + var(--host-badge)); }
+@media (max-width: 759px) {
+  .tabs { padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px) + var(--host-badge)); }
+}
+@media (max-width: 999px) {
+  .panel { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--host-badge)); }
+}
+@media (min-width: 760px) {
+  .wrap { padding-bottom: calc(80px + var(--host-badge)); }
+  .f-pill, .app-update { bottom: calc(20px + var(--host-badge)); }
+}
+.app-install { border: 1px solid rgba(255,255,255,.35); background: none; color: inherit; border-radius: 10px; padding: 0 12px; min-height: 34px; font-size: .78rem; font-weight: 700; margin-top: 6px; }
+</style>
+<script>
+// ---- Android app shell: offline support, install button, and update notice
+(() => {
+  const current = document.querySelector('meta[name="app-version"]')?.content;
+
+  // make room for the host's badge while it's on the page
+  const badgeRoom = () => document.documentElement.style.setProperty("--host-badge", document.getElementById("nl-badge-frame") ? "56px" : "0px");
+  new MutationObserver(badgeRoom).observe(document.body, { childList: true });
+  badgeRoom();
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+  // "Install app" button while running in a browser tab
+  let deferred = null;
+  window.addEventListener("beforeinstallprompt", e => {
+    e.preventDefault(); deferred = e;
+    if (document.querySelector(".app-install")) return;
+    const b = document.createElement("button");
+    b.className = "app-install"; b.textContent = "Install app";
+    b.onclick = async () => { deferred.prompt(); await deferred.userChoice.catch(() => {}); deferred = null; b.remove(); };
+    document.getElementById("sync")?.after(b);
+  });
+  window.addEventListener("appinstalled", () => document.querySelector(".app-install")?.remove());
+
+  // tell the user when a newer version has been published while the app is open
+  let shown = false;
+  async function check() {
+    if (shown || !navigator.onLine || !current) return;
+    try {
+      const html = await (await fetch("index.html", { cache: "no-store" })).text();
+      const v = (html.match(/name="app-version" content="([^"]+)"/) || [])[1];
+      if (v && v !== current) {
+        shown = true;
+        const bar = document.createElement("div");
+        bar.className = "app-update"; bar.setAttribute("role", "status");
+        bar.innerHTML = `<span>A new version of Skill Ladder is ready.</span><button type="button">Update</button>`;
+        bar.querySelector("button").onclick = () => location.reload();
+        document.body.appendChild(bar);
+      }
+    } catch (e) {}
+  }
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") check(); });
+  setInterval(check, 15 * 60 * 1000);
+  setTimeout(check, 5000);
+})();
+</script>
