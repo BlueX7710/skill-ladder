@@ -21,7 +21,7 @@
   --good: #23784B;
   --good-soft: #D8EDE0;
   --danger: #B4372B;
-  --push: #E05A14; --pull: #2153D0; --core: #8A3CD6; --legs: #23874A; --balance: #C98A00;
+  --push: #E05A14; --pull: #2153D0; --core: #8A3CD6; --legs: #23874A; --balance: #C98A00; --mobility: #0B827E;
   --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
   --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
@@ -31,13 +31,13 @@
   --bg: #0E1518; --surface: #162026; --raised: #1C282F; --ink: #E5EBE8; --muted: #93A2A7; --line: #2A373D;
   --hero: #1E2D35; --hero-ink: #EEF2F0;
   --accent: #6F96FF; --accent-ink: #0C1420; --accent-soft: #1F2C4A; --good: #5FC38C; --good-soft: #17301F; --danger: #E2665A;
-  --push: #FF8A4C; --pull: #6F96FF; --core: #B784F5; --legs: #5CC584; --balance: #F2BD3A;
+  --push: #FF8A4C; --pull: #6F96FF; --core: #B784F5; --legs: #5CC584; --balance: #F2BD3A; --mobility: #45CFC6;
   color-scheme: dark; } }
 :root[data-theme="dark"] {
   --bg: #0E1518; --surface: #162026; --raised: #1C282F; --ink: #E5EBE8; --muted: #93A2A7; --line: #2A373D;
   --hero: #1E2D35; --hero-ink: #EEF2F0;
   --accent: #6F96FF; --accent-ink: #0C1420; --accent-soft: #1F2C4A; --good: #5FC38C; --good-soft: #17301F; --danger: #E2665A;
-  --push: #FF8A4C; --pull: #6F96FF; --core: #B784F5; --legs: #5CC584; --balance: #F2BD3A;
+  --push: #FF8A4C; --pull: #6F96FF; --core: #B784F5; --legs: #5CC584; --balance: #F2BD3A; --mobility: #45CFC6;
   color-scheme: dark; }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -45,7 +45,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--body); font-
 button, input { font: inherit; color: inherit; }
 button { cursor: pointer; touch-action: manipulation; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.g-Push { --g: var(--push); } .g-Pull { --g: var(--pull); } .g-Core { --g: var(--core); } .g-Legs { --g: var(--legs); } .g-Balance { --g: var(--balance); }
+.g-Push { --g: var(--push); } .g-Pull { --g: var(--pull); } .g-Core { --g: var(--core); } .g-Legs { --g: var(--legs); } .g-Balance { --g: var(--balance); } .g-Mobility { --g: var(--mobility); }
 
 .wrap { max-width: 1240px; margin: 0 auto; padding-block: 16px calc(var(--navh) + 40px + env(safe-area-inset-bottom, 0px));
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
@@ -218,10 +218,39 @@ li.cur .dot::before, .tn.cur .tdot::before { content: ""; position: absolute; in
 .card h3 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 1.35rem; text-transform: uppercase; line-height: 1.05; }
 .card .sub { font-size: .78rem; color: var(--muted); }
 .linkbtn { background: none; border: 1px solid var(--line); border-radius: 8px; padding: 0 10px; min-height: 34px; color: var(--g); font-size: .8rem; font-weight: 700; }
+.linkbtn.watch, .f-watch { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; text-decoration: none; }
+.linkbtn.watch svg, .f-watch svg { width: 11px; height: 11px; }
+.f-watch { color: inherit; font-size: .85rem; font-weight: 700; border: 1px solid rgba(255,255,255,.3); border-radius: 99px; padding: 6px 12px; }
+.aim { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: .82rem; }
+.aim span { font-size: .66rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; color: var(--g); }
+.aim b { font-family: var(--mono); font-weight: 500; }
+.aim em { font-style: normal; color: var(--muted); }
+.flow-row { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+.warm-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.warm-row .linkbtn { color: var(--accent); }
+.plan-banner.assess { margin-bottom: 12px; border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.plan-banner.assess .btn { white-space: nowrap; --g: var(--accent); }
+.assess-again { margin: 0 0 10px; }
+.assess-again .linkbtn, .ps-step .note .linkbtn { color: var(--accent); min-height: 30px; }
+.pa-bar { width: 100%; height: 4px; border-radius: 4px; background: rgba(255,255,255,.14); overflow: hidden; }
+.pa-bar i { display: block; height: 100%; background: #F2F5F3; transition: width .3s; }
+.pa-list { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 6px; text-align: left; }
+.pa-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 10px; padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,.07);
+  border-left: 4px solid var(--g); }
+.pa-list b { font-size: .9rem; }
+.pa-list span { grid-column: 1; font-size: .8rem; opacity: .8; }
+.pa-list em { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-style: normal; font-size: .72rem; opacity: .65; }
 .donecard { display: grid; place-items: center; text-align: center; gap: 6px; min-height: 140px; }
 
 /* Log */
 .log { display: grid; gap: 18px; max-width: 780px; }
+.wk { display: grid; gap: 8px; }
+.wk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 136px), 1fr)); gap: 8px; }
+.wk-tile { display: grid; gap: 2px; padding: 12px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
+.wk-tile b { font-family: var(--display); font-weight: 800; font-size: 1.7rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.wk-tile span { font-size: .78rem; color: var(--ink); font-weight: 600; }
+.wk-tile i { font-style: normal; font-size: .72rem; color: var(--muted); }
+.wk-tile i.up { color: var(--good); }
 .heat-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; overflow-x: auto; }
 .heat { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 13px); gap: 3px; width: max-content; }
 .heat i { width: 13px; height: 13px; border-radius: 3px; background: var(--line); opacity: .55; }
@@ -455,6 +484,8 @@ li.ready .dot::after { content: "★"; position: absolute; top: -7px; right: -7p
   touch-action: manipulation; -webkit-user-select: none; user-select: none; transition: background .08s; }
 .f-tapzone:active { background: rgba(255,255,255,.12); }
 .f-tapzone .f-hint { display: block; }
+.f-aim { opacity: .9; }
+.f-aim b { color: #7BE0A4; }
 .f-main:disabled { opacity: .5; }
 .f-quick { display: grid; gap: 8px; justify-items: center; width: 100%; }
 .f-quick > span { font-size: .75rem; opacity: .7; text-transform: uppercase; letter-spacing: .08em; }
@@ -534,6 +565,7 @@ li.ready .dot::after { content: "★"; position: absolute; top: -7px; right: -7p
 
   <section id="view-tree">
     <div class="section-h"><h2>Your ladders</h2><span>Tap a ring to jump to your current step</span></div>
+    <div id="assess-cta"></div>
     <div class="rings" id="rings"></div>
     <div class="section-h"><h2>Progressions</h2><span id="tree-hint"></span></div>
     <div class="chips" id="filters"></div>
@@ -561,6 +593,7 @@ li.ready .dot::after { content: "★"; position: absolute; top: -7px; right: -7p
   </section>
 </div>
 <div id="focus-host"></div>
+<div id="flow-host"></div>
 <div id="party-host"></div>
 
 <script>
@@ -667,7 +700,29 @@ const TRACKS = [
   ["Bridge walkout",3,8,"r","From a bridge, walk the heels out in small steps|Go as far as you can keep the hips up|Walk back in"],
   ["Partial Nordic negative",3,5,"r","Kneel with your ankles anchored under something sturdy|Lean forward with a straight body as far as you can control|Push back up with your hands"],
   ["Nordic negative",3,5,"r","Lower slowly all the way to the floor|Catch yourself with your hands|Keep the hips straight, don't bend at the waist"],
-  ["Nordic curl",3,3,"r","Lower under control, then pull yourself back up with the hamstrings|Hips stay straight the whole rep|Use a small push from the hands at first"]]}
+  ["Nordic curl",3,3,"r","Lower under control, then pull yourself back up with the hamstrings|Hips stay straight the whole rep|Use a small push from the hands at first"]]},
+ // Mobility ladders (mob: true) unlock range for skills like the V-sit, handstand and back lever; they don't count toward rank
+ { id:"pike", name:"Pike flexibility", group:"Mobility", mob:true, steps:[
+  ["Standing toe reach",3,30,"s","Legs straight, fold from the hips|Let the head and arms hang|Breathe out and sink a little lower each time"],
+  ["Seated forward fold",3,30,"s","Sit tall first, then fold from the hips|Reach for the feet, knees straight|Relax the neck"],
+  ["Pike pulses",3,12,"r","Seated fold, gently pulse a little deeper each rep|Keep the back long, not rounded|Exhale on each pulse"],
+  ["Seated pike leg lifts",3,10,"r","Sit tall, hands on the floor beside the knees|Lift both straight legs a few centimetres|Builds the compression the V-sit needs"],
+  ["Full pike fold",3,30,"s","Chest rests on the thighs|Knees locked, toes pointed or flexed|Hold without bouncing"],
+  ["Pike compression lift",3,10,"r","Hands beside the hips, legs straight|Lift both legs and hold for a second|Lean the shoulders forward over the hands"]]},
+ { id:"bridge", name:"Bridge", group:"Mobility", mob:true, steps:[
+  ["Cobra stretch",3,30,"s","Lie face down, press the chest up with the arms|Keep the hips on the floor|Look up and open the chest"],
+  ["Tabletop bridge",3,20,"s","Hands behind you, fingers toward the feet|Lift the hips until the body is flat|Squeeze the glutes and open the chest"],
+  ["Box bridge",3,20,"s","Hands on a bench or low box behind you|Push up into a bridge from there|Push the chest toward the wall behind the hands"],
+  ["Full bridge",3,20,"s","Hands by the ears, fingers toward the feet|Push up through hands and feet|Straighten the arms as far as you can"],
+  ["Shoulders-over-hands bridge",3,15,"s","From a full bridge, lean the shoulders over the hands|Straighten the legs a little to help|Arms locked straight"],
+  ["One-leg bridge",3,10,"ss","Full bridge, then lift one straight leg|Keep the hips level|Switch legs between sets"]]},
+ { id:"shoulder", name:"Shoulder mobility", group:"Mobility", mob:true, steps:[
+  ["Wall arm raises",3,10,"r","Back, head and hips against a wall|Raise straight arms until the thumbs touch the wall|Keep the lower back flat"],
+  ["Puppy pose",3,30,"s","Kneel with hips over the knees|Walk the hands forward and sink the chest|Arms straight, armpits toward the floor"],
+  ["Broomstick pass-through",3,10,"r","Hold a broomstick or band with a wide grip|Lift it over the head and behind you with straight arms|Bring the hands closer over time"],
+  ["Bench T-spine stretch",3,30,"s","Kneel, elbows on a bench, hands behind the head|Sink the chest toward the floor|Breathe into the upper back"],
+  ["Arms-overhead wall stand",3,30,"s","Back to the wall, arms overhead touching it|Lower back stays flat against the wall|This is the shoulder line of a handstand"],
+  ["Narrow-grip pass-through",3,10,"r","Same as the pass-through, hands closer together|Arms stay straight the whole way|Slow and controlled, no jerking"]]}
 ];
 
 // ---- Stick figures for every exercise.
@@ -831,6 +886,30 @@ const SP = {
     { A:NK(0, [60,180]), B:NK(75, [100,60]), pr:[FLOOR, ANKLE], ic:"A" },
     { A:NK(0, [60,180]), B:NK(68, [100,60]), pr:[FLOOR, ANKLE] },
   ],
+  pike: [
+    { A:{ an:"f", at:[44,90], t:20, hd:65, a:[88,88], l:[90,90] }, pr:[FLOOR] },
+    { A:{ an:"p", at:[36,86], t:-25, hd:-10, a:[15,10], l:[0,0] }, pr:[FLOOR] },
+    { A:{ an:"p", at:[36,86], t:-55, hd:-40, a:[10,10], l:[0,0] }, B:{ an:"p", at:[36,86], t:-20, hd:-5, a:[12,8], l:[0,0] }, pr:[FLOOR] },
+    { A:{ an:"p", at:[40,86], t:-95, hd:-90, a:[75,88], l:[0,0] }, B:{ an:"p", at:[40,86], t:-95, hd:-90, a:[75,88], l:[-12,-12] }, pr:[FLOOR] },
+    { A:{ an:"p", at:[36,86], t:-8, hd:0, a:[5,5], l:[0,0] }, pr:[FLOOR] },
+    { A:{ an:"w", at:[44,90], t:-80, hd:-80, a:[95,90], l:[0,0] }, B:{ an:"w", at:[44,90], t:-80, hd:-80, a:[95,90], l:[-18,-18] }, pr:[FLOOR] },
+  ],
+  bridge: [
+    { A:{ an:"p", at:[52,87], t:-65, hd:-75, a:[90,90], l:[180,180] }, pr:[FLOOR] },
+    { A:{ an:"f", at:[70,90], t:202, hd:190, a:[90,90], l:[0,90] }, pr:[FLOOR] },
+    { A:{ an:"f", at:[72,90], t:170, hd:150, a:[168,168], l:[45,90] }, pr:[FLOOR, BOX(4,72,22,90)] },
+    { A:{ an:"f", at:[72,90], t:150, hd:110, a:[140,140], l:[45,90] }, pr:[FLOOR] },
+    { A:{ an:"f", at:[72,90], t:168, hd:120, a:[90,90], l:[60,90] }, pr:[FLOOR] },
+    { A:{ an:"f", at:[72,90], t:150, hd:110, a:[140,140], l:[45,90], l2:[-70,-70] }, pr:[FLOOR] },
+  ],
+  shoulder: [
+    { A:M(STAND, { a:[95,95] }), B:M(STAND, { a:[-88,-88] }), pr:[FLOOR, WALL(45)] },
+    { A:{ an:"p", at:[40,74], t:20, hd:30, a:[20,5], l:[90,180] }, pr:[FLOOR] },
+    { A:M(STAND, { a:[70,70] }), B:M(STAND, { a:[-250,-250] }), pr:[FLOOR] },
+    { A:{ an:"p", at:[36,74], t:5, hd:15, a:[-40,-150], l:[90,180] }, pr:[FLOOR, BOX(64,68,92,90)] },
+    { A:M(STAND, { a:[-100,-100] }), pr:[FLOOR, WALL(45)] },
+    { A:M(STAND, { a:[70,70] }), B:M(STAND, { a:[-250,-250] }), pr:[FLOOR], ic:"A" },
+  ],
 };
 
 const RM = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; } })();
@@ -899,19 +978,23 @@ function figStep(tid, i, cls = "fig", anim = true) {
 const fig = (id, cls = "fig") => figStep(id, T[id].steps.length - 1, cls, false);
 
 const PLAY = `<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9-5.5z" fill="currentColor"/></svg>`;
-const GROUPS = ["All","Push","Pull","Core","Legs","Balance"];
+// a YouTube search rather than one fixed video, so the link never goes dead
+const watchUrl = name => "https://www.youtube.com/results?search_query=" + encodeURIComponent(name + " calisthenics tutorial");
+const GROUPS = ["All","Push","Pull","Core","Legs","Balance","Mobility"];
 const UNIT = { r:"reps", rs:"reps / side", s:"sec", ss:"sec / side" };
 const UNIT_SHORT = { r:"reps", rs:"reps/side", s:"s", ss:"s/side" };
 const T = Object.fromEntries(TRACKS.map(t => [t.id, t]));
 const step = (tid, i) => { const s = T[tid].steps[i]; return { name:s[0], sets:s[1], target:s[2], unit:s[3], cues:s[4].split("|") }; };
 const total = TRACKS.reduce((n, t) => n + t.steps.length, 0);
 const xpFor = i => (i + 1) * 10;
-const XP_MAX = TRACKS.reduce((n, t) => n + t.steps.reduce((m, _, i) => m + xpFor(i), 0), 0);
+// ranks are measured against the strength ladders only, so adding mobility ladders never lowers anyone's rank
+const XP_MAX = TRACKS.filter(t => !t.mob).reduce((n, t) => n + t.steps.reduce((m, _, i) => m + xpFor(i), 0), 0);
 const RANKS = [["Novice",0],["Apprentice",.04],["Intermediate",.14],["Advanced",.32],["Elite",.55],["Master",.8]];
 
 // ---- State
 const LS = "skill-ladder-v1";
-const blank = () => ({ levels:{}, routine:["push","pull","lsit","hs","legs"], logs:[], plan:null });
+// done: when each step was mastered ({t, tr, st}), kept for the weekly summary
+const blank = () => ({ levels:{}, routine:["push","pull","lsit","hs","legs"], logs:[], plan:null, done:[] });
 let state = blank();
 try { const s = JSON.parse(localStorage.getItem(LS)); if (s && s.levels) state = { ...blank(), ...s }; } catch (e) {}
 const lvl = tid => state.levels[tid] || 0;
@@ -995,6 +1078,19 @@ function mastery(tid, i) {
       + (missing ? ` Do ${missing} more set${missing === 1 ? "" : "s"} in the same session.` : "");
   return { pct: Math.min(1, score), best, ready, msg };
 }
+// Today's small step: your last session of this step with the weakest set nudged up (one rep, or a few seconds),
+// so there is always something to beat between "not started" and "mastered"
+function nextTarget(tid, i) {
+  const s = step(tid, i), last = [...state.logs].reverse().find(l => l.tr === tid && l.st === i);
+  if (!last || !last.sets.length) return null;
+  const top = [...last.sets].sort((a, b) => b - a).slice(0, s.sets);
+  while (top.length < s.sets) top.push(top[top.length - 1]);   // sets you didn't get to count like your weakest one
+  const prev = top.map(v => Math.min(v, s.target));
+  if (prev.every(v => v >= s.target) && last.sets.length >= s.sets) return null;
+  const goal = prev.slice(), k = goal.indexOf(Math.min(...goal));
+  goal[k] = Math.min(s.target, goal[k] + (isTime(s.unit) ? Math.max(2, Math.round(s.target / 10)) : 1));
+  return { last: last.sets.slice(), goal };
+}
 function masteryCard(tid, i) {
   const s = step(tid, i), m = mastery(tid, i), st = statusOf(tid, i);
   const pill = st === "done" ? `<span class="m-pill done">Mastered</span>` : m.ready ? `<span class="m-pill ready">Ready to master</span>`
@@ -1034,15 +1130,18 @@ function ringSvg(pct, size, sw, color, track = "var(--line)") {
 // ---- Training plan: a weekly schedule built around the skill you want most
 // What each goal leans on: the ladders that build its strength, in order of importance
 const GOAL_SUPPORT = {
-  push: ["lsit", "legs"], pl: ["push", "hs", "lsit"], hspu: ["hs", "push", "lsit"], hs: ["push", "lsit"],
-  lsit: ["df", "pull"], df: ["lsit", "pull"], flag: ["pull", "push", "lsit"], pull: ["df", "push"],
-  mu: ["pull", "push", "lsit"], fl: ["pull", "df", "lsit"], bl: ["pull", "lsit", "push"],
-  legs: ["nordic", "lsit"], nordic: ["legs", "lsit"],
+  push: ["lsit", "legs"], pl: ["push", "hs", "lsit"], hspu: ["hs", "push", "lsit"], hs: ["push", "shoulder", "lsit"],
+  lsit: ["df", "pike", "pull"], df: ["lsit", "pull"], flag: ["pull", "push", "lsit"], pull: ["df", "push"],
+  mu: ["pull", "push", "lsit"], fl: ["pull", "df", "lsit"], bl: ["pull", "lsit", "shoulder"],
+  legs: ["nordic", "lsit"], nordic: ["legs", "pike"],
+  pike: ["lsit", "legs"], bridge: ["shoulder", "nordic"], shoulder: ["bridge", "hs"],
 };
 const BALANCE = ["push", "pull", "legs", "lsit", "df", "nordic"];
 // Equipment the plan can count on: hanging ladders need a bar or rings
-const EQUIP = [["bar", "Pull-up bar"], ["rings", "Rings"], ["par", "Parallettes"]];
-const NEEDS = { pull: ["bar", "rings"], mu: ["bar", "rings"], fl: ["bar", "rings"], bl: ["bar", "rings"] };
+const EQUIP = [["bar", "Pull-up bar"], ["rings", "Rings"], ["par", "Parallettes"], ["pole", "Vertical pole"]];
+const NEEDS = { pull: ["bar", "rings"], mu: ["bar", "rings"], fl: ["bar", "rings"], bl: ["bar", "rings"], flag: ["pole"] };
+const NEED_TXT = { bar: "a pull-up bar", rings: "rings", pole: "a sturdy vertical pole" };
+const needsText = id => `Needs ${NEEDS[id].map(k => NEED_TXT[k]).join(" or ")}`;
 // plans made before the equipment question assume everything is at hand
 const planEquip = plan => plan.equip || EQUIP.map(e => e[0]);
 const canDo = (id, equip) => !NEEDS[id] || NEEDS[id].some(e => equip.includes(e));
@@ -1129,12 +1228,12 @@ function renderPlan() {
     const dr = planDraft || (planDraft = { goals: [], days: [0, 2, 4], minutes: 45, equip: ["bar"] });
     host.innerHTML = `<div class="plan-setup">
       <div class="ps-step"><p class="h4">1 · What equipment do you have?</p><p class="note">Pick all that apply. With none, the plan sticks to floor exercises.</p>
-        <div class="row"><span class="seg">${EQUIP.map(([k, n]) => `<button type="button" data-pequip="${k}" aria-pressed="${dr.equip.includes(k)}">${n}</button>`).join("")}</span></div></div>
-      <div class="ps-step"><p class="h4">2 · What do you want to learn most?</p><p class="note">Pick up to two. The first one gets the most practice.</p>
+        <div class="row">${EQUIP.map(([k, n]) => `<button type="button" class="chip" data-pequip="${k}" aria-pressed="${dr.equip.includes(k)}">${n}</button>`).join("")}</div></div>
+      <div class="ps-step"><p class="h4">2 · What do you want to learn most?</p><p class="note">Pick up to two. The first one gets the most practice. Not sure what you can do yet? <button type="button" class="linkbtn" data-w="a-start">Find my level</button></p>
         <div class="goal-grid">${TRACKS.map(t => {
           const k = dr.goals.indexOf(t.id), done = lvl(t.id) >= t.steps.length, ok = canDo(t.id, dr.equip);
           return `<button type="button" class="goal g-${t.group}${k >= 0 ? " on" : ""}" data-goal="${t.id}" aria-pressed="${k >= 0}"${ok ? "" : " disabled"}>
-            ${k >= 0 ? `<span class="goal-n">${k + 1}</span>` : ""}${fig(t.id)}<b>${esc(goalName(t.id))}</b><span>${!ok ? "Needs a bar or rings" : done ? "Already mastered" : `${esc(t.name)} ladder`}</span></button>`;
+            ${k >= 0 ? `<span class="goal-n">${k + 1}</span>` : ""}${fig(t.id)}<b>${esc(goalName(t.id))}</b><span>${!ok ? needsText(t.id) : done ? "Already mastered" : `${esc(t.name)} ladder`}</span></button>`;
         }).join("")}</div></div>
       <div class="ps-step"><p class="h4">3 · Which days can you train?</p>
         <div class="row"><span class="seg">${[2, 3, 4, 5, 6].map(n => `<button type="button" data-pdays="${n}" aria-pressed="${dr.days.length === n}">${n} days</button>`).join("")}</span></div>
@@ -1178,7 +1277,8 @@ function renderPlan() {
       ${canHang(eq) ? "" : `<p class="note">No bar or rings, so the pulling ladders are left out. Rows under a sturdy table keep your back working until you get a bar.</p>`}</div>
     <div class="session">
       <div class="session-h"><h3>${DAY_NAMES[planDay]}${planDay === td ? " · today" : ""}</h3><span class="note">${sess.length} exercises · about ${p.minutes} min</span></div>
-      <p class="note warm">Warm up for 5 minutes first: wrist circles, arm swings, scapular pulls and a few easy push-ups. Do the exercises in this order.</p>
+      <div class="warm warm-row"><p class="note">Warm up first (about ${flowMins("warm", sess.map(it => it.id))} min, picked for these exercises), then do them in this order.</p>
+        <button type="button" class="linkbtn" data-w="warm" data-ids="${sess.map(it => it.id).join(",")}">Start warm-up</button></div>
       <div class="prows">${rows}</div>
       ${planDay === td ? `<button type="button" class="btn go" data-view="today" style="justify-content:center">Go to today's workout</button>` : ""}
     </div>
@@ -1207,7 +1307,11 @@ function planClick(el) {
       state.plan = { goals: dr.goals.slice(), days: dr.days.slice(), minutes: dr.minutes, equip: dr.equip.slice(), created: Date.now() };
       planDraft = null; planDay = null; save(); toast(`Plan ready: ${goalName(state.plan.goals[0])} is your main goal`);
     } else if (a === "cancel") planDraft = null;
-    else if (a === "edit") planDraft = { goals: state.plan.goals.slice(), days: state.plan.days.slice(), minutes: state.plan.minutes, equip: planEquip(state.plan).slice() };
+    else if (a === "edit") {
+      planDraft = { goals: state.plan.goals.slice(), days: state.plan.days.slice(), minutes: state.plan.minutes, equip: planEquip(state.plan).slice() };
+      // plans saved before an equipment option existed keep their goals selectable
+      state.plan.goals.forEach(g => { if (!canDo(g, planDraft.equip)) planDraft.equip.push(NEEDS[g][0]); });
+    }
     else if (a === "remove") { if (planArmed) { state.plan = null; planArmed = false; planDraft = null; save(); } else { planArmed = true; renderPlan(); return true; } }
   } else return false;
   planArmed = false;
@@ -1244,6 +1348,11 @@ function renderHero() {
 }
 
 function renderRings() {
+  // new here: a big invitation to the level check; afterwards just a small link to redo it
+  const fresh = !Object.keys(state.levels).length && !state.logs.length;
+  $("assess-cta").innerHTML = fresh
+    ? `<div class="plan-banner assess"><span><b>New here?</b> Answer a few yes/no questions and every ladder starts at your level. Takes about 2 minutes.</span><button type="button" class="btn go" data-w="a-start">Find my level</button></div>`
+    : `<p class="note assess-again">Levels look off? <button type="button" class="linkbtn" data-w="a-start">Find my level again</button></p>`;
   $("rings").innerHTML = TRACKS.map(t => {
     const L = Math.min(lvl(t.id), t.steps.length), pct = L / t.steps.length;
     return `<button class="ring g-${t.group}${pct >= 1 ? " complete" : ""}" data-ring="${t.id}" aria-label="${esc(t.name)}: ${L} of ${t.steps.length} steps mastered">
@@ -1254,7 +1363,7 @@ function renderRings() {
 
 // ---- Skill tree map: each ladder is a branch; advanced ladders sprout from the step that unlocks them
 const LOCK = `<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>`;
-const TREE_COLS = ["push","pl","hspu","hs","lsit","df","flag","pull","mu","fl","bl","legs","nordic"];
+const TREE_COLS = ["push","pl","hspu","hs","lsit","df","flag","pull","mu","fl","bl","legs","nordic","pike","bridge","shoulder"];
 const TG = { colW: 88, unit: 172, minGap: 86, padL: 70, padR: 16, hubY: 70, row0: 210 };
 // Difficulty of every step on one shared 1–10 scale (roughly the levels coaches use); the tree places each node this far from Start
 const LEVEL = {
@@ -1271,6 +1380,9 @@ const LEVEL = {
   df:   [1.5, 2.5, 4, 5, 6, 7],
   flag: [1.5, 4, 5.5, 6.5, 7.5, 8.5],
   nordic: [1, 2, 3, 4, 5.5, 7.5],
+  pike: [1, 1.5, 2, 3, 4, 5],
+  bridge: [1, 1.5, 2.5, 3.5, 5, 6],
+  shoulder: [1, 1.5, 2, 2.5, 3.5, 4.5],
 };
 const TIERS = [[1, "Beginner"], [3, "Novice"], [5, "Intermediate"], [7, "Advanced"], [9, "Elite"]];
 const tierOf = L => TIERS.reduce((n, t) => L >= t[0] ? t[1] : n, "Beginner");
@@ -1316,7 +1428,7 @@ function renderSkillTree() {
   });
   const W = TG.padL + TG.padR + TREE_COLS.length * TG.colW;
   const H = Math.max(...TREE_COLS.map(id => pos[id][pos[id].length - 1][1]), levelY(10)) + 80;
-  const hubX = colX(6);
+  const hubX = colX((TREE_COLS.length - 1) / 2);
   const dimmed = id => filter !== "All" && T[id].group !== filter;
   let edges = "", nodes = "", labels = "";
   // difficulty bands: one per level, labelled on the left, tier names where a tier begins
@@ -1548,8 +1660,9 @@ function setInputs(tid, i, prefix) {
 // "All 15" fills every set with the target; "Same as last time" copies your last session of this step
 function quickFill(tid, i, prefix) {
   const s = step(tid, i), u = isTime(s.unit) ? "s" : "";
-  const last = [...state.logs].reverse().find(l => l.tr === tid && l.st === i);
-  return `<div class="qfill"><button type="button" class="chip" data-fill="${prefix}" data-vals="${Array(s.sets).fill(s.target).join(",")}">All ${s.target}${u}</button>${last ?
+  const last = [...state.logs].reverse().find(l => l.tr === tid && l.st === i), nt = nextTarget(tid, i);
+  return `<div class="qfill"><button type="button" class="chip" data-fill="${prefix}" data-vals="${Array(s.sets).fill(s.target).join(",")}">All ${s.target}${u}</button>${nt ?
+    `<button type="button" class="chip" data-fill="${prefix}" data-vals="${nt.goal.join(",")}">Today's aim: ${nt.goal.join(" · ")}</button>` : ""}${last ?
     `<button type="button" class="chip" data-fill="${prefix}" data-vals="${last.sets.join(",")}">Same as last time: ${last.sets.join(" · ")}</button>` : ""}</div>`;
 }
 
@@ -1590,7 +1703,8 @@ function renderPanel() {
       ${masteryCard(tid, i)}
       ${st === "cur" && hit ? `<div class="row">${actions}</div><p class="note">Next up: ${i + 1 < track.steps.length ? esc(step(tid, i + 1).name) : "nothing, this is the top of the ladder"}.</p>` : ""}
       <button class="btn go start" data-focus="${tid}:${i}" style="justify-content:center">${PLAY}Start exercise</button>
-      <div><p class="h4" style="margin-bottom:8px">Form cues</p><ol class="cues">${s.cues.map(c => `<li>${esc(c)}</li>`).join("")}</ol></div>
+      <div><p class="h4" style="margin-bottom:8px">Form cues</p><ol class="cues">${s.cues.map(c => `<li>${esc(c)}</li>`).join("")}</ol>
+        <a class="linkbtn watch" href="${watchUrl(s.name)}" target="_blank" rel="noopener">${PLAY}Watch how on YouTube</a></div>
       ${sparkline(tid, i)}
       <form class="logform" data-form="panel" data-t="${tid}" data-i="${i}">
         <p class="h4">Or log a session by hand</p>
@@ -1695,13 +1809,16 @@ function renderToday() {
     $("today-hint").textContent = `${state.routine.length} ladder${state.routine.length === 1 ? "" : "s"} in your routine`;
     banner = `<div class="plan-banner"><span>Want a schedule built around the skill you want most?</span><button type="button" class="linkbtn" data-view="plan">Make a plan</button></div>`;
   }
+  const ids = todayIds();
+  banner += `<div class="flow-row"><button type="button" class="btn alt" data-w="warm">Warm up · about ${flowMins("warm", ids)} min</button>
+    <button type="button" class="btn alt" data-w="cool">Cool down · ${flowMins("cool", ids)} min</button></div>`;
   $("routine").innerHTML = banner + (usePlan ? "" : chips);
   const list = usePlan ? planned.map(it => T[it.id]) : TRACKS.filter(t => state.routine.includes(t.id));
   if (!list.length) { $("today").innerHTML = `<div class="empty">Tap ladders above to add them to today's workout.</div>`; return; }
   $("today").innerHTML = list.map(t => {
     const L = lvl(t.id);
     if (L >= t.steps.length) return `<div class="card g-${t.group} donecard">${fig(t.id)}<h3>${esc(t.name)}</h3><p class="note ok">Ladder complete. Keep it sharp with regular practice.</p></div>`;
-    const s = step(t.id, L), m = mastery(t.id, L), hit = m.ready;
+    const s = step(t.id, L), m = mastery(t.id, L), hit = m.ready, nt = !hit && nextTarget(t.id, L), u = isTime(s.unit) ? "s" : "";
     return `<form class="card g-${t.group}" data-form="today" data-t="${t.id}" data-i="${L}">
       <div class="card-h">${figStep(t.id, L)}<div><div class="sub">${esc(t.name)} · step ${L + 1} of ${t.steps.length}</div><h3>${esc(s.name)}</h3></div>
         <button type="button" class="linkbtn" data-open="${t.id}">Details</button></div>
@@ -1709,6 +1826,7 @@ function renderToday() {
         <div class="m-mini-top"><span>To master: <b>${requirement(s)}</b></span><b class="m-pct">${hit ? "Ready ★" : `${Math.round(m.pct * 100)}%`}</b></div>
         <div class="m-track"><i style="width:${m.pct * 100}%"></i></div>
         <p class="note${hit ? " ok" : ""}">${m.msg}</p>
+        ${nt ? `<p class="aim"><span>Today's aim</span><b>${nt.goal.map(v => v + u).join(" · ")}</b><em>last time ${nt.last.map(v => v + u).join(" · ")}</em></p>` : ""}
         <p class="note eta-mini">${CLOCK} Usually takes ${etaText(t.id, L)}</p>
       </div>
       ${setInputs(t.id, L, "d-" + t.id)}
@@ -1740,7 +1858,7 @@ let logEditing = null;
 // ---- Backup & restore: move progress between the Claude version and the apps (or to a new phone)
 const BACKUP_PREFIX = "SKILLLADDER1:";
 function makeBackup() {
-  const data = { v: 1, at: Date.now(), levels: state.levels, routine: state.routine, logs: state.logs, plan: state.plan || null };
+  const data = { v: 1, at: Date.now(), levels: state.levels, routine: state.routine, logs: state.logs, plan: state.plan || null, done: state.done || [] };
   return BACKUP_PREFIX + btoa(unescape(encodeURIComponent(JSON.stringify(data))));
 }
 function readBackup(text) {
@@ -1757,7 +1875,9 @@ function mergeBackup(data) {
   const seen = new Set(state.logs.map(l => l.id));
   const logs = state.logs.concat(data.logs.filter(l => l && l.id && !seen.has(l.id) && T[l.tr] && Array.isArray(l.sets))).sort((a, b) => a.t - b.t).slice(-600);
   const added = logs.length - state.logs.length;
-  state = { ...state, levels, logs, routine: state.routine.length ? state.routine : (data.routine || state.routine), plan: state.plan || data.plan || null };
+  const have = new Set((state.done || []).map(d => d.tr + ":" + d.st));
+  const done = (state.done || []).concat((Array.isArray(data.done) ? data.done : []).filter(d => d && T[d.tr] && !have.has(d.tr + ":" + d.st))).sort((a, b) => a.t - b.t);
+  state = { ...state, levels, logs, done, routine: state.routine.length ? state.routine : (data.routine || state.routine), plan: state.plan || data.plan || null };
   save();
   return added;
 }
@@ -1798,8 +1918,27 @@ function showMsg() {
   if (!p) { p = document.createElement("p"); el.appendChild(p); }
   p.className = "note ok"; p.textContent = backupMsg;
 }
+// This week (from Monday) next to last week: days, sets, reps, hold time and steps mastered
+function weekSummary() {
+  const start = startOfDay(Date.now()) - todayIdx() * 864e5, prevStart = start - 7 * 864e5;
+  const tally = (a, b) => {
+    const ls = state.logs.filter(l => l.t >= a && l.t < b && T[l.tr] && T[l.tr].steps[l.st]);
+    let reps = 0, secs = 0;
+    ls.forEach(l => { const sum = l.sets.reduce((n, v) => n + v, 0); if (isTime(T[l.tr].steps[l.st][3])) secs += sum; else reps += sum; });
+    return { days: new Set(ls.map(l => startOfDay(l.t))).size, sets: ls.reduce((n, l) => n + l.sets.length, 0), reps, secs,
+      steps: (state.done || []).filter(d => d.t >= a && d.t < b).length };
+  };
+  const now = tally(start, Infinity), prev = tally(prevStart, start);
+  const fmtS = s => s >= 60 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${s}s`;
+  const tile = (label, k, fmt = String) => {
+    const d = now[k] - prev[k], [one, many] = label.split("|");
+    return `<div class="wk-tile"><b>${fmt(now[k])}</b><span>${now[k] === 1 ? one : many ?? one}</span><i class="${d > 0 ? "up" : d < 0 ? "down" : ""}">${d === 0 ? "same as last week" : `${d > 0 ? "+" : "−"}${fmt(Math.abs(d))} vs last week`}</i></div>`;
+  };
+  return `<div class="wk"><p class="h4">This week</p><div class="wk-grid">
+    ${tile("day trained|days trained", "days")}${tile("set|sets", "sets")}${tile("rep|reps", "reps")}${tile("time in holds", "secs", fmtS)}${tile("step mastered|steps mastered", "steps")}</div></div>`;
+}
 function renderLog() {
-  let html = heatmap();
+  let html = weekSummary() + heatmap();
   if (!state.logs.length) { $("log").innerHTML = html + `<div class="empty">No sessions yet. Log sets from a skill or from today's workout and they show up here.</div>` + backupHTML(); return; }
   const byDay = {};
   [...state.logs].sort((a, b) => b.t - a.t).slice(0, 150).forEach(l => (byDay[dayKey(l.t)] ||= []).push(l));
@@ -1833,7 +1972,9 @@ function celebrate(tid, i) {
   setTimeout(() => { $("party-host").innerHTML = ""; }, 2550);
 }
 function master(tid, i) {
-  state.levels = { ...state.levels, [tid]: i + 1 }; justHit = null; save(); celebrate(tid, i);
+  state.levels = { ...state.levels, [tid]: i + 1 }; justHit = null;
+  state.done = [...(state.done || []), { t: Date.now(), tr: tid, st: i }].slice(-300);
+  save(); celebrate(tid, i);
 }
 
 // ---- Guided exercise mode
@@ -1868,7 +2009,7 @@ function startFocus(tid, i) {
   if (fo && fo.tid === tid && fo.i === i) { fo.min = false; document.body.style.overflow = "hidden"; lockWake(); return renderFocus(); }
   // another exercise in progress: keep its sets by saving them to the log first
   if (fo && fo.sets.length && fo.phase !== "saved") { logSession(fo.tid, fo.i, fo.sets); toast(`Saved ${fo.sets.length} set${fo.sets.length === 1 ? "" : "s"} of ${step(fo.tid, fo.i).name} to your log`); }
-  fo = { tid, i, sets: [], cur: 0, phase: "work", running: false, t0: 0, acc: 0, beeped: false, restDur: 90, restStart: 0, arm: false, hit: false, min: false, started: Date.now() };
+  fo = { tid, i, aim: nextTarget(tid, i), sets: [], cur: 0, phase: "work", running: false, t0: 0, acc: 0, beeped: false, restDur: 90, restStart: 0, arm: false, hit: false, min: false, started: Date.now() };
   sel = null; renderPanel(); clock = { mode:null }; clearInterval(tick);
   document.body.style.overflow = "hidden"; lockWake(); renderFocus();
   clearInterval(foTick); foTick = setInterval(focusTick, 200);
@@ -1930,6 +2071,7 @@ function renderFocus() {
     k < n ? `<button type="button" class="d${fo.sets[k] >= s.target ? " hit" : ""}" data-f="editset" data-k="${k}" aria-label="Edit set ${k + 1}: ${fo.sets[k]}">${fo.sets[k]}</button>` : `<i class="${k === n && fo.phase === "work" ? "c" : ""}">${k + 1}</i>`).join("");
   const setLbl = fo.phase === "work" ? `Set ${n + 1} of ${Math.max(s.sets, n + 1)}` : fo.phase === "rest" ? `Rest · ${n} of ${s.sets} done` : `${n} sets`;
   let mid = "";
+  const aimV = fo.aim && fo.aim.goal[n], aim = aimV ? `<p class="f-hint f-aim">Aim for <b>${aimV}${timed ? "s" : " reps"}</b> this set${fo.aim.last[n] != null ? ` · last time ${fo.aim.last[n]}${timed ? "s" : ""}` : ""}</p>` : "";
   if (fo.phase === "work") {
     if (timed) {
       const e = elapsed();
@@ -1937,7 +2079,7 @@ function renderFocus() {
         <button class="f-ring" data-f="go" aria-label="${fo.running ? "Stop hold" : "Start hold"}">${focusRing(e / s.target, e >= s.target ? "#7BE0A4" : "#F2F5F3")}
           <span class="f-num"><b>${mmss(e)}</b><span>Target ${s.target}s${side}</span></span></button>
         <p class="f-hint">${fo.running ? "Tap the ring or Stop when you come down" : e ? "Adjust if needed, then finish the set" : "Get in position, then tap Start"}</p>
-        <div class="f-sets">${pills}</div>
+        ${aim}<div class="f-sets">${pills}</div>
         <div class="f-ctrl">
           ${fo.running ? "" : `<button class="f-round" data-f="tminus" aria-label="Minus one second">−</button>`}
           ${fo.running ? `<button class="f-main" data-f="go">Stop</button>`
@@ -1954,7 +2096,7 @@ function renderFocus() {
             <span class="f-num"><b>${fo.cur}</b><span>of ${s.target} reps${side}</span></span></span>
           <span class="f-hint">Tap anywhere here after each rep</span>
         </button>
-        <div class="f-sets">${pills}</div>
+        ${aim}<div class="f-sets">${pills}</div>
         <div class="f-ctrl">
           <button class="f-round" data-f="minus" aria-label="Remove a rep">−</button>
           <button class="f-main go" data-f="done"${fo.cur ? "" : " disabled"}>${fo.cur ? `Finish set · ${fo.cur} reps` : "Finish set"}</button>
@@ -1998,7 +2140,8 @@ function renderFocus() {
       <button class="f-x${fo.arm ? " arm" : ""}" data-f="exit" aria-label="End session">${fo.arm ? "Discard sets?" : "✕"}</button>
       <div class="f-eyebrow">${esc(t.name)}<br>Step ${fo.i + 1} of ${t.steps.length}</div>
       <button class="f-cuebtn" data-f="cues" aria-expanded="${!!fo.cues}">Cues</button><span class="f-setlbl">${setLbl}</span>
-      ${fo.cues ? `<div class="f-cuebox" role="region" aria-label="Form cues"><p>Form cues</p><ol>${s.cues.map(c => `<li>${esc(c)}</li>`).join("")}</ol></div>` : ""}</div>
+      ${fo.cues ? `<div class="f-cuebox" role="region" aria-label="Form cues"><p>Form cues</p><ol>${s.cues.map(c => `<li>${esc(c)}</li>`).join("")}</ol>
+        <a class="f-watch" href="${watchUrl(s.name)}" target="_blank" rel="noopener">${PLAY}Watch how on YouTube</a></div>` : ""}</div>
     <div class="f-inner">${mid}</div>
     ${sheetHTML(s, timed, n)}
   </div>`;
@@ -2121,6 +2264,168 @@ function focusAction(a, el) {
   renderFocus();
 }
 
+// ---- Warm-up, cool-down and Find my level: full-screen flows with the guided-mode look
+// Drills: [name, seconds, cue, stick figure as [ladder, step]]
+const DRILLS = {
+  arms: ["Arm circles", 30, "Big, slow circles, forwards then backwards"],
+  wrists: ["Wrist circles and rocks", 45, "Circle both ways, then rock gently on hands and knees, fingers forward, then back"],
+  scapPush: ["Scapular push-ups", 30, "Arms straight in a plank; let the chest sink between the shoulders, then push it away", ["push", 3]],
+  wallPush: ["Easy wall push-ups", 30, "Slow and smooth through the full range", ["push", 0]],
+  hang: ["Dead hang", 20, "Relax into the bar and breathe", ["pull", 0]],
+  scapPull: ["Scapular pulls", 30, "From a hang, pull the shoulders down without bending the arms", ["pull", 1]],
+  ytw: ["Prone Y-T-W raises", 40, "Lie face down; lift the arms into a Y, a T, then a W, squeezing the shoulder blades"],
+  hollow: ["Hollow body hold", 20, "Lower back pressed into the floor", ["lsit", 0]],
+  squat: ["Bodyweight squats", 30, "Easy pace, full depth", ["legs", 1]],
+  glute: ["Glute bridges", 30, "Drive through the heels and squeeze at the top", ["nordic", 0]],
+  chest: ["Doorway chest stretch", 40, "Forearm on a door frame, step through until the chest opens; switch sides halfway"],
+  lats: ["Lat stretch", 40, "Hold a rail or door frame with straight arms and sink the hips back"],
+  wristStretch: ["Wrist stretch", 40, "Kneel, palms down with fingers toward the knees and lean back gently; then flip the hands over"],
+  fold: ["Seated forward fold", 40, "Legs straight, reach for the toes and breathe slowly", ["pike", 1]],
+  hip: ["Hip flexor stretch", 40, "Half-kneeling lunge, tuck the hips under and lean forward; switch sides halfway"],
+  puppy: ["Puppy pose", 40, "Hips over the knees, walk the hands forward and sink the chest", ["shoulder", 1]],
+  child: ["Child's pose", 40, "Knees wide, arms long, sink the hips to the heels and breathe"],
+};
+// the drills today's ladders need: wrists and shoulder blades for pushing and balance, a hang for pulling, and so on
+function drillsFor(kind, ids) {
+  if (!ids.length) ids = TRACKS.filter(t => !t.mob).map(t => t.id);
+  const g = new Set(ids.map(id => T[id] && T[id].group)), has = (...x) => ids.some(id => x.includes(id));
+  const pushy = g.has("Push") || g.has("Balance") || has("lsit", "flag"), pully = g.has("Pull") || has("flag");
+  const list = [];
+  if (kind === "warm") {
+    list.push("arms");
+    if (pushy) list.push("wrists", "scapPush");
+    if (pully) list.push(...(canHang(state.plan ? planEquip(state.plan) : ["bar"]) ? ["hang", "scapPull"] : ["ytw"]));
+    if (g.has("Core") || g.has("Mobility")) list.push("hollow");
+    if (g.has("Legs")) list.push("squat", "glute");
+    if (pushy) list.push("wallPush");
+    if (list.length < 4) list.push("squat", "hollow");
+  } else {
+    if (pushy) list.push("chest", "wristStretch");
+    if (pully) list.push("lats");
+    if (pushy || pully) list.push("puppy");
+    if (g.has("Core") || g.has("Legs") || g.has("Mobility")) list.push("fold", "hip");
+    list.push("child");
+  }
+  return [...new Set(list)];
+}
+const todayIds = () => { const p = planToday(); return p && p.length ? p.map(it => it.id) : state.routine.slice(); };
+const flowMins = (kind, ids) => Math.max(1, Math.round(drillsFor(kind, ids).reduce((n, k) => n + DRILLS[k][1], 0) / 60));
+let wu = null, pa = null, flowTimer = null;
+function flowOpen() { document.body.style.overflow = "hidden"; lockWake(); }
+function flowClose() {
+  wu = null; pa = null; clearInterval(flowTimer); $("flow-host").innerHTML = "";
+  if (!fo || fo.min) document.body.style.overflow = "";
+  if (!fo) { try { wake && wake.release(); } catch (e) {} wake = null; }
+}
+function startFlow(kind, ids) {
+  pa = null; wu = { kind, list: drillsFor(kind, ids), k: 0, acc: 0, t0: 0, running: false, done: false };
+  flowOpen(); renderWarm();
+  clearInterval(flowTimer); flowTimer = setInterval(warmTick, 200);
+}
+const wuLeft = () => Math.max(0, DRILLS[wu.list[wu.k]][1] - (wu.acc + (wu.running ? Date.now() - wu.t0 : 0)) / 1000);
+const wuTotal = () => wuLeft() + wu.list.slice(wu.k + 1).reduce((n, k) => n + DRILLS[k][1], 0);
+// each drill flows into the next with a chime, so you never have to touch the phone mid-warm-up
+function warmTick() {
+  if (!wu || !wu.running || wu.done) return;
+  const left = wuLeft();
+  if (left <= 0) { beep("hold"); return warmGo(wu.k + 1); }
+  const b = document.querySelector("#flow-host .f-num b"), r = document.querySelector("#flow-host .f-ring"), tot = document.querySelector("#flow-host .f-setlbl");
+  if (b) b.textContent = mmss(Math.ceil(left));
+  if (r) r.firstElementChild.outerHTML = focusRing(left / DRILLS[wu.list[wu.k]][1]);
+  if (tot) tot.textContent = mmss(Math.ceil(wuTotal())) + " left";
+}
+function warmGo(k) {
+  wu.acc = 0; wu.t0 = Date.now();
+  if (k >= wu.list.length) { wu.done = true; wu.running = false; } else wu.k = Math.max(0, k);
+  renderWarm();
+}
+function renderWarm() {
+  const warm = wu.kind === "warm", title = warm ? "Warm-up" : "Cool-down", tint = warm ? "Legs" : "Mobility";
+  if (wu.done) {
+    $("flow-host").innerHTML = `<div class="focus g-${tint}" role="dialog" aria-label="${title} done">
+      <div class="f-top"><button class="f-x" data-w="close" aria-label="Close">✕</button></div>
+      <div class="f-inner"><h2 class="f-name">${warm ? "Warmed up" : "All done"}</h2>
+        <p class="f-msg ok">${warm ? "You're ready. Start with the first exercise on today's list." : "Nice work. That's the session finished."}</p>
+        <div class="f-ctrl"><button class="f-main go" data-w="${warm ? "towork" : "close"}">${warm ? "Go to today's workout" : "Done"}</button></div></div></div>`;
+    return;
+  }
+  const [name, dur, cue, f] = DRILLS[wu.list[wu.k]], left = wuLeft(), next = wu.list[wu.k + 1], started = wu.running || wu.acc || wu.k;
+  $("flow-host").innerHTML = `<div class="focus g-${tint}" role="dialog" aria-label="${title}">
+    <div class="f-top"><button class="f-x" data-w="close" aria-label="End the ${title.toLowerCase()}">✕</button>
+      <div class="f-eyebrow">${title}<br>${wu.k + 1} of ${wu.list.length}</div><span class="f-setlbl" style="margin-left:auto">${mmss(Math.ceil(wuTotal()))} left</span></div>
+    <div class="f-inner"><h2 class="f-name">${esc(name)}</h2>
+      ${f ? figStep(f[0], f[1], "fig f-fig" + (SP[f[0]][f[1]].B ? "" : " still")) : ""}
+      <button class="f-ring" data-w="pause" aria-label="${wu.running ? "Pause" : "Start"}">${focusRing(left / dur)}
+        <span class="f-num"><b>${mmss(Math.ceil(left))}</b><span>${wu.running ? "Tap to pause" : started ? "Paused" : "Tap to start"}</span></span></button>
+      <p class="f-hint">${esc(cue)}</p>
+      <div class="f-ctrl"><button class="f-round" data-w="prev" aria-label="Previous drill"${wu.k ? "" : " disabled"}>‹</button>
+        <button class="f-main${wu.running ? "" : " go"}" data-w="pause">${wu.running ? "Pause" : started ? "Resume" : "Start"}</button>
+        <button class="f-round" data-w="next" aria-label="Next drill">›</button></div>
+      <p class="f-hint">${next ? `Next: ${esc(DRILLS[next][0])}` : "Last one"}</p></div></div>`;
+}
+
+// Find my level: a few yes/no questions per ladder (a binary search over its steps). A ladder that an earlier
+// answer leaves locked is set to the start without asking, so the whole thing takes a couple of minutes.
+function startAssess() { wu = null; clearInterval(flowTimer); pa = { res: {} }; flowOpen(); assessLadder(0); }
+function assessLadder(k) {
+  pa.k = k; pa.end = k >= TRACKS.length;
+  if (!pa.end) {
+    const t = TRACKS[k], pre = t.prereq;
+    if (pre && (pa.res[pre[0]] ?? lvl(pre[0])) <= pre[1]) { pa.res[t.id] = 0; return assessLadder(k + 1); }
+    pa.lo = 0; pa.hi = t.steps.length;
+  }
+  renderAssess();
+}
+function assessAnswer(yes) {
+  const mid = Math.ceil((pa.lo + pa.hi) / 2);
+  if (yes) pa.lo = mid; else pa.hi = mid - 1;
+  if (pa.lo >= pa.hi) { pa.res[TRACKS[pa.k].id] = pa.lo; return assessLadder(pa.k + 1); }
+  renderAssess();
+}
+function renderAssess() {
+  if (pa.end) {
+    const rows = TRACKS.map(t => {
+      const n = t.steps.length, L = pa.res[t.id] ?? lvl(t.id), was = lvl(t.id);
+      return `<li class="g-${t.group}"><b>${esc(t.name)}</b><span>${L >= n ? "Ladder complete" : `Step ${L + 1} · ${esc(step(t.id, L).name)}`}</span>
+        ${L !== was ? `<em>was ${was >= n ? "complete" : `step ${was + 1}`}</em>` : ""}</li>`;
+    }).join("");
+    $("flow-host").innerHTML = `<div class="focus g-Pull" role="dialog" aria-label="Your levels">
+      <div class="f-top"><button class="f-x" data-w="close" aria-label="Close without saving">✕</button><div class="f-eyebrow">Find my level<br>Results</div></div>
+      <div class="f-inner"><h2 class="f-name">Your levels</h2><p class="f-hint">Each ladder starts at the first step you can't do yet.</p>
+        <ul class="pa-list">${rows}</ul>
+        <div class="f-ctrl"><button class="f-main go" data-w="a-save">Save my levels</button></div>
+        <button class="f-alt" data-w="close">Cancel</button></div></div>`;
+    return;
+  }
+  const t = TRACKS[pa.k], i = Math.ceil((pa.lo + pa.hi) / 2) - 1, s = step(t.id, i);
+  $("flow-host").innerHTML = `<div class="focus g-${t.group}" role="dialog" aria-label="Find my level">
+    <div class="f-top"><button class="f-x" data-w="close" aria-label="Stop">✕</button>
+      <div class="f-eyebrow">Find my level · ${pa.k + 1} of ${TRACKS.length}<br>${esc(t.name)}</div></div>
+    <div class="f-inner"><div class="pa-bar"><i style="width:${pa.k / TRACKS.length * 100}%"></i></div>
+      <h2 class="f-name">${esc(s.name)}</h2>${figStep(t.id, i, "fig f-fig" + (SP[t.id][i].B ? "" : " still"))}
+      <p class="f-msg">Can you do this today, with good form?</p>
+      <p class="f-hint">${requirement(s).replace(/<\/?b>/g, "")}</p>
+      <div class="f-ctrl"><button class="f-main go" data-w="a-yes">Yes</button><button class="f-main" data-w="a-no">No</button></div>
+      <div class="f-chips"><button data-w="a-never">I haven't trained this</button><button data-w="a-skip">Skip, keep my level</button></div></div></div>`;
+}
+function flowAction(a, el) {
+  if (a === "warm" || a === "cool") return startFlow(a, el.dataset.ids ? el.dataset.ids.split(",") : todayIds());
+  if (a === "a-start") return startAssess();
+  if (a === "close") return flowClose();
+  if (a === "towork") { flowClose(); view = "today"; try { localStorage.setItem("skill-ladder-view", view); history.replaceState(null, "", "#today"); } catch (x) {} window.scrollTo(0, 0); return render(); }
+  if (wu) {
+    if (a === "pause") { if (wu.running) { wu.acc += Date.now() - wu.t0; wu.running = false; } else { wu.t0 = Date.now(); wu.running = true; } return renderWarm(); }
+    if (a === "next") return warmGo(wu.k + 1);
+    if (a === "prev") return warmGo(wu.k - 1);
+  }
+  if (pa) {
+    if (a === "a-yes" || a === "a-no") return assessAnswer(a === "a-yes");
+    if (a === "a-never") { pa.res[TRACKS[pa.k].id] = 0; return assessLadder(pa.k + 1); }
+    if (a === "a-skip") { pa.res[TRACKS[pa.k].id] = lvl(TRACKS[pa.k].id); return assessLadder(pa.k + 1); }
+    if (a === "a-save") { state.levels = { ...state.levels, ...pa.res }; save(); flowClose(); render(); toast("Levels saved. Every ladder now starts where you are."); }
+  }
+}
+
 // ---- Set boxes you've typed into but not logged yet survive re-renders and closing the app
 const DRAFT_KEY = "skill-ladder-drafts";
 let drafts = {};
@@ -2146,6 +2451,7 @@ try { navigator.storage && navigator.storage.persist && navigator.storage.persis
 document.addEventListener("click", e => {
   const el = e.target.closest("button, .scrim"); if (!el) return;
   if (el.dataset.f && fo) return focusAction(el.dataset.f, el);
+  if (el.dataset.w) return flowAction(el.dataset.w, el);
   if ((el.dataset.goal || el.dataset.pdays || el.dataset.pday || el.dataset.pmin || el.dataset.pequip || el.dataset.pdayView || el.dataset.plan) && planClick(el)) return;
   if (el.dataset.focus) { const [tid, i] = el.dataset.focus.split(":"); return startFocus(tid, +i); }
   if (el.dataset.view) { view = el.dataset.view; armed = null; try { localStorage.setItem("skill-ladder-view", view); } catch (x) {} sel = wide() ? sel : null; try { history.replaceState(null, "", "#" + view); } catch (x) {} window.scrollTo(0, 0); return render(); }

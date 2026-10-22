@@ -15,10 +15,13 @@ Everything below describes the project as of **2026-10-21**.
 
 A single-page calisthenics trainer:
 
-- **13 skill ladders, 89 exercises**: Push-up, Planche, Handstand push-up, Handstand, L-sit, Dragon flag, Human flag, Pull-up, Muscle-up, Front lever, Back lever, Pistol squat, Nordic curl.
+- **16 ladders, 107 exercises**: 13 strength ladders (Push-up, Planche, Handstand push-up, Handstand, L-sit, Dragon flag, Human flag, Pull-up, Muscle-up, Front lever, Back lever, Pistol squat, Nordic curl) and 3 **Mobility** ladders (Pike flexibility, Bridge, Shoulder mobility; `mob: true`, teal). Mobility XP counts, but ranks are measured against the strength ladders only, so adding ladders never lowers a rank.
+- **Find my level:** a few yes/no questions per ladder (binary search over its steps; ladders an earlier answer leaves locked are skipped). Results screen, then "Save my levels". Offered prominently to new users on the Skills tab, as a small link afterwards, and in plan setup.
 - **Skills tab:** a zoomable, draggable **skill tree**. Nodes are placed by difficulty (Lv 1–10, Beginner → Elite bands), and advanced branches sprout from the step that unlocks them. A **List** view and progress rings are also available.
-- **Step details:** an animated stick figure for every exercise, a difficulty tag, **estimated time to learn**, a **mastery check** (requirement, set-by-set bars from your best session, what's missing, "Ready to master ★"), form cues, a progress chart and manual set logging.
-- **Workout tab:** today's exercises from the plan (or a chosen routine), a rest timer, cards with mastery progress, and quick fill ("All 15", "Same as last time").
+- **Step details:** an animated stick figure for every exercise, a "Watch how on YouTube" link, a difficulty tag, **estimated time to learn**, a **mastery check** (requirement, set-by-set bars from your best session, what's missing, "Ready to master ★"), form cues, a progress chart and manual set logging.
+- **Workout tab:** today's exercises from the plan (or a chosen routine), a rest timer, cards with mastery progress, and quick fill ("All 15", "Today's aim", "Same as last time").
+- **Today's aim:** `nextTarget()` takes your last session of the step and nudges the weakest set up (+1 rep, or +10% of the target in seconds, at least 2). Shown on Workout cards, as a quick-fill chip and per set in guided mode (worked out when the session starts).
+- **Warm-up and cool-down:** guided, timed drill sequences (`DRILLS`, `drillsFor()`) picked for the day's ladders and equipment; each drill flows into the next with a chime. Buttons on the Workout tab and in the Plan tab's session.
 - **Guided mode** (full screen, "Start exercise"):
   - Tap anywhere to count reps (tick and buzz), or hold timers for timed exercises.
   - A **confirm panel** opens before any set is logged.
@@ -26,8 +29,8 @@ A single-page calisthenics trainer:
   - Automatic rest countdown with a chime, vibration and an optional notification in the installed app.
   - Minimize to a floating bar; the session is saved on every change and survives closing the app for 12 hours.
   - The Cues button sits in the top bar.
-- **Plan tab:** pick your equipment (pull-up bar, rings, parallettes; none = floor only), up to 2 goal skills, training days and session length. Without a bar or rings, the hanging ladders (Pull-up, Muscle-up, Front lever, Back lever) can't be chosen as goals and are left out of the plan. Without parallettes, L-sit and deficit HSPU rows show what to use instead. Plans saved before this setting existed count as having everything. It builds a weekly schedule (goal first, then unlock work, then support, then balance), shows a time-to-goal estimate, and moves up automatically when steps are mastered.
-- **Log tab:** a 16-week heatmap and sessions by day. Tap the numbers to edit a session (no Edit button); clearing a box erases that set. Also has **Backup & restore** (code starting `SKILLLADDER1:`, merged on restore) and Reset.
+- **Plan tab:** pick your equipment (pull-up bar, rings, parallettes, vertical pole; none = floor only), up to 2 goal skills, training days and session length. Without a bar or rings, the hanging ladders (Pull-up, Muscle-up, Front lever, Back lever) can't be chosen as goals and are left out of the plan; the Human flag needs a pole. Without parallettes, L-sit and deficit HSPU rows show what to use instead. Plans saved before this setting existed count as having everything. It builds a weekly schedule (goal first, then unlock work, then support, then balance), shows a time-to-goal estimate, and moves up automatically when steps are mastered.
+- **Log tab:** a **This week** summary (days, sets, reps, hold time, steps mastered, each compared with last week), a 16-week heatmap and sessions by day. Tap the numbers to edit a session (no Edit button); clearing a box erases that set. Also has **Backup & restore** (code starting `SKILLLADDER1:`, merged on restore) and Reset.
 - **Ranks and XP** (Novice → Master), a day streak and a celebration when a step is mastered.
 
 ## Where it lives
@@ -71,12 +74,13 @@ The repo is the source of truth. The temporary folder from the first session is 
 | `Progressions` | `TRACKS`: each ladder `{id, name, group, prereq?, steps:[[name, sets, target, unit, cues]]}`; unit `r` reps, `rs` reps/side, `s` sec, `ss` sec/side |
 | `Stick figures` | `SP` poses per step: `{A, B?, pr, front?, ic?}`. A pose is segment angles in degrees, pinned at the wrist (`an:"w"`), foot (`"f"`), hip (`"p"`) or shoulder (`"s"`). Two poses (A, B) animate the rep; one pose is a hold. `figStep(tid,i)` renders. |
 | `LEVEL`, `TIERS`, `etaWeeks` | Difficulty 1–10 per step; the time estimate is `max(.5, gap) × 3.57 × e^(0.231·L)` weeks |
-| `State`, `Persistence` | `state = {levels, routine, logs, plan}`; `save()` writes localStorage and, in Claude, the db doc `data/users/<id>/progress` (snapshot data is frozen, so it's always deep-copied) |
+| `State`, `Persistence` | `state = {levels, routine, logs, plan, done}` (`done`: when each step was mastered, for the weekly summary; included in backups); `save()` writes localStorage and, in Claude, the db doc `data/users/<id>/progress` (snapshot data is frozen, so it's always deep-copied) |
 | `Mastery` | `requirement()`, `mastery()`, `masteryCard()` |
 | `Training plan` | `GOAL_SUPPORT`, `BALANCE`, `EQUIP`/`NEEDS`/`canDo()`/`parSwap()` (equipment filter; `plan.equip`), `buildWeek(plan)`, `goalEta()`, `renderPlan()`, `planClick()` |
 | `Skill tree map`, `Tree map` | `TREE_COLS` column order, `TG` layout, `renderSkillTree()`, zoom/pan: during a pinch, wheel or zoom-button glide only a GPU transform moves (`liveStart`/`liveSet`); `liveEnd()` then applies the real size and scroll in one step without a visible jump. `zoomTo()` animates the buttons; `markSel()` moves the selection highlight without rebuilding the map |
 | `Timer` | Workout-tab rest timer, `beep(kind)`, `restOver()`, the shared `audioCtx` (unlocked on first tap) |
 | `Backup & restore` | `makeBackup()`, `readBackup()`, `mergeBackup()` |
+| `Warm-up, cool-down and Find my level` | Full-screen flows in `#flow-host` using the guided-mode styles: `wu` (warm-up state), `pa` (assessment state), `flowAction()` handles `data-w` buttons |
 | `Guided exercise mode` | `fo` session object (saved to `skill-ladder-session`), `startFocus`, `renderFocus`, `sheetHTML` (confirm/edit panel), `updateReps`/`updateSheet` (in-place updates, no redraw), `focusAction` |
 | `Events`, `Boot` | One delegated click handler (actions use `data-*` attributes); boot restores the last tab and any running session |
 
@@ -84,7 +88,7 @@ The repo is the source of truth. The temporary folder from the first session is 
 
 ## Design rules used so far
 
-- Dark hero card with a gold accent. Group colors: Push orange, Pull blue, Core violet, Legs green, Balance amber.
+- Dark hero card with a gold accent. Group colors: Push orange, Pull blue, Core violet, Legs green, Balance amber, Mobility teal.
 - Fonts: Big Shoulders Display (headings), Instrument Sans (body), IBM Plex Mono (numbers).
 - Colors are tokens on `:root` with dark-mode overrides. Phone first, with a bottom tab bar on narrow screens.
 - In guided mode: −/+ updates the number in place with no animation. Panels open instantly and only slide when closing.
@@ -124,5 +128,5 @@ The installed app checks `app-version` on open and every 15 minutes, and shows *
 ## Ideas not done yet
 
 - Retire the Netlify site once progress has been moved.
-- Voice rep counting; per-exercise video links.
-- Equipment for the Human flag (a vertical pole) isn't part of the plan filter yet.
+- "Watch how" links open a YouTube search per step (no fixed videos to go stale); hand-picked videos could replace them.
+- Not planned: voice rep counting (unreliable mid-exercise), automatic phone/Claude sync (needs a server), training-day reminders (web apps can't schedule them reliably).
