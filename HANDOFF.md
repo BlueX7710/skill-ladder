@@ -74,7 +74,7 @@ The repo is the source of truth. The temporary folder from the first session is 
 | `State`, `Persistence` | `state = {levels, routine, logs, plan}`; `save()` writes localStorage and, in Claude, the db doc `data/users/<id>/progress` (snapshot data is frozen, so it's always deep-copied) |
 | `Mastery` | `requirement()`, `mastery()`, `masteryCard()` |
 | `Training plan` | `GOAL_SUPPORT`, `BALANCE`, `EQUIP`/`NEEDS`/`canDo()`/`parSwap()` (equipment filter; `plan.equip`), `buildWeek(plan)`, `goalEta()`, `renderPlan()`, `planClick()` |
-| `Skill tree map`, `Tree map` | `TREE_COLS` column order, `TG` layout, `renderSkillTree()`, zoom/pan (`applyZoom`, wheel/pinch/drag) |
+| `Skill tree map`, `Tree map` | `TREE_COLS` column order, `TG` layout, `renderSkillTree()`, zoom/pan: during a pinch, wheel or zoom-button glide only a GPU transform moves (`liveStart`/`liveSet`); `liveEnd()` then applies the real size and scroll in one step without a visible jump. `zoomTo()` animates the buttons; `markSel()` moves the selection highlight without rebuilding the map |
 | `Timer` | Workout-tab rest timer, `beep(kind)`, `restOver()`, the shared `audioCtx` (unlocked on first tap) |
 | `Backup & restore` | `makeBackup()`, `readBackup()`, `mergeBackup()` |
 | `Guided exercise mode` | `fo` session object (saved to `skill-ladder-session`), `startFocus`, `renderFocus`, `sheetHTML` (confirm/edit panel), `updateReps`/`updateSheet` (in-place updates, no redraw), `focusAction` |
@@ -88,6 +88,7 @@ The repo is the source of truth. The temporary folder from the first session is 
 - Fonts: Big Shoulders Display (headings), Instrument Sans (body), IBM Plex Mono (numbers).
 - Colors are tokens on `:root` with dark-mode overrides. Phone first, with a bottom tab bar on narrow screens.
 - In guided mode: −/+ updates the number in place with no animation. Panels open instantly and only slide when closing.
+- Smoothness: animate only `transform` and `opacity` (the current-step pulse is a growing ring, not a box-shadow). Don't rebuild the tree for small changes like selecting a step; update classes in place.
 - Keep it one self-contained file. External scripts only from approved CDNs; the app currently uses none.
 
 ## Publishing an update (both places)

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="20261021030938">
+<meta name="app-version" content="20261022130332">
 <meta name="theme-color" content="#15232A">
 <meta name="description" content="Calisthenics skill tree with guided workouts and progress tracking.">
 <meta name="mobile-web-app-capable" content="yes">
@@ -153,9 +153,12 @@ button { cursor: pointer; touch-action: manipulation; }
 .node .nm { font-size: .74rem; line-height: 1.25; text-align: center; color: var(--muted); }
 li.done .dot { background: var(--g); border-color: var(--g); color: #fff; }
 li.done .nm { color: var(--ink); }
-li.cur .dot { background: var(--raised); border: 3px solid var(--g); color: var(--g); font-weight: 700; animation: pulse 2.2s infinite; }
+li.cur .dot { background: var(--raised); border: 3px solid var(--g); color: var(--g); font-weight: 700; position: relative; }
 li.cur .nm { color: var(--ink); font-weight: 700; }
-@keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--g) 45%, transparent); } 60% { box-shadow: 0 0 0 9px transparent; } }
+/* the current step pulses with a ring that only grows and fades, which the GPU animates without repainting the page */
+li.cur .dot::before, .tn.cur .tdot::before { content: ""; position: absolute; inset: -3px; border-radius: inherit; border: 3px solid var(--g);
+  opacity: 0; pointer-events: none; animation: pulse 2.2s ease-out infinite; }
+@keyframes pulse { 0% { transform: scale(1); opacity: .5; } 60%, 100% { transform: scale(1.45); opacity: 0; } }
 .node:hover .dot { transform: scale(1.08); }
 .node.sel .dot { outline: 2px solid var(--ink); outline-offset: 3px; }
 
@@ -286,6 +289,12 @@ li.cur .nm { color: var(--ink); font-weight: 700; }
 .tree-scroll { touch-action: pan-x pan-y; position: relative; overflow: auto; height: min(74vh, 780px); overscroll-behavior: contain; cursor: grab; }
 .tree-scroll.dragging { cursor: grabbing; user-select: none; }
 .tree-scroll.dragging .tn { pointer-events: none; }
+/* a fixed scrollbar gutter keeps the map's width the same at every zoom, so it never shifts when the zoom is applied */
+.tree-scroll { contain: content; scrollbar-gutter: stable; }
+/* while zooming the map is one GPU layer that is only scaled; it's redrawn sharp when the gesture ends */
+.tree-scroll.zooming .tree { will-change: transform; }
+.tree-scroll.zooming .tn { pointer-events: none; }
+.tree-scroll.zooming .tdot::before { animation-play-state: paused; }
 .tree-sizer { position: relative; margin: 0 auto; }
 .tree { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
 .zoombar { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
@@ -313,7 +322,7 @@ li.cur .nm { color: var(--ink); font-weight: 700; }
 .tn:hover .tdot { transform: scale(1.08); }
 .tn.done .tdot { background: var(--g); border-color: var(--g); color: #fff; box-shadow: 0 0 12px color-mix(in srgb, var(--g) 45%, transparent); }
 .tn.done .tnm { color: var(--ink); }
-.tn.cur .tdot { border: 3px solid var(--g); color: var(--g); animation: pulse 2.2s infinite; }
+.tn.cur .tdot { border: 3px solid var(--g); color: var(--g); }
 .tn.cur .tnm { color: var(--ink); font-weight: 700; }
 .tn.locked .tdot { border-style: dashed; }
 .tn.final .tdot { width: 56px; height: 56px; border-radius: 16px; transform: rotate(45deg); }
@@ -1305,6 +1314,7 @@ const CLOCK = `<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true
 let treeMode = "tree";
 try { treeMode = localStorage.getItem("skill-ladder-mode") || "tree"; } catch (e) {}
 function renderSkillTree() {
+  liveEnd();
   const host = $("lanes"), prev = host.querySelector(".tree-scroll"), keepX = prev ? prev.scrollLeft : null, keepY = prev ? prev.scrollTop : 0;
   const colX = c => TG.padL + c * TG.colW + TG.colW / 2, levelY = L => TG.row0 + (L - 1) * TG.unit;
   // place parents before the branches that sprout from them
@@ -1386,28 +1396,72 @@ function renderSkillTree() {
 const ZMIN = .2, ZMAX = 1.6;
 let treeZoom = 1;
 try { treeZoom = Math.min(ZMAX, Math.max(ZMIN, +localStorage.getItem("skill-ladder-zoom") || 1)); } catch (e) {}
-// fx, fy: focal point in screen coordinates. The spot under it stays put while zooming.
-function applyZoom(z, fx, fy) {
-  const sc = document.querySelector(".tree-scroll"); if (!sc) return;
-  const sizer = sc.querySelector(".tree-sizer"), tree = sc.querySelector(".tree");
-  z = Math.min(ZMAX, Math.max(ZMIN, z));
-  const old = treeZoom; if (Math.abs(z - old) < .001) return;
-  const r = sc.getBoundingClientRect();
-  const px = (fx ?? r.left + r.width / 2) - r.left, py = (fy ?? r.top + r.height / 2) - r.top;
-  const cx = (px + sc.scrollLeft - sizer.offsetLeft) / old, cy = (py + sc.scrollTop - sizer.offsetTop) / old;
-  treeZoom = z;
-  sizer.style.width = sizer.dataset.w * z + "px"; sizer.style.height = sizer.dataset.h * z + "px";
-  tree.style.transform = `scale(${z})`;
-  sc.scrollLeft = cx * z + sizer.offsetLeft - px;
-  sc.scrollTop = cy * z + sizer.offsetTop - py;
-  const pct = document.getElementById("zoom-pct"); if (pct) pct.textContent = Math.round(z * 100) + "%";
-  try { localStorage.setItem("skill-ladder-zoom", String(Math.round(z * 100) / 100)); } catch (e) {}
+// While a pinch, wheel or zoom button is moving the map, only a GPU transform changes, so every frame is cheap.
+// The real size and scroll position are set once, when the gesture ends; the map looks the same before and after.
+let zLive = null, zRaf = 0, zSettle = null, zAnim = 0;
+function liveStart() {
+  if (zLive) return zLive;
+  const sc = document.querySelector(".tree-scroll"); if (!sc) return null;
+  const sizer = sc.querySelector(".tree-sizer");
+  sc.classList.add("zooming");
+  return zLive = { sc, sizer, tree: sc.querySelector(".tree"), z: treeZoom, goal: treeZoom, tx: 0, ty: 0, ox: sizer.offsetLeft, oy: sizer.offsetTop,
+    sx: sc.scrollLeft, sy: sc.scrollTop, w: +sizer.dataset.w, h: +sizer.dataset.h, cw: sc.clientWidth, ch: sc.clientHeight, r: sc.getBoundingClientRect() };
 }
+// the map point under a position in the map box, at the zoom shown right now
+const liveAt = (L, px, py) => [(px - L.ox + L.sx - L.tx) / L.z, (py - L.oy + L.sy - L.ty) / L.z];
+function liveDraw() {
+  zRaf = 0; if (!zLive) return;
+  zLive.tree.style.transform = `translate(${zLive.tx}px,${zLive.ty}px) scale(${zLive.z})`;
+  const pct = $("zoom-pct"); if (pct) pct.textContent = Math.round(zLive.z * 100) + "%";
+}
+// zoom to z with map point (cx, cy) under (px, py), clamped to where the map can actually scroll
+function liveSet(L, z, cx, cy, px, py, now) {
+  z = Math.min(ZMAX, Math.max(ZMIN, z));
+  const ox = Math.max(0, (L.cw - L.w * z) / 2);
+  const sx = Math.min(Math.max(0, L.w * z - L.cw), Math.max(0, ox + cx * z - px));
+  const sy = Math.min(Math.max(0, L.h * z - L.ch), Math.max(0, L.oy + cy * z - py));
+  L.z = z; L.tx = ox - sx - L.ox + L.sx; L.ty = L.sy - sy;
+  if (now) liveDraw(); else if (!zRaf) zRaf = requestAnimationFrame(liveDraw);
+}
+function liveEnd() {
+  const L = zLive; if (!L) return;
+  zLive = null; cancelAnimationFrame(zRaf); zRaf = 0; cancelAnimationFrame(zAnim); zAnim = 0; clearTimeout(zSettle);
+  treeZoom = L.z;
+  L.sizer.style.width = L.w * L.z + "px"; L.sizer.style.height = L.h * L.z + "px";
+  L.tree.style.transform = `scale(${L.z})`;
+  L.sc.scrollLeft = L.sizer.offsetLeft - L.ox - L.tx + L.sx;
+  L.sc.scrollTop = L.sizer.offsetTop - L.oy - L.ty + L.sy;
+  L.sc.classList.remove("zooming");
+  const pct = $("zoom-pct"); if (pct) pct.textContent = Math.round(L.z * 100) + "%";
+  try { localStorage.setItem("skill-ladder-zoom", String(Math.round(L.z * 100) / 100)); } catch (e) {}
+}
+// zoom buttons glide to the new level around the middle of the map; "Fit all" glides so the top-left corner ends in view
+function zoomTo(z, fit) {
+  const L = liveStart(); if (!L) return;
+  cancelAnimationFrame(zAnim); zAnim = 0;
+  z = Math.min(ZMAX, Math.max(ZMIN, z)); L.goal = z;
+  const z0 = L.z;
+  let px = L.cw / 2, py = L.ch / 2, cx, cy;
+  if (fit && Math.abs(z - z0) > .001) {
+    // the one map point that stays put on the way from here to zoom z at scroll 0, 0
+    const ox = Math.max(0, (L.cw - L.w * z) / 2);
+    cx = (L.ox + L.tx - L.sx - ox) / (z - z0); cy = (L.ty - L.sy) / (z - z0);
+    px = ox + cx * z; py = L.oy + cy * z;
+  } else if (fit) { liveEnd(); return L.sc.scrollTo({ left: 0, top: 0, behavior: RM ? "auto" : "smooth" }); }
+  else [cx, cy] = liveAt(L, px, py);
+  const t0 = performance.now(), dur = RM ? 0 : 260;
+  const step = now => {
+    const u = dur ? Math.min(1, (now - t0) / dur) : 1, e = 1 - Math.pow(1 - u, 3);
+    liveSet(L, z0 * Math.pow(z / z0, e), cx, cy, px, py, true);
+    if (u < 1) zAnim = requestAnimationFrame(step); else liveEnd();
+  };
+  zAnim = requestAnimationFrame(step);
+}
+const zoomGoal = () => zLive ? zLive.goal : treeZoom;
 function fitZoom() {
   const sc = document.querySelector(".tree-scroll"); if (!sc) return;
   const sz = sc.querySelector(".tree-sizer");
-  applyZoom(Math.min((sc.clientWidth - 8) / +sz.dataset.w, (sc.clientHeight - 8) / +sz.dataset.h));
-  sc.scrollLeft = 0; sc.scrollTop = 0;
+  zoomTo(Math.min((sc.clientWidth - 8) / +sz.dataset.w, (sc.clientHeight - 8) / +sz.dataset.h), true);
 }
 let panSaveTimer = null;
 // mouse drag to move the map; a drag never counts as a click on a node
@@ -1434,26 +1488,46 @@ function bindZoomGestures(sc) {
   }, { passive: true });
   sc.addEventListener("pointerdown", e => {
     if (e.pointerType !== "mouse" || e.button !== 0) return;
+    liveEnd();
     treeDrag = { sc, x: e.clientX, y: e.clientY, l: sc.scrollLeft, t: sc.scrollTop, moved: false };
   });
   let pinch = null;
   const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
-  sc.addEventListener("touchstart", e => { if (e.touches.length === 2) pinch = { d: dist(e.touches), z: treeZoom }; }, { passive: true });
+  const mid = (t, L) => [(t[0].clientX + t[1].clientX) / 2 - L.r.left, (t[0].clientY + t[1].clientY) / 2 - L.r.top];
+  // the map point between the fingers stays between them, so a pinch can zoom and move the map at once
+  sc.addEventListener("touchstart", e => {
+    if (e.touches.length !== 2) return;
+    const L = liveStart(); if (!L) return;
+    cancelAnimationFrame(zAnim); zAnim = 0;
+    const [px, py] = mid(e.touches, L);
+    pinch = { d: dist(e.touches), z: L.z, c: liveAt(L, px, py) };
+  }, { passive: true });
   sc.addEventListener("touchmove", e => {
-    if (!pinch || e.touches.length !== 2) return;
+    if (!pinch || e.touches.length !== 2 || !zLive) return;
     e.preventDefault();
-    const t = e.touches;
-    applyZoom(pinch.z * dist(t) / pinch.d, (t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2);
+    const [px, py] = mid(e.touches, zLive);
+    liveSet(zLive, pinch.z * dist(e.touches) / pinch.d, pinch.c[0], pinch.c[1], px, py);
   }, { passive: false });
-  sc.addEventListener("touchend", e => { if (e.touches.length < 2) pinch = null; });
-  // wheel inside the map zooms around the cursor (pinch on a trackpad too)
+  const pinchEnd = e => { if (pinch && e.touches.length < 2) { pinch = null; liveEnd(); } };
+  sc.addEventListener("touchend", pinchEnd);
+  sc.addEventListener("touchcancel", pinchEnd);
+  // wheel inside the map zooms around the cursor (pinch on a trackpad too); the size is applied once the wheel stops
   sc.addEventListener("wheel", e => {
     e.preventDefault();
-    const d = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
-    applyZoom(treeZoom * Math.exp(-d * (e.ctrlKey ? .01 : .0013)), e.clientX, e.clientY);
+    const L = liveStart(); if (!L) return;
+    cancelAnimationFrame(zAnim); zAnim = 0;
+    const d = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY, px = e.clientX - L.r.left, py = e.clientY - L.r.top, [cx, cy] = liveAt(L, px, py);
+    liveSet(L, L.z * Math.exp(-d * (e.ctrlKey ? .01 : .0013)), cx, cy, px, py);
+    L.goal = L.z;
+    clearTimeout(zSettle); zSettle = setTimeout(liveEnd, 180);
   }, { passive: false });
 }
 
+// picking or closing a step only moves the highlight; redrawing the whole map would drop frames and reset each ladder's scroll
+function markSel() {
+  document.querySelectorAll(".tn.sel, .node.sel").forEach(n => n.classList.remove("sel"));
+  if (sel) document.querySelectorAll(`.tn[data-t="${sel.t}"][data-i="${sel.i}"], .node[data-t="${sel.t}"][data-i="${sel.i}"]`).forEach(n => n.classList.add("sel"));
+}
 function renderTree() {
   $("tree-hint").innerHTML = `<span class="seg" role="group" aria-label="Layout"><button data-mode="tree" aria-pressed="${treeMode === "tree"}">Tree</button><button data-mode="list" aria-pressed="${treeMode === "list"}">List</button></span>`;
   $("filters").innerHTML = GROUPS.map(g => `<button class="chip g-${g}" aria-pressed="${g === filter}" data-filter="${g}">${g === "All" ? "" : `<span class="sw"></span>`}${g}</button>`).join("");
@@ -2094,12 +2168,12 @@ document.addEventListener("click", e => {
   if (el.dataset.filter) { filter = el.dataset.filter; return renderTree(); }
   if (el.dataset.mode) { treeMode = el.dataset.mode; try { localStorage.setItem("skill-ladder-mode", treeMode); } catch (x) {} return renderTree(); }
   if (el.dataset.zoom) { const k = el.dataset.zoom;
-    if (k === "in") applyZoom(treeZoom * 1.25); else if (k === "out") applyZoom(treeZoom / 1.25);
-    else if (k === "fit") fitZoom(); else applyZoom(1); return; }
-  if (el.classList.contains("tn")) { sel = { t: el.dataset.t, i: +el.dataset.i }; justHit = null; renderTree(); return renderPanel(); }
+    if (k === "in") zoomTo(zoomGoal() * 1.25); else if (k === "out") zoomTo(zoomGoal() / 1.25);
+    else if (k === "fit") fitZoom(); else zoomTo(1); return; }
+  if (el.classList.contains("tn")) { sel = { t: el.dataset.t, i: +el.dataset.i }; justHit = null; markSel(); return renderPanel(); }
   if (el.dataset.ring) { const id = el.dataset.ring; filter = "All"; sel = { t: id, i: Math.min(lvl(id), T[id].steps.length - 1) }; justHit = null; renderTree(); renderPanel();
     const lane = $("lane-" + id); if (lane && wide()) lane.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
-  if (el.dataset.t && el.classList.contains("node")) { sel = { t: el.dataset.t, i: +el.dataset.i }; justHit = null; renderTree(); return renderPanel(); }
+  if (el.dataset.t && el.classList.contains("node")) { sel = { t: el.dataset.t, i: +el.dataset.i }; justHit = null; markSel(); return renderPanel(); }
   if (el.dataset.fill) {
     const box = document.querySelector(`[data-sets="${el.dataset.fill}"]`), vals = el.dataset.vals.split(",");
     while (box.querySelectorAll("input").length < vals.length) box.querySelector("[data-add]").click();
@@ -2121,7 +2195,7 @@ document.addEventListener("click", e => {
     return;
   }
   const act = el.dataset.act;
-  if (act === "close") { sel = null; renderTree(); return renderPanel(); }
+  if (act === "close") { sel = null; markSel(); return renderPanel(); }
   if (act === "master") { const { t, i } = sel; master(t, i);
     if (i + 1 < T[t].steps.length) sel = { t, i: i + 1 }; return render(); }
   if (act === "jump") { state.levels = { ...state.levels, [sel.t]: sel.i }; justHit = null; save(); return render(); }
@@ -2145,7 +2219,7 @@ document.addEventListener("click", e => {
   if (el.dataset.backup) return backupClick(el.dataset.backup);
   if (el.hasAttribute("data-reset")) { if (armed === "reset") { state = blank(); armed = null; sel = null; save(); } else armed = "reset"; return render(); }
 });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && sel && !wide() && !fo) { sel = null; renderTree(); renderPanel(); } });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && sel && !wide() && !fo) { sel = null; markSel(); renderPanel(); } });
 document.addEventListener("visibilitychange", () => { if (fo && document.visibilityState === "visible") lockWake(); });
 
 document.addEventListener("submit", e => {
