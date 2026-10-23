@@ -58,6 +58,58 @@ button { cursor: pointer; touch-action: manipulation; }
 .hero-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
 .hero h1 { font-family: var(--display); font-weight: 900; font-size: clamp(2.2rem, 9vw, 3.4rem); line-height: .85; margin: 0; text-transform: uppercase; letter-spacing: .01em; }
 .sync { font-size: .72rem; opacity: .7; text-align: right; }
+/* Rep, the mascot */
+.hero-side { display: grid; justify-items: end; gap: 4px; }
+.mascot { width: 68px; height: 68px; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.rep { width: 100%; height: 100%; overflow: visible; display: block; }
+.rep .r-skin { fill: #F4B740; }
+.rep .r-band { fill: #E8544E; }
+.rep .r-eyes-open circle { fill: #15232A; } .rep .r-eyes-open .r-shine { fill: #fff; }
+.rep path, .rep .r-arms-up circle { fill: none; stroke: #15232A; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.rep .r-arms-down path, .rep .r-arms-up path { stroke: #F4B740; stroke-width: 6; }
+.rep .r-arms-up circle { fill: #F4B740; stroke: none; }
+.rep path.r-band { fill: #E8544E; stroke: none; }
+.rep .r-bi { fill: #F4B740; stroke: #D9962A; stroke-width: .8; }
+.rep .r-line { stroke: #C98A22; stroke-width: 1.4; }
+.rep .r-brow { stroke-width: 2.2; }
+.rep .r-star { fill: #FFF3C4; stroke: none; }
+.rep .r-aura { fill: #F4B740; opacity: .18; transform-origin: 32px 36px; animation: rep-aura 1.8s ease-in-out infinite alternate; }
+@keyframes rep-aura { from { transform: scale(.9); opacity: .1; } to { transform: scale(1.05); opacity: .28; } }
+.rep .r-mouth-open { fill: #15232A; }
+.rep .r-blush { fill: #FF8A7A; opacity: .55; }
+.rep .r-shadow { fill: rgba(0,0,0,.28); }
+.rep .r-zzz text { fill: #CFE3EA; font: 700 9px var(--display, sans-serif); }
+.rep .r-body { transform-origin: 32px 58px; animation: rep-bob 2.6s ease-in-out infinite; }
+/* parts shown per mood */
+.rep .r-arms-up, .rep .r-eyes-shut, .rep .r-eyes-happy, .rep .r-mouth-open, .rep .r-mouth-flat, .rep .r-zzz { display: none; }
+.rep.m-cheer .r-arms-up, .rep.m-flex .r-arms-up { display: inline; }
+.rep.m-cheer .r-arms-down, .rep.m-flex .r-arms-down { display: none; }
+.rep.m-cheer .r-mouth-open, .rep.m-flex .r-mouth-open { display: inline; }
+.rep.m-cheer .r-mouth-smile, .rep.m-flex .r-mouth-smile, .rep.m-sleepy .r-mouth-smile, .rep.m-think .r-mouth-smile { display: none; }
+.rep.m-flex .r-eyes-open, .rep.m-sleepy .r-eyes-open { display: none; }
+.rep.m-flex .r-eyes-happy { display: inline; }
+.rep.m-sleepy .r-eyes-shut, .rep.m-sleepy .r-mouth-flat, .rep.m-sleepy .r-zzz, .rep.m-think .r-mouth-flat { display: inline; }
+.rep.m-cheer .r-body { animation: rep-jump .55s ease-in-out infinite alternate; }
+.rep.m-flex .r-body { animation: rep-flex .5s ease-in-out infinite alternate; }
+.rep.m-sleepy .r-body { animation: rep-bob 4.5s ease-in-out infinite; }
+.rep.m-think .r-body { animation: rep-tilt 1.6s ease-in-out infinite alternate; }
+.rep.m-sleepy .r-zzz text { animation: rep-z 2.4s ease-in-out infinite; }
+.rep.m-sleepy .r-zzz text + text { animation-delay: .8s; }
+@keyframes rep-bob { 50% { transform: translateY(-2px) scaleY(1.02); } }
+@keyframes rep-jump { from { transform: translateY(0) scale(1.03, .97); } to { transform: translateY(-7px); } }
+@keyframes rep-flex { from { transform: rotate(-5deg) scale(1); } to { transform: rotate(5deg) scale(1.06); } }
+@keyframes rep-tilt { from { transform: rotate(-7deg); } to { transform: rotate(4deg); } }
+@keyframes rep-z { 0% { opacity: 0; transform: translateY(4px); } 40% { opacity: 1; } 100% { opacity: 0; transform: translateY(-6px); } }
+.mascot:active .rep { transform: scale(.92); }
+.m-bubble { position: absolute; right: 18px; top: 104px; z-index: 5; max-width: min(260px, calc(100% - 36px)); background: #F2F5F3; color: #15232A;
+  font-size: .84rem; font-weight: 600; line-height: 1.35; padding: 10px 12px; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.3);
+  opacity: 0; transform: translateY(-6px) scale(.96); transform-origin: 85% 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+.m-bubble::before { content: ""; position: absolute; right: 26px; top: -7px; border: 8px solid transparent; border-top: 0; border-bottom-color: #F2F5F3; }
+.m-bubble.show { opacity: 1; transform: none; }
+.rep-party { width: 76px; height: 76px; margin-bottom: -4px; }
+.rep-glow { width: 130px; height: 130px; animation: pop .7s cubic-bezier(.2,1.5,.4,1); }
+.rep-pop { position: absolute; right: 16px; bottom: 120px; width: 84px; height: 84px; z-index: 3; pointer-events: none; animation: rep-pop 1.9s ease-out forwards; }
+@keyframes rep-pop { 0% { transform: translateY(40px) scale(.4); opacity: 0; } 18% { transform: none; opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-20px); opacity: 0; } }
 .rank { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; }
 .badge { width: 62px; height: 62px; display: grid; place-items: center; position: relative; }
 .badge svg { position: absolute; inset: 0; }
@@ -66,6 +118,80 @@ button { cursor: pointer; touch-action: manipulation; }
 .rank-sub { font-size: .8rem; opacity: .75; font-variant-numeric: tabular-nums; }
 .xpbar { height: 8px; border-radius: 99px; background: rgba(255,255,255,.14); overflow: hidden; margin-top: 8px; }
 .xpbar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--push), var(--balance), var(--legs), var(--pull), var(--core)); transition: width .6s; }
+.rank-wk { font-size: .78rem; opacity: .85; margin-top: 6px; }
+.rank-wk b { color: var(--balance); font-weight: 700; }
+/* Next unlock: the step closest to mastery, tap to open it */
+.unlock { grid-column: 1 / -1; display: grid; gap: 6px; text-align: left; color: inherit; font: inherit; cursor: pointer;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); border-left: 3px solid var(--g); border-radius: 12px; padding: 10px 12px; }
+.unlock:active { transform: scale(.99); }
+.u-k { font-size: .64rem; text-transform: uppercase; letter-spacing: .1em; opacity: .7; }
+.u-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.u-top b { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.u-top em { font-style: normal; font-family: var(--mono); color: var(--g); }
+.u-bar { height: 6px; border-radius: 99px; background: rgba(255,255,255,.14); overflow: hidden; }
+.u-bar i { display: block; height: 100%; background: var(--g); border-radius: 99px; transition: width .6s; }
+.u-sub { font-size: .74rem; opacity: .75; }
+/* Tappable level: badge and text open the XP breakdown */
+button.badge, .rank-main { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.rank-main { display: grid; min-width: 0; }
+.rank-main > span { display: block; }
+.rank-sub em { font-style: normal; color: var(--balance); font-weight: 600; margin-left: 6px; white-space: nowrap; }
+.xpbar i, .badge svg circle { transition: width .9s cubic-bezier(.2,.8,.2,1), stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1) !important; }
+.xp-fly { position: absolute; top: -6px; right: -10px; font-family: var(--mono); font-size: .78rem; font-weight: 500; color: #15232A;
+  background: var(--balance); border-radius: 99px; padding: 2px 7px; pointer-events: none; animation: xpfly 1.6s ease-out forwards; }
+@keyframes xpfly { 0% { transform: translateY(8px) scale(.6); opacity: 0; } 20% { transform: none; opacity: 1; } 75% { opacity: 1; } 100% { transform: translateY(-18px); opacity: 0; } }
+.xp-sheet { grid-column: 1 / -1; display: grid; gap: 6px; animation: fade .25s ease-out; }
+.xs-how { font-size: .78rem; opacity: .85; margin: 0 0 4px; line-height: 1.45; }
+.xs-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; align-items: baseline; background: rgba(255,255,255,.05); border: 0; border-radius: 10px;
+  padding: 8px 10px; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.xs-n { font-size: .84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.xs-v { font-family: var(--mono); font-size: .74rem; opacity: .8; }
+.xs-bar { grid-column: 1 / -1; height: 4px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; }
+.xs-bar i { display: block; height: 100%; background: var(--g); border-radius: 99px; }
+.unlock-wrap { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; }
+.unlock-wrap .unlock { grid-column: auto; }
+.u-flip { display: grid; place-items: center; gap: 5px; align-content: center; width: 40px; border-radius: 12px; cursor: pointer;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); color: inherit; font: inherit; }
+.u-flip i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.3); }
+.u-flip i.on { background: var(--balance); }
+.u-flip span { font-size: 1.2rem; line-height: 1; opacity: .8; }
+.f-xp b { color: var(--balance); font-weight: 700; }
+/* New best: the XP line flashes and the exercise name gets a tag */
+.f-xp.pb { animation: pbflash 1.2s ease-out; }
+@keyframes pbflash { 0% { transform: scale(1); } 15% { transform: scale(1.12); color: #FFE08A; } 100% { transform: scale(1); } }
+.f-name.pb { position: relative; }
+.f-name.pb::after { content: attr(data-pb); position: absolute; left: 50%; top: -6px; transform: translate(-50%, -100%); white-space: nowrap;
+  font-family: var(--body, inherit); font-size: .8rem; letter-spacing: .08em; background: var(--balance); color: #15232A; padding: 3px 10px; border-radius: 99px;
+  animation: pbtag 1.8s ease-out forwards; }
+@keyframes pbtag { 0% { opacity: 0; transform: translate(-50%, -60%) scale(.7); } 15% { opacity: 1; transform: translate(-50%, -100%) scale(1.05); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -130%); } }
+/* Weekly challenge */
+.challenge { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--line);
+  border-left: 4px solid var(--balance); border-radius: 14px; padding: 10px 14px; margin-bottom: 10px; }
+.challenge.done { border-left-color: #2E9E5B; }
+.ch-ring { width: 46px; height: 46px; display: grid; place-items: center; position: relative; }
+.ch-ring svg { position: absolute; inset: 0; }
+.ch-ring b { position: relative; font-family: var(--mono); font-size: .72rem; font-weight: 500; }
+.ch-k { display: block; font-size: .66rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.ch-n { display: block; font-weight: 600; line-height: 1.3; }
+/* Trophy shelf */
+.trophies { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin: 14px 0; }
+.tr-h { display: flex; justify-content: space-between; align-items: baseline; }
+.tr-h span { font-family: var(--mono); font-size: .8rem; color: var(--muted); }
+.tr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; margin-top: 10px; }
+.tr { display: grid; justify-items: center; gap: 4px; padding: 8px 4px; border-radius: 12px; border: 1px solid var(--line); background: none; color: var(--muted); font: inherit; cursor: pointer; }
+.tr-i { font-size: 1.6rem; line-height: 1; filter: grayscale(1); opacity: .35; }
+.tr-n { font-size: .66rem; font-weight: 600; text-align: center; line-height: 1.2; }
+.tr-p { width: 80%; height: 3px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.tr-p i { display: block; height: 100%; background: var(--balance); }
+.tr.got { color: var(--ink); border-color: color-mix(in srgb, var(--balance) 55%, var(--line)); background: color-mix(in srgb, var(--balance) 10%, transparent); }
+.tr.got .tr-i { filter: none; opacity: 1; }
+.tr.on { outline: 2px solid var(--balance); outline-offset: 1px; }
+.tr:active { transform: scale(.96); }
+.tr-d { font-size: .82rem; color: var(--muted); margin: 10px 0 0; }
+.tr-d b { color: var(--ink); }
+.trophy-big { font-size: 3rem; line-height: 1.1; animation: pop .6s cubic-bezier(.2,1.6,.4,1); }
+.m-xp { font-size: .76rem; color: var(--muted); margin: 6px 0 0; }
+.m-xp b { font-family: var(--mono); font-weight: 500; color: var(--ink); }
 .hstats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; border-top: 1px solid rgba(255,255,255,.12); padding-top: 12px; }
 .hstat b { display: block; font-family: var(--display); font-weight: 800; font-size: 1.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
 .hstat span { font-size: .64rem; text-transform: uppercase; letter-spacing: .08em; opacity: .7; }
@@ -550,7 +676,9 @@ li.ready .dot::after { content: "★"; position: absolute; top: -7px; right: -7p
   <header class="hero">
     <div class="hero-top">
       <h1>Skill<br>Ladder</h1>
-      <div class="sync" id="sync">Saved on this device</div>
+      <div class="hero-side"><div class="sync" id="sync">Saved on this device</div>
+        <button type="button" class="mascot" id="mascot" data-mascot aria-label="Rep, your training buddy. Tap to chat"></button></div>
+      <div class="m-bubble" id="m-bubble" role="status" aria-live="polite"></div>
     </div>
     <div class="rank" id="rank"></div>
     <div class="hstats" id="stats"></div>
@@ -986,9 +1114,6 @@ const UNIT_SHORT = { r:"reps", rs:"reps/side", s:"s", ss:"s/side" };
 const T = Object.fromEntries(TRACKS.map(t => [t.id, t]));
 const step = (tid, i) => { const s = T[tid].steps[i]; return { name:s[0], sets:s[1], target:s[2], unit:s[3], cues:s[4].split("|") }; };
 const total = TRACKS.reduce((n, t) => n + t.steps.length, 0);
-const xpFor = i => (i + 1) * 10;
-// ranks are measured against the strength ladders only, so adding mobility ladders never lowers anyone's rank
-const XP_MAX = TRACKS.filter(t => !t.mob).reduce((n, t) => n + t.steps.reduce((m, _, i) => m + xpFor(i), 0), 0);
 const RANKS = [["Novice",0],["Apprentice",.04],["Intermediate",.14],["Advanced",.32],["Elite",.55],["Master",.8]];
 
 // ---- State
@@ -1027,7 +1152,13 @@ function setSync(t) { document.getElementById("sync").textContent = t; }
     ref.onSnapshot(snap => {
       if (snap.metadata.hasPendingWrites || saving || dirty) return;
       // snapshot data arrives frozen; copy it so later edits (mastering, logging) actually apply
-      if (snap.exists) { state = { ...blank(), ...JSON.parse(JSON.stringify(snap.data())) }; try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {} render(); setSync("Synced to your account"); }
+      if (snap.exists) {
+        // keep the higher level-up marks, so a stale copy from another device can't celebrate twice
+        const seen = { lvSeen: state.lvSeen, rkSeen: state.rkSeen, chSeen: state.chSeen, tSeen: state.tSeen };
+        state = { ...blank(), ...JSON.parse(JSON.stringify(snap.data())) };
+        ["lvSeen", "rkSeen", "chSeen"].forEach(k => { if (seen[k] != null) state[k] = Math.max(seen[k], state[k] || 0); });
+        if (seen.tSeen) state.tSeen = [...new Set([...(state.tSeen || []), ...seen.tSeen])];
+        xpCheck(true); try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {} render(); setSync("Synced to your account"); }
       else if (first && (state.logs.length || Object.keys(state.levels).length)) { dirty = true; flush(); }
       else setSync("Synced to your account");
       first = false;
@@ -1104,14 +1235,246 @@ function masteryCard(tid, i) {
     <p class="m-req">${requirement(s)} Keep good form the whole way (see the cues).</p>
     <div class="m-bars">${bars}</div>
     <p class="note${m.ready && st !== "done" ? " ok" : ""}">${st === "done" ? "You've mastered this step." : m.msg}</p>
+    <p class="m-xp">${xpLine(tid, i)}</p>
   </div>`;
 }
-function xp() { return TRACKS.reduce((n, t) => { let m = 0; for (let i = 0; i < Math.min(lvl(t.id), t.steps.length); i++) m += xpFor(i); return n + m; }, 0); }
+// what a step is worth, and how much of it you've earned
+function xpLine(tid, i) {
+  const v = stepXp(tid, i), st = statusOf(tid, i);
+  if (st === "done") return `<b>${v} XP</b> earned`;
+  if (st === "todo") return `Worth <b>${v} XP</b>`;
+  const got = Math.round(PART * v * stepQ(tid, i));
+  return `<b>${got} / ${v} XP</b> · beating your best earns the next ${Math.round(PART * v - got)}, mastering adds ${Math.round(v * (1 - PART))}`;
+}
+// ---- XP lives on the skills. A step is worth 50 × its difficulty level. The step you're on pays up to 80% of that
+// as your best session closes in on its target, and mastering it pays the rest. Extra sets or days earn nothing:
+// XP only moves when you get closer to a skill. Everything is derived from levels, logs and done, so edits,
+// backups and syncing never need an XP ledger.
+const PART = .8;
+const stepXp = (tid, i) => 50 * LEVEL[tid][i];
+function qOf(l) {
+  const s = T[l.tr] && T[l.tr].steps[l.st]; if (!s || !l.sets.length) return 0;
+  const top = [...l.sets].sort((a, b) => b - a).slice(0, s[1]);
+  return Math.min(1, top.reduce((n, v) => n + Math.min(v, s[2]), 0) / (s[1] * s[2]));
+}
+function qualities(logs) { const q = {}; for (const l of logs) { const k = l.tr + ":" + l.st, v = qOf(l); if (!(q[k] >= v)) q[k] = v; } return q; }
+function xpOf(levels, q, strengthOnly) {
+  let x = 0;
+  TRACKS.forEach(t => {
+    if (strengthOnly && t.mob) return;
+    const L = Math.min(levels[t.id] || 0, t.steps.length);
+    for (let i = 0; i < L; i++) x += stepXp(t.id, i);
+    if (L < t.steps.length) x += PART * stepXp(t.id, L) * (q[t.id + ":" + L] || 0);
+  });
+  return Math.round(x);
+}
+// levels as they stood at time t: steps mastered since then are undone (placement and jumps count as already there)
+function levelsAt(t) {
+  const lv = { ...state.levels };
+  (state.done || []).forEach(d => { if (d.t >= t && T[d.tr]) lv[d.tr] = Math.min(lv[d.tr] || 0, d.st); });
+  return lv;
+}
+let xpCache = null;
+function xpState() {
+  const wk = startOfDay(Date.now()) - todayIdx() * 864e5, c = xpCache;
+  if (c && c.logs === state.logs && c.levels === state.levels && c.done === state.done && c.wk === wk) return c;
+  const q = qualities(state.logs), x = xpOf(state.levels, q);
+  const at = t => xpOf(levelsAt(t), qualities(state.logs.filter(l => l.t < t)));
+  const a0 = at(wk);
+  return xpCache = { logs: state.logs, levels: state.levels, done: state.done, wk, q, x, strength: xpOf(state.levels, q, true), week: x - a0, lastWeek: a0 - at(wk - 7 * 864e5) };
+}
+const stepQ = (tid, i) => xpState().q[tid + ":" + i] || 0;
+// what marking a step mastered still pays
+const masterGain = (tid, i) => Math.round(stepXp(tid, i) * (1 - PART * stepQ(tid, i)));
+// athlete level: each one costs 30 XP more than the last (120, 150, 180 …)
+function athleteLevel(x) { let n = 1, need = 120; while (x >= need) { x -= need; n++; need = 120 + 30 * (n - 1); } return { n, into: x, need }; }
+// ranks are measured against the strength ladders only, so adding mobility ladders never lowers anyone's rank
+let strengthMax = 0;
+function rankRaw(x) {
+  strengthMax ||= xpOf(Object.fromEntries(TRACKS.map(t => [t.id, t.steps.length])), {}, true);
+  let r = 0; RANKS.forEach((k, i) => { if (x / strengthMax >= k[1]) r = i; }); return r;
+}
+// the rank as XP used to work it out, so nobody's rank drops with the update
+function oldRank() {
+  const f = i => (i + 1) * 10; let x = 0, m = 0;
+  TRACKS.filter(t => !t.mob).forEach(t => t.steps.forEach((_, i) => { m += f(i); if (i < lvl(t.id)) x += f(i); }));
+  let r = 0; RANKS.forEach((k, i) => { if (x / m >= k[1]) r = i; }); return r;
+}
 function rankInfo() {
-  const x = xp(), f = x / XP_MAX; let r = 0;
-  RANKS.forEach((k, i) => { if (f >= k[1]) r = i; });
-  const lo = RANKS[r][1] * XP_MAX, hi = r + 1 < RANKS.length ? RANKS[r + 1][1] * XP_MAX : XP_MAX;
-  return { x, r, name: RANKS[r][0], next: RANKS[r + 1] ? RANKS[r + 1][0] : null, toNext: Math.ceil(hi - x), pct: hi > lo ? Math.min(1, (x - lo) / (hi - lo)) : 1 };
+  const X = xpState(), r = Math.max(rankRaw(X.strength), state.rkSeen || 0);
+  return { ...athleteLevel(X.x), x: X.x, week: X.week, r, name: RANKS[r][0] };
+}
+// high-water marks: a level-up is celebrated once and never on a drop; silent for placement, jumps, restores and syncs
+function xpCheck(silent) {
+  const X = xpState(), L = athleteLevel(X.x).n, r = rankRaw(X.strength);
+  let changed = false;
+  if (state.rkSeen == null) { state.rkSeen = Math.max(oldRank(), r); changed = true; }
+  if (r > state.rkSeen) { state.rkSeen = r; changed = true; }
+  if (state.lvSeen == null) { state.lvSeen = L; changed = true; }
+  else if (L > state.lvSeen) { if (!silent) levelUp(L, state.lvSeen); state.lvSeen = L; changed = true; }
+  if (changed) save();
+  funCheck(silent);
+}
+// the current step closest to mastery among today's exercises (the plan's goals on a rest day, else your routine)
+function nextUnlock() {
+  const planned = planToday();
+  let ids = state.routine, tag = "Closest to unlocking";
+  if (planned && planned.length) { ids = planned.map(p => p.id); tag = "Today's best shot"; }
+  else if (state.plan) { ids = state.plan.goals; tag = "Rest day · next up"; }
+  const open = id => T[id] && lvl(id) < T[id].steps.length;
+  let pick = ids.filter(open);
+  if (!pick.length) pick = TRACKS.map(t => t.id).filter(open);
+  pick.sort((a, b) => stepQ(b, lvl(b)) - stepQ(a, lvl(a)) || stepXp(b, lvl(b)) - stepXp(a, lvl(a)));
+  // up to three, so you can flip through your nearest unlocks; one with nothing logged is a starting point, not a near miss
+  return pick.slice(0, 3).map(tid => ({ tid, i: lvl(tid), tag: stepQ(tid, lvl(tid)) || tag !== "Closest to unlocking" ? tag : "Up next" }));
+}
+// live XP in guided mode: what this session has earned, what the current set adds, and what one more rep would add
+function xpLive() {
+  const s = step(fo.tid, fo.i), v = PART * stepXp(fo.tid, fo.i), q0 = fo.q0 || 0;
+  const g = sets => Math.round(v * Math.max(0, qOf({ tr: fo.tid, st: fo.i, sets }) - q0));
+  const cur = isTime(s.unit) ? elapsed() : fo.cur, done = g(fo.sets), now = cur ? g([...fo.sets, cur]) : done;
+  const next = !isTime(s.unit) && fo.phase === "work" ? g([...fo.sets, cur + 1]) - now : 0;
+  if (statusOf(fo.tid, fo.i) !== "cur") return "";
+  if (now <= 0 && next <= 0) {
+    const pct = Math.round(qOf({ tr: fo.tid, st: fo.i, sets: cur ? [...fo.sets, cur] : fo.sets }) * 100);
+    return `This session: <b>${pct}%</b> of the target · pass your best (${Math.round(q0 * 100)}%) to earn XP`;
+  }
+  return `<b>+${now} XP</b> this session${now > done ? ` · this set +${now - done}` : ""}${next > 0 ? ` · next rep +${next}` : ""}`;
+}
+// the moment a set passes your best: a chime, a buzz and a flash, once per session
+function updateXpLive() {
+  const p = document.querySelector(".f-xp"); if (!p) return;
+  p.innerHTML = xpLive();
+  if (!fo.pb && /^\+[1-9]/.test(p.textContent)) {
+    fo.pb = true; beep(); saveFo();
+    p.classList.remove("pb"); void p.offsetWidth; p.classList.add("pb");
+    const n = document.querySelector(".f-name"); if (n) { n.dataset.pb = "New best!"; n.classList.add("pb"); setTimeout(() => n.classList.remove("pb"), 1800); }
+    const fx = document.querySelector(".focus"); if (fx) { const r = document.createElement("span"); r.className = "rep-pop"; r.innerHTML = repSvg("flex"); fx.appendChild(r); setTimeout(() => r.remove(), 1900); }
+  }
+}
+
+// ---- Trophies and the weekly challenge: small goals that reward what XP rewards (beating your best, mastering,
+// showing up). All of it is worked out from your logs; only what has been celebrated is saved.
+function prList() {
+  // every session that beat your previous best on its step
+  const top = {}, out = [];
+  [...state.logs].sort((a, b) => a.t - b.t).forEach(l => {
+    const k = l.tr + ":" + l.st, q = qOf(l);
+    if (top[k] != null && q > top[k] + 1e-9) out.push({ t: l.t, k });
+    if (!(top[k] >= q)) top[k] = q;
+  });
+  return out;
+}
+function longestStreak() {
+  const days = [...new Set(state.logs.map(l => startOfDay(l.t)))].sort((a, b) => a - b);
+  let best = 0, run = 0;
+  days.forEach((d, k) => { run = k && Math.round((d - days[k - 1]) / 864e5) === 1 ? run + 1 : 1; best = Math.max(best, run); });
+  return best;
+}
+const STRONG_GROUPS = ["Push", "Pull", "Core", "Legs", "Balance"];
+const inRange = (a, b) => state.logs.filter(l => l.t >= a && l.t < b && T[l.tr]);
+// weekly challenges rotate by week; each returns [have, need] for the week from a to b
+const CHALLENGES = [
+  ["Beat your best on 3 different skills", (a, b, F) => [new Set(F.prs.filter(p => p.t >= a && p.t < b).map(p => p.k)).size, 3]],
+  ["Train on 3 different days", (a, b) => [new Set(inRange(a, b).map(l => startOfDay(l.t))).size, 3]],
+  ["Train every group: Push, Pull, Core, Legs and Balance", (a, b) => [new Set(inRange(a, b).map(l => T[l.tr].group).filter(g => STRONG_GROUPS.includes(g))).size, 5]],
+  ["Move one skill 25% closer to mastering it", (a, b) => {
+    const q0 = qualities(state.logs.filter(l => l.t < a)), q1 = qualities(state.logs.filter(l => l.t < b));
+    return [Math.round(Math.max(0, ...Object.keys(q1).map(k => q1[k] - (q0[k] || 0))) * 100), 25];
+  }],
+  ["Set 5 personal bests", (a, b, F) => [F.prs.filter(p => p.t >= a && p.t < b).length, 5]]
+];
+const WEEK = 7 * 864e5;
+const challengeOf = wk => CHALLENGES[((Math.round(wk / WEEK) % CHALLENGES.length) + CHALLENGES.length) % CHALLENGES.length];
+// [id, icon, name, how to earn it, (F) => [have, need]]
+const TROPHIES = [
+  ["first", "👟", "First step", "Log your first session", F => [Math.min(1, state.logs.length), 1]],
+  ["pb1", "⚡", "Personal best", "Beat your best on any step", F => [Math.min(1, F.prs.length), 1]],
+  ["pb10", "🔥", "On a roll", "Set 10 personal bests", F => [Math.min(10, F.prs.length), 10]],
+  ["pb50", "☄️", "Unstoppable", "Set 50 personal bests", F => [Math.min(50, F.prs.length), 50]],
+  ["m1", "🪜", "Step up", "Master a step", F => [Math.min(1, F.mastered), 1]],
+  ["m10", "🧗", "Climber", "Master 10 steps", F => [Math.min(10, F.mastered), 10]],
+  ["m30", "🏔️", "Mountaineer", "Master 30 steps", F => [Math.min(30, F.mastered), 30]],
+  ["hard", "💎", "Elite move", "Master a step of level 7 or harder", F => [F.hardest >= 7 ? 1 : 0, 1]],
+  ["top", "🏁", "Summit", "Finish a whole ladder", F => [Math.min(1, F.complete), 1]],
+  ["s3", "📅", "Three in a row", "Train 3 days in a row", F => [Math.min(3, F.streak), 3]],
+  ["s7", "🗓️", "Week warrior", "Train 7 days in a row", F => [Math.min(7, F.streak), 7]],
+  ["all", "🎯", "All-rounder", "Train all five groups in one week", F => [F.groupsWeek, 5]],
+  ["mob", "🧘", "Bendy", "Log a mobility session", F => [Math.min(1, F.mob), 1]],
+  ["hold", "⏱️", "Iron hold", "Hold one timed set for 60 seconds", F => [Math.min(60, F.hold), 60]],
+  ["lv10", "🔟", "Double digits", "Reach level 10", F => [Math.min(10, F.level), 10]],
+  ["ch3", "🏆", "Challenger", "Complete 3 weekly challenges", F => [Math.min(3, F.chDone), 3]]
+];
+let funCache = null;
+function funState() {
+  const X = xpState(), c = funCache;
+  if (c && c.X === X) return c;
+  const F = { X, prs: prList(), streak: longestStreak(), level: athleteLevel(X.x).n };
+  F.mastered = TRACKS.reduce((n, t) => n + Math.min(lvl(t.id), t.steps.length), 0);
+  F.complete = TRACKS.filter(t => lvl(t.id) >= t.steps.length).length;
+  F.hardest = Math.max(0, ...TRACKS.flatMap(t => t.steps.slice(0, lvl(t.id)).map((_, i) => LEVEL[t.id][i])));
+  F.mob = state.logs.some(l => T[l.tr] && T[l.tr].mob) ? 1 : 0;
+  F.hold = Math.max(0, ...state.logs.filter(l => T[l.tr] && T[l.tr].steps[l.st] && T[l.tr].steps[l.st][3] === "s").flatMap(l => l.sets));
+  // best week for groups, and finished challenges, over the last 26 weeks
+  F.groupsWeek = 0; F.chDone = 0;
+  for (let k = 0; k < 26; k++) {
+    const a = X.wk - k * WEEK, b = a + WEEK;
+    F.groupsWeek = Math.max(F.groupsWeek, CHALLENGES[2][1](a, b, F)[0]);
+    const [have, need] = challengeOf(a)[1](a, b, F); if (have >= need) F.chDone++;
+  }
+  const [name, fn] = challengeOf(X.wk), [have, need] = fn(X.wk, X.wk + WEEK, F);
+  F.challenge = { name, have: Math.min(have, need), need, done: have >= need, left: Math.ceil((X.wk + WEEK - Date.now()) / 864e5) };
+  F.earned = TROPHIES.filter(t => { const [h, n] = t[4](F); return h >= n; }).map(t => t[0]);
+  return funCache = F;
+}
+// celebrate new trophies and a finished challenge once; the first run after the update stays quiet
+function funCheck(silent) {
+  const F = funState(); let changed = false;
+  if (!Array.isArray(state.tSeen)) { state.tSeen = F.earned; state.chSeen = F.challenge.done ? F.X.wk : 0; return save(); }
+  F.earned.filter(id => !state.tSeen.includes(id)).forEach(id => {
+    const t = TROPHIES.find(x => x[0] === id);
+    if (!silent) queueParty(`<span class="k">Trophy unlocked</span><span class="trophy-big">${t[1]}</span><b>${esc(t[2])}</b><span class="note" style="color:inherit;opacity:.75">${esc(t[3])}</span>`);
+    state.tSeen = [...state.tSeen, id]; changed = true;
+  });
+  if (F.challenge.done && state.chSeen !== F.X.wk) {
+    if (!silent) queueParty(`<span class="k">Weekly challenge done</span><span class="trophy-big">🏅</span><b>${esc(F.challenge.name)}</b><span class="note" style="color:inherit;opacity:.75">A new one starts Monday</span>`);
+    state.chSeen = F.X.wk; changed = true;
+  }
+  if (changed) save();
+}
+function challengeCard() {
+  const C = funState().challenge;
+  return `<div class="challenge${C.done ? " done" : ""}">
+    <div class="ch-ring">${ringSvg(C.have / C.need, 46, 5, C.done ? "#7BE0A4" : "var(--balance)")}<b>${C.done ? "✓" : `${C.have}/${C.need}`}</b></div>
+    <div><span class="ch-k">This week's challenge · ${C.done ? "done!" : `${C.left} day${C.left === 1 ? "" : "s"} left`}</span><b class="ch-n">${esc(C.name)}</b></div></div>`;
+}
+let trophyPick = null;
+function trophyShelf() {
+  const F = funState();
+  const pick = trophyPick && TROPHIES.find(t => t[0] === trophyPick);
+  return `<div class="trophies"><div class="tr-h"><p class="h4">Trophies</p><span>${F.earned.length} of ${TROPHIES.length}</span></div>
+    <div class="tr-grid">${TROPHIES.map(t => { const [h, n] = t[4](F), got = h >= n;
+      return `<button type="button" class="tr${got ? " got" : ""}${trophyPick === t[0] ? " on" : ""}" data-trophy="${t[0]}" aria-label="${esc(t[2])}: ${got ? "earned" : `${h} of ${n}`}">
+        <span class="tr-i">${t[1]}</span><span class="tr-n">${esc(t[2])}</span>${got ? "" : `<span class="tr-p"><i style="width:${(h / n * 100).toFixed(0)}%"></i></span>`}</button>`; }).join("")}</div>
+    ${pick ? (() => { const [h, n] = pick[4](F); return `<p class="tr-d"><b>${pick[1]} ${esc(pick[2])}</b> · ${esc(pick[3])}${h >= n ? " · earned ✓" : ` · ${h} of ${n} so far`}</p>`; })() : `<p class="tr-d">Tap a trophy to see how to earn it.</p>`}</div>`;
+}
+// one toast when a session moved you closer to a skill; nothing when it didn't
+function xpToast(before, q0, tid, i) {
+  const d = xpState().x - before, q1 = stepQ(tid, i);
+  if (d <= 0) return;
+  const msg = `+${d} XP · ${step(tid, i).name} ${Math.round(q0 * 100)}% → ${Math.round(q1 * 100)}%`;
+  // Rep announces it when the hero card is in view; otherwise a toast does
+  const top = $("mascot") && $("mascot").getBoundingClientRect();
+  if (top && top.bottom > 0 && top.top < innerHeight) repSay(`${msg}. Yes!`, q1 >= 1 ? "flex" : "cheer"); else toast(msg);
+}
+function trimLogs(logs) {
+  if (logs.length <= 600) return logs;
+  // never trim a step's best session: it holds that step's progress
+  const top = new Map();
+  logs.forEach(l => { const k = l.tr + ":" + l.st, v = qOf(l), b = top.get(k); if (!b || v > b.v) top.set(k, { l, v }); });
+  const keep = new Set([...top.values()].map(b => b.l));
+  let cut = logs.length - 600;
+  return logs.filter(l => !(cut > 0 && !keep.has(l) && cut--));
 }
 function streak() {
   const days = new Set(state.logs.map(l => startOfDay(l.t)));
@@ -1331,15 +1694,62 @@ function render() {
   restoreDrafts();
 }
 
+let xpOpen = false, unlockK = 0, heroShown = null;
+function countUp(el, a, b) {
+  if (!el || a === b) return;
+  const t0 = performance.now(), run = now => { const k = Math.min(1, (now - t0) / 700); el.textContent = Math.round(a + (b - a) * (1 - (1 - k) ** 3)); if (k < 1) requestAnimationFrame(run); };
+  requestAnimationFrame(run);
+}
+// where your XP comes from: every ladder with what you've earned of it, biggest first; tap one to open its step
+function xpSheet() {
+  const rows = TRACKS.map(t => {
+    let got = 0, all = 0;
+    t.steps.forEach((_, i) => { const v = stepXp(t.id, i); all += v; if (i < lvl(t.id)) got += v; else if (i === lvl(t.id)) got += PART * v * stepQ(t.id, i); });
+    return { t, got: Math.round(got), all: Math.round(all) };
+  }).sort((a, b) => b.got - a.got || a.all - b.all);
+  return `<div class="xp-sheet">
+    <p class="xs-how"><b>How XP works:</b> every step is worth 50 × its difficulty level. Beating your best session on the step you're on earns up to 80% of it, and mastering it earns the rest. Extra sets don't count, so rest days never cost you.</p>
+    ${rows.map(({ t, got, all }) => `<button type="button" class="xs-row g-${t.group}" data-open="${t.id}">
+      <span class="xs-n">${esc(t.name)}</span><span class="xs-v">${got} / ${all}</span>
+      <span class="xs-bar"><i style="width:${(got / all * 100).toFixed(1)}%"></i></span></button>`).join("")}</div>`;
+}
 function renderHero() {
   const R = rankInfo();
   const mastered = TRACKS.reduce((n, t) => n + Math.min(lvl(t.id), t.steps.length), 0);
   const weekAgo = Date.now() - 7 * 864e5, week = state.logs.filter(l => l.t > weekAgo);
+  xpCheck(); renderRep();
+  // a week with no new XP shows the effort instead of a bare +0
+  const sessions = new Set(state.logs.filter(l => l.t >= xpState().wk).map(l => startOfDay(l.t))).size;
+  const wkLine = R.week > 0 ? `<b>+${R.week} XP</b> this week`
+    : sessions ? `${sessions} session${sessions === 1 ? "" : "s"} this week · XP comes when a set beats your best` : "No training yet this week";
+  const list = nextUnlock() || [], N = list[unlockK % (list.length || 1)];
+  let unlock = "";
+  if (N) {
+    const t = T[N.tid], q = stepQ(N.tid, N.i), nx = N.i + 1 < t.steps.length ? `unlocks ${esc(step(N.tid, N.i + 1).name)}` : `completes ${esc(t.name)}`;
+    unlock = `<div class="unlock-wrap"><button type="button" class="unlock g-${t.group}" data-open="${N.tid}">
+      <span class="u-k">${N.tag}</span>
+      <span class="u-top"><b>${esc(step(N.tid, N.i).name)}</b><em>${Math.round(q * 100)}%</em></span>
+      <span class="u-bar"><i style="width:${(q * 100).toFixed(1)}%"></i></span>
+      <span class="u-sub">+${masterGain(N.tid, N.i)} XP more to master · ${nx}</span></button>
+      ${list.length > 1 ? `<button type="button" class="u-flip" data-unlock aria-label="Show another skill close to unlocking">${list.map((_, k) => `<i class="${k === unlockK % list.length ? "on" : ""}"></i>`).join("")}<span>›</span></button>` : ""}</div>`;
+  }
+  // gains since the last draw glide in: the bar starts where it was and the number counts up
+  const prev = heroShown, pct = R.into / R.need, grew = prev && R.x > prev.x;
+  const from = grew && prev.n === R.n ? prev.into / prev.need : grew ? 0 : pct;
   $("rank").innerHTML = `
-    <div class="badge">${ringSvg(R.pct, 62, 5, "var(--balance)", "rgba(255,255,255,.14)")}<b>${R.r + 1}</b></div>
-    <div><div class="rank-name">${R.name}</div>
-      <div class="rank-sub">${R.x} XP · ${R.next ? `${R.toNext} XP to ${R.next}` : "Top rank reached"}</div>
-      <div class="xpbar"><i style="width:${(R.pct * 100).toFixed(1)}%"></i></div></div>`;
+    <button type="button" class="badge" data-xp aria-expanded="${xpOpen}" aria-label="Level ${R.n}. Show where your XP comes from">${ringSvg(from, 62, 5, "var(--balance)", "rgba(255,255,255,.14)")}<b>${R.n}</b>
+      ${grew ? `<span class="xp-fly">+${R.x - prev.x}</span>` : ""}</button>
+    <button type="button" class="rank-main" data-xp aria-expanded="${xpOpen}"><span class="rank-name">Level ${R.n} · ${R.name}</span>
+      <span class="rank-sub"><span class="xp-into">${grew && prev.n === R.n ? prev.into : R.into}</span> / ${R.need} XP to level ${R.n + 1} <em>${xpOpen ? "Hide" : "Details"} ›</em></span>
+      <span class="xpbar"><i style="width:${(from * 100).toFixed(1)}%"></i></span>
+      <span class="rank-wk">${wkLine}</span></button>${xpOpen ? xpSheet() : ""}${unlock}`;
+  heroShown = { x: R.x, n: R.n, into: R.into, need: R.need };
+  if (from !== pct) requestAnimationFrame(() => requestAnimationFrame(() => {
+    const bar = document.querySelector(".xpbar i"), ring = document.querySelector(".badge svg circle:last-child");
+    if (bar) bar.style.width = (pct * 100).toFixed(1) + "%";
+    if (ring) ring.style.strokeDashoffset = ring.getAttribute("stroke-dasharray") * (1 - pct);
+    countUp(document.querySelector(".xp-into"), grew && prev.n === R.n ? prev.into : 0, R.into);
+  }));
   $("stats").innerHTML = `
     <div class="hstat"><b>${mastered}</b><span>of ${total} steps</span></div>
     <div class="hstat"><b>${streak()}</b><span>day streak</span></div>
@@ -1687,7 +2097,7 @@ function renderPanel() {
   const statusTxt = { done:"Mastered", cur:"Current step", todo:"Upcoming" }[st];
   const hit = (justHit && justHit.t === tid && justHit.i === i) || mastery(tid, i).ready;
   let actions = "";
-  if (st === "cur") actions = `<button class="btn ${hit ? "good" : "alt"}" data-act="master">${hit ? "Mark as mastered" : "I've mastered it already"} · +${xpFor(i)} XP</button>`;
+  if (st === "cur") actions = `<button class="btn ${hit ? "good" : "alt"}" data-act="master">${hit ? "Mark as mastered" : "I've mastered it already"} · +${masterGain(tid, i)} XP</button>`;
   if (st === "todo") actions = `<button class="btn alt" data-act="jump">I can already do the steps before this</button>`;
   if (st === "done") actions = `<button class="btn alt" data-act="jump">Go back to this step</button>`;
   host.innerHTML = `${wide() ? "" : `<div class="scrim" data-act="close"></div>`}
@@ -1812,7 +2222,7 @@ function renderToday() {
   const ids = todayIds();
   banner += `<div class="flow-row"><button type="button" class="btn alt" data-w="warm">Warm up · about ${flowMins("warm", ids)} min</button>
     <button type="button" class="btn alt" data-w="cool">Cool down · ${flowMins("cool", ids)} min</button></div>`;
-  $("routine").innerHTML = banner + (usePlan ? "" : chips);
+  $("routine").innerHTML = challengeCard() + banner + (usePlan ? "" : chips);
   const list = usePlan ? planned.map(it => T[it.id]) : TRACKS.filter(t => state.routine.includes(t.id));
   if (!list.length) { $("today").innerHTML = `<div class="empty">Tap ladders above to add them to today's workout.</div>`; return; }
   $("today").innerHTML = list.map(t => {
@@ -1824,6 +2234,7 @@ function renderToday() {
         <button type="button" class="linkbtn" data-open="${t.id}">Details</button></div>
       <div class="m-mini${hit ? " ready" : ""}">
         <div class="m-mini-top"><span>To master: <b>${requirement(s)}</b></span><b class="m-pct">${hit ? "Ready ★" : `${Math.round(m.pct * 100)}%`}</b></div>
+        <p class="m-xp">${xpLine(t.id, L)}</p>
         <div class="m-track"><i style="width:${m.pct * 100}%"></i></div>
         <p class="note${hit ? " ok" : ""}">${m.msg}</p>
         ${nt ? `<p class="aim"><span>Today's aim</span><b>${nt.goal.map(v => v + u).join(" · ")}</b><em>last time ${nt.last.map(v => v + u).join(" · ")}</em></p>` : ""}
@@ -1832,7 +2243,7 @@ function renderToday() {
       ${setInputs(t.id, L, "d-" + t.id)}
       <div class="row"><button type="button" class="btn go start" data-focus="${t.id}:${L}">${PLAY}Start exercise</button>
         <button class="btn alt" type="submit">Log sets</button>
-        ${hit ? `<button type="button" class="btn good" data-master="${t.id}">Mark as mastered</button>` : ""}</div>
+        ${hit ? `<button type="button" class="btn good" data-master="${t.id}">Mark as mastered · +${masterGain(t.id, L)} XP</button>` : ""}</div>
     </form>`;
   }).join("");
 }
@@ -1873,12 +2284,12 @@ function mergeBackup(data) {
   const levels = { ...state.levels };
   Object.entries(data.levels).forEach(([k, v]) => { if (T[k] && Number.isFinite(v)) levels[k] = Math.max(levels[k] || 0, Math.min(v, T[k].steps.length)); });
   const seen = new Set(state.logs.map(l => l.id));
-  const logs = state.logs.concat(data.logs.filter(l => l && l.id && !seen.has(l.id) && T[l.tr] && Array.isArray(l.sets))).sort((a, b) => a.t - b.t).slice(-600);
+  const logs = state.logs.concat(data.logs.filter(l => l && l.id && !seen.has(l.id) && T[l.tr] && Array.isArray(l.sets))).sort((a, b) => a.t - b.t);
   const added = logs.length - state.logs.length;
   const have = new Set((state.done || []).map(d => d.tr + ":" + d.st));
   const done = (state.done || []).concat((Array.isArray(data.done) ? data.done : []).filter(d => d && T[d.tr] && !have.has(d.tr + ":" + d.st))).sort((a, b) => a.t - b.t);
-  state = { ...state, levels, logs, done, routine: state.routine.length ? state.routine : (data.routine || state.routine), plan: state.plan || data.plan || null };
-  save();
+  state = { ...state, levels, logs: trimLogs(logs), done, routine: state.routine.length ? state.routine : (data.routine || state.routine), plan: state.plan || data.plan || null };
+  save(); xpCheck(true);
   return added;
 }
 let backupOpen = false, backupMsg = "";
@@ -1928,17 +2339,18 @@ function weekSummary() {
     return { days: new Set(ls.map(l => startOfDay(l.t))).size, sets: ls.reduce((n, l) => n + l.sets.length, 0), reps, secs,
       steps: (state.done || []).filter(d => d.t >= a && d.t < b).length };
   };
-  const now = tally(start, Infinity), prev = tally(prevStart, start);
+  const now = tally(start, Infinity), prev = tally(prevStart, start), X = xpState();
+  now.xp = Math.max(0, X.week); prev.xp = Math.max(0, X.lastWeek);
   const fmtS = s => s >= 60 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${s}s`;
   const tile = (label, k, fmt = String) => {
     const d = now[k] - prev[k], [one, many] = label.split("|");
     return `<div class="wk-tile"><b>${fmt(now[k])}</b><span>${now[k] === 1 ? one : many ?? one}</span><i class="${d > 0 ? "up" : d < 0 ? "down" : ""}">${d === 0 ? "same as last week" : `${d > 0 ? "+" : "−"}${fmt(Math.abs(d))} vs last week`}</i></div>`;
   };
   return `<div class="wk"><p class="h4">This week</p><div class="wk-grid">
-    ${tile("day trained|days trained", "days")}${tile("set|sets", "sets")}${tile("rep|reps", "reps")}${tile("time in holds", "secs", fmtS)}${tile("step mastered|steps mastered", "steps")}</div></div>`;
+    ${tile("day trained|days trained", "days")}${tile("set|sets", "sets")}${tile("rep|reps", "reps")}${tile("time in holds", "secs", fmtS)}${tile("step mastered|steps mastered", "steps")}${tile("XP earned", "xp")}</div></div>`;
 }
 function renderLog() {
-  let html = weekSummary() + heatmap();
+  let html = weekSummary() + trophyShelf() + heatmap();
   if (!state.logs.length) { $("log").innerHTML = html + `<div class="empty">No sessions yet. Log sets from a skill or from today's workout and they show up here.</div>` + backupHTML(); return; }
   const byDay = {};
   [...state.logs].sort((a, b) => b.t - a.t).slice(0, 150).forEach(l => (byDay[dayKey(l.t)] ||= []).push(l));
@@ -1958,23 +2370,43 @@ function renderLog() {
 }
 
 // ---- Celebration
-function celebrate(tid, i) {
+function celebrate(tid, i, gain) {
   const t = T[tid], colors = ["var(--push)","var(--pull)","var(--core)","var(--legs)","var(--balance)"];
   const bits = Array.from({ length: 28 }, (_, k) => {
     const a = Math.random() * Math.PI * 2, d = 120 + Math.random() * 160;
     return `<i style="background:${colors[k % 5]};--x:${Math.cos(a) * d}px;--y:${Math.sin(a) * d}px;--r:${Math.random() * 720}deg"></i>`;
   }).join("");
   $("party-host").innerHTML = `<div class="party g-${t.group}" role="status">${bits}<div class="party-card">${fig(tid)}
-    <span class="k">Step mastered</span><b>${esc(step(tid, i).name)}</b><span class="xp">+${xpFor(i)} XP</span>
+    <span class="k">Step mastered</span><b>${esc(step(tid, i).name)}</b><span class="xp">+${gain} XP</span>
     ${i + 1 < t.steps.length ? `<span class="note" style="color:inherit;opacity:.75">Next up: ${esc(step(tid, i + 1).name)}</span>` : `<span class="note" style="color:inherit;opacity:.75">${esc(t.name)} ladder complete</span>`}</div></div>`;
   const el = $("party-host").firstChild;
   setTimeout(() => el && el.classList.add("out"), 2200);
   setTimeout(() => { $("party-host").innerHTML = ""; }, 2550);
 }
 function master(tid, i) {
+  const gain = masterGain(tid, i);
   state.levels = { ...state.levels, [tid]: i + 1 }; justHit = null;
   state.done = [...(state.done || []), { t: Date.now(), tr: tid, st: i }].slice(-300);
-  save(); celebrate(tid, i);
+  save(); celebrate(tid, i, gain);
+}
+// waits for a mastery card that is still showing
+function levelUp(n, prev = n - 1) {
+  queueParty(`<span class="k">Level up</span><b>Level ${n}</b>
+    <span class="note" style="color:inherit;opacity:.75">${esc(rankInfo().name)} · next level in ${athleteLevel(xpState().x).need} XP</span>`);
+  // crossing a stage: Rep shows off the new body
+  const s = repStage(n);
+  if (s > repStage(prev)) queueParty(`<span class="k">Rep got stronger!</span>${repSvg("flex", "rep rep-glow", s)}<b>${REP_STAGES[s][1]} Rep</b>
+    <span class="note" style="color:inherit;opacity:.75">${s + 1 < REP_STAGES.length ? `Next glow-up at level ${REP_STAGES[s + 1][0]}` : "Maximum gains reached"}</span>`, true);
+}
+// level-ups, trophies and challenges take turns, after any mastery card that is still showing
+let partyQ = [];
+function queueParty(inner, own) { partyQ.push({ inner, own }); if (partyQ.length === 1) setTimeout(nextParty, $("party-host").innerHTML ? 2600 : 0); }
+function nextParty() {
+  if (!partyQ.length) return;
+  $("party-host").innerHTML = `<div class="party" role="status"><div class="party-card">${partyQ[0].own ? "" : repSvg("flex", "rep rep-party")}${partyQ[0].inner}</div></div>`;
+  const el = $("party-host").firstChild;
+  setTimeout(() => el && el.classList.add("out"), 2200);
+  setTimeout(() => { if ($("party-host").firstChild === el) $("party-host").innerHTML = ""; partyQ.shift(); nextParty(); }, 2550);
 }
 
 // ---- Guided exercise mode
@@ -1988,7 +2420,7 @@ function saveFo() { try { fo ? localStorage.setItem(SESSION_KEY, JSON.stringify(
 function logSession(tid, i, sets) {
   const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   state.logs = [...state.logs, { id, t: Date.now(), tr: tid, st: i, sets: sets.slice() }];
-  if (state.logs.length > 600) state.logs = state.logs.slice(-600);
+  state.logs = trimLogs(state.logs);
   save();
   return id;
 }
@@ -2009,12 +2441,13 @@ function startFocus(tid, i) {
   if (fo && fo.tid === tid && fo.i === i) { fo.min = false; document.body.style.overflow = "hidden"; lockWake(); return renderFocus(); }
   // another exercise in progress: keep its sets by saving them to the log first
   if (fo && fo.sets.length && fo.phase !== "saved") { logSession(fo.tid, fo.i, fo.sets); toast(`Saved ${fo.sets.length} set${fo.sets.length === 1 ? "" : "s"} of ${step(fo.tid, fo.i).name} to your log`); }
-  fo = { tid, i, aim: nextTarget(tid, i), sets: [], cur: 0, phase: "work", running: false, t0: 0, acc: 0, beeped: false, restDur: 90, restStart: 0, arm: false, hit: false, min: false, started: Date.now() };
+  fo = { tid, i, aim: nextTarget(tid, i), sets: [], cur: 0, phase: "work", running: false, t0: 0, acc: 0, beeped: false, restDur: 90, restStart: 0, arm: false, hit: false, min: false, started: Date.now(), xp0: xpState().x, q0: stepQ(tid, i) };
   sel = null; renderPanel(); clock = { mode:null }; clearInterval(tick);
   document.body.style.overflow = "hidden"; lockWake(); renderFocus();
   clearInterval(foTick); foTick = setInterval(focusTick, 200);
 }
 function exitFocus() {
+  if (fo && fo.xp0 != null) xpToast(fo.xp0, fo.q0, fo.tid, fo.i);
   fo = null; saveFo(); clearInterval(foTick); try { wake && wake.release(); } catch (e) {} wake = null;
   $("focus-host").innerHTML = ""; document.body.style.overflow = ""; render();
 }
@@ -2043,6 +2476,7 @@ function focusTick() {
     if (!fo.beeped && e >= s.target) { fo.beeped = true; beep(); }
     const b = document.querySelector(".f-num b"), r = document.querySelector(".f-ring");
     if (b) b.textContent = mmss(e);
+    updateXpLive();
     if (r) r.firstElementChild.outerHTML = focusRing(e / s.target, e >= s.target ? "#7BE0A4" : "#F2F5F3");
   }
   if (fo.phase === "rest") {
@@ -2079,7 +2513,7 @@ function renderFocus() {
         <button class="f-ring" data-f="go" aria-label="${fo.running ? "Stop hold" : "Start hold"}">${focusRing(e / s.target, e >= s.target ? "#7BE0A4" : "#F2F5F3")}
           <span class="f-num"><b>${mmss(e)}</b><span>Target ${s.target}s${side}</span></span></button>
         <p class="f-hint">${fo.running ? "Tap the ring or Stop when you come down" : e ? "Adjust if needed, then finish the set" : "Get in position, then tap Start"}</p>
-        ${aim}<div class="f-sets">${pills}</div>
+        ${aim}<p class="f-hint f-xp">${xpLive()}</p><div class="f-sets">${pills}</div>
         <div class="f-ctrl">
           ${fo.running ? "" : `<button class="f-round" data-f="tminus" aria-label="Minus one second">−</button>`}
           ${fo.running ? `<button class="f-main" data-f="go">Stop</button>`
@@ -2096,7 +2530,7 @@ function renderFocus() {
             <span class="f-num"><b>${fo.cur}</b><span>of ${s.target} reps${side}</span></span></span>
           <span class="f-hint">Tap anywhere here after each rep</span>
         </button>
-        ${aim}<div class="f-sets">${pills}</div>
+        ${aim}<p class="f-hint f-xp">${xpLive()}</p><div class="f-sets">${pills}</div>
         <div class="f-ctrl">
           <button class="f-round" data-f="minus" aria-label="Remove a rep">−</button>
           <button class="f-main go" data-f="done"${fo.cur ? "" : " disabled"}>${fo.cur ? `Finish set · ${fo.cur} reps` : "Finish set"}</button>
@@ -2123,6 +2557,7 @@ function renderFocus() {
         const missing = Math.max(0, s.sets - fo.sets.length);
         return `To master: ${requirement(s).replace(/<\/?b>/g, "")} ${shorts.length ? `Today you were short by ${shorts.join(", ")}${timed ? "s" : " reps"}.` : ""}${missing ? ` ${missing} more set${missing === 1 ? "" : "s"} needed.` : ""}`;
       })()}</p>
+      <p class="f-hint f-xp">${xpLive()}</p>
       <div class="f-ctrl"><button class="f-main go" data-f="save">Save to log</button></div>
       <button class="f-alt" data-f="more">Add another set</button>`;
   } else if (fo.phase === "saved") {
@@ -2130,7 +2565,7 @@ function renderFocus() {
     mid = `${focusFig()}<h2 class="f-name">Saved</h2>
       <div class="f-sets">${pills}</div>
       <p class="f-msg ${canMaster ? "ok" : ""}">${canMaster ? `Ready to move up to ${fo.i + 1 < t.steps.length ? esc(step(fo.tid, fo.i + 1).name) : "the top of the ladder"}?` : "Logged. See it in your training log."}</p>
-      <div class="f-ctrl">${canMaster ? `<button class="f-main go" data-f="master">Mark as mastered · +${xpFor(fo.i)} XP</button>` : `<button class="f-main" data-f="close">Done</button>`}</div>
+      <div class="f-ctrl">${canMaster ? `<button class="f-main go" data-f="master">Mark as mastered · +${masterGain(fo.tid, fo.i)} XP</button>` : `<button class="f-main" data-f="close">Done</button>`}</div>
       ${canMaster ? `<button class="f-alt" data-f="close">Not yet</button>` : ""}`;
   }
   const unsaved = fo.sets.length && fo.phase !== "saved";
@@ -2177,6 +2612,7 @@ function updateReps() {
   if (ring) ring.firstElementChild.outerHTML = focusRing(fo.cur / s.target, hit ? "#7BE0A4" : "#F2F5F3");
   if (fin) { fin.disabled = !fo.cur; fin.textContent = fo.cur ? `Finish set · ${fo.cur} reps` : "Finish set"; }
   const z = document.querySelector(".f-tapzone"); if (z) z.setAttribute("aria-label", `Count a rep. ${fo.cur} of ${s.target} so far`);
+  updateXpLive();
   saveFo();
 }
 // update the open panel's number in place
@@ -2422,7 +2858,7 @@ function flowAction(a, el) {
     if (a === "a-yes" || a === "a-no") return assessAnswer(a === "a-yes");
     if (a === "a-never") { pa.res[TRACKS[pa.k].id] = 0; return assessLadder(pa.k + 1); }
     if (a === "a-skip") { pa.res[TRACKS[pa.k].id] = lvl(TRACKS[pa.k].id); return assessLadder(pa.k + 1); }
-    if (a === "a-save") { state.levels = { ...state.levels, ...pa.res }; save(); flowClose(); render(); toast("Levels saved. Every ladder now starts where you are."); }
+    if (a === "a-save") { state.levels = { ...state.levels, ...pa.res }; save(); xpCheck(true); flowClose(); render(); toast("Levels saved. Every ladder now starts where you are."); }
   }
 }
 
@@ -2488,8 +2924,12 @@ document.addEventListener("click", e => {
   if (act === "close") { sel = null; markSel(); return renderPanel(); }
   if (act === "master") { const { t, i } = sel; master(t, i);
     if (i + 1 < T[t].steps.length) sel = { t, i: i + 1 }; return render(); }
-  if (act === "jump") { state.levels = { ...state.levels, [sel.t]: sel.i }; justHit = null; save(); return render(); }
+  if (act === "jump") { state.levels = { ...state.levels, [sel.t]: sel.i }; justHit = null; save(); xpCheck(true); return render(); }
   if (el.dataset.master) { const tid = el.dataset.master; master(tid, lvl(tid)); return render(); }
+  if (el.hasAttribute("data-xp")) { xpOpen = !xpOpen; return renderHero(); }
+  if (el.hasAttribute("data-unlock")) { unlockK++; return renderHero(); }
+  if (el.hasAttribute("data-mascot")) return repTap();
+  if (el.dataset.trophy) { trophyPick = trophyPick === el.dataset.trophy ? null : el.dataset.trophy; return renderLog(); }
   if (el.dataset.open) { const id = el.dataset.open; sel = { t: id, i: lvl(id) }; view = "tree"; window.scrollTo(0, 0); return render(); }
   if (el.dataset.routine) { const id = el.dataset.routine; state.routine = state.routine.includes(id) ? state.routine.filter(x => x !== id) : [...state.routine, id]; save(); renderToday(); return restoreDrafts(); }
   if (el.dataset.rest) { clock = { mode:"rest", start: Date.now(), dur: +el.dataset.rest * 1000 }; return runClock(); }
@@ -2518,15 +2958,86 @@ document.addEventListener("submit", e => {
   const tid = f.dataset.t, i = +f.dataset.i;
   const sets = [...f.querySelectorAll("input")].map(x => x.value.trim()).filter(v => v !== "").map(Number).filter(n => n >= 0);
   if (!sets.length) { const first = f.querySelector("input"); first && first.focus(); return; }
-  state.logs = [...state.logs, { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), t: Date.now(), tr: tid, st: i, sets }];
-  if (state.logs.length > 600) state.logs = state.logs.slice(-600);
+  const xp0 = xpState().x, q0 = stepQ(tid, i);
+  state.logs =[...state.logs, { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), t: Date.now(), tr: tid, st: i, sets }];
+  state.logs = trimLogs(state.logs);
   justHit = hitTarget(tid, i, sets) && statusOf(tid, i) === "cur" ? { t: tid, i } : null;
   clearDrafts(f);
-  save(); render();
+  save(); render(); xpToast(xp0, q0, tid, i);
 });
 
 let lastWide = wide();
 window.addEventListener("resize", () => { if (wide() !== lastWide) { lastWide = wide(); if (view === "tree") renderPanel(); } });
+
+// ---- Rep, the mascot: a little gold buddy in a sweatband who reacts to your training and tells you what's next.
+// Moods: happy (default), cheer (arms up, bounces), flex (big win), sleepy (no training for 3+ days), think (tapped)
+// Rep gets buffer as you level up: wider shoulders, thicker arms, then biceps, brows, abs and finally a glow
+const REP_STAGES = [[1, "Sprout"], [5, "Toned"], [9, "Strong"], [14, "Buff"], [20, "Beast"]];
+const repStage = (n = athleteLevel(xpState().x).n) => REP_STAGES.reduce((s, [at], k) => n >= at ? k : s, 0);
+function repSvg(mood = "happy", cls = "rep", s = repStage()) {
+  const w = 38 + 3 * s, y0 = 18 - 3 * s, xl = 32 - w / 2, xr = 32 + w / 2, arm = 4.5 + 2 * s, fist = 3 + .8 * s, bi = 1.8 + 1.1 * s;
+  const arms = (l, r) => `<path d="${l}" style="stroke-width:${arm}"/><path d="${r}" style="stroke-width:${arm}"/>`;
+  return `<svg class="${cls} m-${mood} st-${s}" viewBox="-6 -6 76 72" aria-hidden="true">
+    ${s >= 4 ? `<circle class="r-aura" cx="32" cy="36" r="31"/>` : ""}
+    <ellipse class="r-shadow" cx="32" cy="60" rx="${15 + 2 * s}" ry="2.5"/>
+    <g class="r-body">
+      <g class="r-arms-down">${arms(`M${xl + 2} 38 Q${xl - 4} 44 ${xl - 2} 51`, `M${xr - 2} 38 Q${xr + 4} 44 ${xr + 2} 51`)}
+        ${s >= 1 ? `<circle cx="${xl - 3}" cy="43" r="${bi}" class="r-bi"/><circle cx="${xr + 3}" cy="43" r="${bi}" class="r-bi"/>` : ""}</g>
+      <g class="r-arms-up">${arms(`M${xl + 2} 34 Q${xl - 6 - s} ${26 - s} ${xl - 3 - s} ${y0 - 2}`, `M${xr - 2} 34 Q${xr + 6 + s} ${26 - s} ${xr + 3 + s} ${y0 - 2}`)}
+        <circle cx="${xl - 3 - s}" cy="${y0 - 3}" r="${fist}"/><circle cx="${xr + 3 + s}" cy="${y0 - 3}" r="${fist}"/>
+        ${s >= 1 ? `<circle cx="${xl - 5.5 - s}" cy="${26 - s}" r="${bi}" class="r-bi"/><circle cx="${xr + 5.5 + s}" cy="${26 - s}" r="${bi}" class="r-bi"/>` : ""}</g>
+      <rect x="${xl}" y="${y0}" width="${w}" height="${58 - y0}" rx="18" class="r-skin"/>
+      ${s >= 3 ? `<path class="r-line" d="M24 52.5 q4 2 8 0 q4 2 8 0"/><path class="r-line" d="M32 53 v4"/>` : ""}
+      <rect x="${xl}" y="${y0 + 7}" width="${w}" height="6" class="r-band"/><path d="M${xr - 2} ${y0 + 9} l7 -3 l-2 6 z" class="r-band"/>
+      ${s >= 4 ? `<path class="r-star" d="M32 ${y0 + 7.6} l1.2 2.2 2.4.3-1.8 1.6.5 2.4-2.3-1.2-2.3 1.2.5-2.4-1.8-1.6 2.4-.3z"/>` : ""}
+      ${s >= 3 ? `<path class="r-brow" d="M21 33.5 l7 1.8"/><path class="r-brow" d="M43 33.5 l-7 1.8"/>` : ""}
+      <g class="r-eyes-open"><circle cx="25" cy="38" r="3.2"/><circle cx="39" cy="38" r="3.2"/><circle cx="26" cy="37" r="1" class="r-shine"/><circle cx="40" cy="37" r="1" class="r-shine"/></g>
+      <g class="r-eyes-shut"><path d="M21.5 38.5 q3.5 2.5 7 0"/><path d="M35.5 38.5 q3.5 2.5 7 0"/></g>
+      <g class="r-eyes-happy"><path d="M21.5 39 q3.5 -4 7 0"/><path d="M35.5 39 q3.5 -4 7 0"/></g>
+      <circle cx="19" cy="45" r="3" class="r-blush"/><circle cx="45" cy="45" r="3" class="r-blush"/>
+      <path class="r-mouth-smile" d="M27 46 q5 5 10 0"/>
+      <path class="r-mouth-open" d="M27 45 q5 8 10 0 z"/>
+      <path class="r-mouth-flat" d="M28.5 47.5 h7"/>
+    </g>
+    ${mood === "sleepy" ? '<g class="r-zzz"><text x="50" y="16">z</text><text x="56" y="9">z</text></g>' : ""}
+  </svg>`;
+}
+let repLines = [], repK = 0, repTimer = 0;
+function repMood() {
+  const last = state.logs.reduce((m, l) => Math.max(m, l.t), 0);
+  return state.logs.length && Date.now() - last > 3 * 864e5 ? "sleepy" : "happy";
+}
+// what Rep has to say right now, most useful first
+function repTalk() {
+  const out = [], F = funState(), C = F.challenge, last = state.logs.reduce((m, l) => Math.max(m, l.t), 0);
+  const today = state.logs.some(l => l.t >= startOfDay(Date.now())), idle = last ? Math.floor((Date.now() - last) / 864e5) : 0;
+  const N = (nextUnlock() || [])[0];
+  if (!state.logs.length && !Object.keys(state.levels).length) out.push(["Hi, I'm Rep! Tap Find my level and I'll work out where you should start.", "cheer"]);
+  else if (!state.logs.length) out.push(["Hi, I'm Rep! Log your first session and I'll start tracking your bests.", "cheer"]);
+  if (idle >= 3) out.push([`It's been ${idle} days… my muscles are getting floppy. One short session?`, "sleepy"]);
+  if (today) out.push(["Great work today! Muscles grow while you rest, so sleep well.", "flex"]);
+  if (N) { const q = Math.round(stepQ(N.tid, N.i) * 100);
+    out.push([q >= 70 ? `${step(N.tid, N.i).name} is ${q}% there. So close, I can feel it!` : q ? `${step(N.tid, N.i).name} is at ${q}%. Beat your best and we climb!` : `Next up: ${step(N.tid, N.i).name}. Log a set and I'll show how close you are.`, q >= 70 ? "cheer" : "happy"]); }
+  out.push([C.done ? `Challenge done this week: ${C.name}. You legend!` : `This week's challenge: ${C.name}. ${C.have} of ${C.need} so far!`, C.done ? "flex" : "happy"]);
+  const R = rankInfo(); out.push([`Level ${R.n}! ${R.need - R.into} XP to level ${R.n + 1}. Only better sets count, so quality beats quantity.`, "happy"]);
+  const s = repStage();
+  out.push([s + 1 < REP_STAGES.length ? `I'm ${REP_STAGES[s][1]} Rep right now. Reach level ${REP_STAGES[s + 1][0]} and I get even buffer!` : "Beast mode! You made me as buff as I can get.", "flex"]);
+  out.push(["Tip: stop a rep or two before failure. Clean reps build skills faster.", "think"]);
+  out.push([`${F.earned.length} of ${TROPHIES.length} trophies. The shelf is on the Log tab!`, "happy"]);
+  return out;
+}
+function repSay(text, mood = "cheer", ms = 4200) {
+  const m = $("mascot"), b = $("m-bubble"); if (!m || !b) return;
+  m.innerHTML = repSvg(mood); b.textContent = text; b.classList.remove("show"); void b.offsetWidth; b.classList.add("show");
+  clearTimeout(repTimer);
+  repTimer = setTimeout(() => { b.classList.remove("show"); m.innerHTML = repSvg(repMood()); }, ms);
+}
+function repTap() {
+  if (repK % (repLines.length || 1) === 0) { repLines = repTalk(); repK = 0; }
+  const [t, mood] = repLines[repK % repLines.length]; repK++;
+  repSay(t, mood, 5200);
+}
+function renderRep() { const m = $("mascot"); if (m && !$("m-bubble").classList.contains("show")) m.innerHTML = repSvg(repMood()); }
 
 // ---- Boot
 const h = (location.hash || "").slice(1);
@@ -2544,4 +3055,8 @@ try {
     renderFocus();
   } else if (saved) localStorage.removeItem(SESSION_KEY);
 } catch (e) {}
+// Rep says hello once per visit, with the most useful thing first
+renderRep();
+setTimeout(() => { let seen = false; try { seen = sessionStorage.getItem("skill-ladder-rep"); sessionStorage.setItem("skill-ladder-rep", "1"); } catch (e) {}
+  if (!seen && !fo) { repLines = repTalk(); repK = 0; repTap(); } }, 900);
 </script>

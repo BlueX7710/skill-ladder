@@ -31,7 +31,38 @@ A single-page calisthenics trainer:
   - The Cues button sits in the top bar.
 - **Plan tab:** pick your equipment (pull-up bar, rings, parallettes, vertical pole; none = floor only), up to 2 goal skills, training days and session length. Without a bar or rings, the hanging ladders (Pull-up, Muscle-up, Front lever, Back lever) can't be chosen as goals and are left out of the plan; the Human flag needs a pole. Without parallettes, L-sit and deficit HSPU rows show what to use instead. Plans saved before this setting existed count as having everything. It builds a weekly schedule (goal first, then unlock work, then support, then balance), shows a time-to-goal estimate, and moves up automatically when steps are mastered.
 - **Log tab:** a **This week** summary (days, sets, reps, hold time, steps mastered, each compared with last week), a 16-week heatmap and sessions by day. Tap the numbers to edit a session (no Edit button); clearing a box erases that set. Also has **Backup & restore** (code starting `SKILLLADDER1:`, merged on restore) and Reset.
-- **Ranks and XP** (Novice → Master), a day streak and a celebration when a step is mastered.
+- **XP measures how close you are to your skills**, not how much you train:
+  - Each step is worth 50 × its difficulty level.
+  - The step you're on pays up to 80% of that as your best session closes in on the mastery target. Marking it mastered pays the rest.
+  - Extra sets or days earn nothing, so XP only moves when a set beats your best.
+  - It's all derived from `levels`, `logs` and `done` (`xpState()`, cached on those array references). There's no XP ledger to merge or sync.
+- **Hero card:** your athlete level and rank title, "+N XP this week", and a **Next unlock** card. The card shows the step closest to mastery from today's planned exercises (on a rest day, from your goals; otherwise from your routine), and tapping it opens the step.
+- **Rank titles** (Novice → Master) are still measured against the strength ladders only.
+- **One-time celebrations:** `state.lvSeen` and `state.rkSeen` are high-water marks, so a level-up is celebrated once and a rank never drops after an update. Find my level, jump, restore and sync raise them silently.
+- **Where XP shows:**
+  - A toast after a session that moved you closer, e.g. "+32 XP · Pike hold on box 0% → 40%".
+  - An XP line on mastery cards and Workout cards.
+  - An "XP earned" tile in the weekly summary.
+  - "+N XP" on the mastery buttons.
+- **Log trimming:** `trimLogs()` keeps each step's best session when logs pass 600.
+- **Interactive XP:**
+  - Tap the level to open the XP breakdown per ladder (`xpSheet()`).
+  - The next-unlock card flips through your 3 closest skills (`data-unlock`).
+  - XP gains animate: a fly-off chip, the bar glides and the number counts up.
+  - Guided mode shows live XP ("+16 XP this session · this set +16 · next rep +2", `xpLive()`). The first time a set passes your best, a **New best!** chime and flash plays (`fo.pb`).
+- **Fun layer** (`funState()`, derived from logs):
+  - 16 **trophies** (`TROPHIES`) on the Log tab. Tap one to see how to earn it.
+  - A rotating **weekly challenge** (`CHALLENGES`, picked by week number) on the Workout tab.
+  - Trophy and challenge unlocks celebrate through `queueParty()` and are tracked in `state.tSeen` and `state.chSeen`. The first run after the update stays silent.
+- **Rep, the mascot** (`repSvg(mood)`, `repTalk()`, `repSay()`): a gold buddy in a red sweatband who sits on the hero card.
+  - Moods: happy, cheer, flex, sleepy (3+ days without training) and think.
+  - Rep says hello once per visit with the most useful line, and tapping Rep cycles through tips: the next unlock, the challenge, level, trophies and form advice.
+  - Rep announces XP gains when the hero card is in view (a toast otherwise), flexes on every celebration card, and pops up in guided mode on a new best.
+  - **Rep gets buffer as you level up** (`REP_STAGES`, `repStage()`): Sprout (level 1), Toned (5), Strong (9), Buff (14) and Beast (20).
+    - Each stage makes Rep taller and wider, with thicker arms and bigger biceps.
+    - From Buff, Rep gets determined brows and abs. Beast adds a gold aura and a star on the sweatband.
+    - Crossing a stage shows a "Rep got stronger!" card after the level-up card.
+- A day streak, and a celebration when a step is mastered.
 
 ## Where it lives
 
