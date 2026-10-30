@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="20261023164551">
+<meta name="app-version" content="20261030123625">
 <meta name="theme-color" content="#15232A">
 <meta name="description" content="Calisthenics skill tree with guided workouts and progress tracking.">
 <meta name="mobile-web-app-capable" content="yes">
@@ -845,6 +845,35 @@ const TRACKS = [
   ["Partial Nordic negative",3,5,"r","Kneel with your ankles anchored under something sturdy|Lean forward with a straight body as far as you can control|Push back up with your hands"],
   ["Nordic negative",3,5,"r","Lower slowly all the way to the floor|Catch yourself with your hands|Keep the hips straight, don't bend at the waist"],
   ["Nordic curl",3,3,"r","Lower under control, then pull yourself back up with the hamstrings|Hips stay straight the whole rep|Use a small push from the hands at first"]]},
+ // Beginner ladders (basic: true): easy first wins that need nothing but the floor and a chair; they earn XP but,
+ // like mobility, don't count toward rank, so adding them never lowers anyone's rank
+ { id:"plank", name:"Plank", group:"Core", basic:true, steps:[
+  ["Knee plank",3,20,"s","Forearms down, elbows under the shoulders|Knees down, body straight from knees to head|Squeeze the belly as if bracing for a poke"],
+  ["Forearm plank",3,30,"s","Up on the toes, body in one straight line|Don't let the hips sag or pike up|Breathe steadily, don't hold your breath"],
+  ["Plank shoulder taps",3,10,"rs","High plank, feet a little wider than usual|Tap the opposite shoulder without rocking the hips|Slow is harder than fast"],
+  ["Plank up-downs",3,8,"r","From a forearm plank, press up to a high plank one arm at a time|Lower back down the same way|Lead with the other arm on the next rep"],
+  ["Long-lever plank",3,20,"s","Forearm plank with the elbows well ahead of the shoulders|Keep the lower back flat|The further forward, the harder"],
+  ["Body saw",3,10,"r","Forearm plank, rock the whole body forward and back|Move from the shoulders, not the hips|Keep the line straight the whole time"]]},
+ { id:"back", name:"Superman", group:"Core", basic:true, steps:[
+  ["Bird dog",3,10,"rs","On hands and knees, reach one arm forward and the opposite leg back|Hold for a second, back flat like a table|Switch sides each rep"],
+  ["Superman hold",3,20,"s","Lie face down, arms overhead|Lift the arms, chest and legs a little off the floor|Look at the floor to keep the neck long"],
+  ["Superman raises",3,12,"r","Lift arms, chest and legs together|Pause at the top for a second|Lower slowly"],
+  ["Arch hold",3,30,"s","A higher superman: squeeze the glutes and upper back|Arms and legs straight|The back-side partner of the hollow hold"],
+  ["Swimmers",3,20,"r","Hold the arch, then flutter opposite arm and leg|Keep everything off the floor|Small, quick movements"],
+  ["Reverse snow angels",3,12,"r","Hold the arch, sweep straight arms from overhead to the hips|Keep the hands off the floor the whole way|Great for posture and pull-ups"]]},
+ { id:"dip", name:"Bench dip", group:"Push", basic:true, steps:[
+  ["Chair support hold",3,20,"s","Hands on the front edge of a sturdy chair behind you|Arms straight, shoulders pushed down|Knees bent, feet flat"],
+  ["Bent-knee bench dip",3,10,"r","Lower until the elbows reach about 90°|Elbows point back, not out|Press back up to straight arms"],
+  ["Bench dip",3,12,"r","Legs straight out in front|Keep the hips close to the chair|Full lockout at the top"],
+  ["Feet-up bench dip",3,12,"r","Heels on a second chair|Lower slowly, press up fast|Builds the strength for parallel bar dips"],
+  ["Single-leg bench dip",3,8,"rs","One heel on the floor, the other leg lifted|Keep the hips level|Switch legs between sets"]]},
+ { id:"jump", name:"Jump", group:"Legs", basic:true, steps:[
+  ["Calf raises",3,20,"r","Stand tall, rise onto the balls of the feet|Pause at the top, lower slowly|Hold a wall for balance if needed"],
+  ["Squat jumps",3,10,"r","Squat down, then jump straight up|Land softly with bent knees|Reset before each jump"],
+  ["Single-leg calf raises",3,15,"rs","On one foot, rise as high as you can|Lower all the way down|Hold a wall lightly"],
+  ["Tuck jumps",3,8,"r","Jump and pull the knees toward the chest|Land softly on the balls of the feet|Arms drive up"],
+  ["Broad jumps",3,6,"r","Swing the arms and jump forward as far as you can|Stick the landing without stepping|Walk back and reset"],
+  ["Box jumps",3,8,"r","Jump onto a sturdy step, bench or box|Land quietly in a squat, then stand up|Step down, don't jump down"]]},
  // Mobility ladders (mob: true) unlock range for skills like the V-sit, handstand and back lever; they don't count toward rank
  { id:"pike", name:"Pike flexibility", group:"Mobility", mob:true, steps:[
   ["Standing toe reach",3,30,"s","Legs straight, fold from the hips|Let the head and arms hang|Breathe out and sink a little lower each time"],
@@ -912,6 +941,15 @@ const FLAG = (l, l2, t = 180, hd = 180) => ({ an:"w", at:[30,36], t, hd, a:[-146
 const GB = (t, l, l2) => ({ an:"s", at:[24,88], t, hd:180, a:[0,0], l, l2 });
 const NK = (tilt, a) => ({ an:"f", at:[34,88], t:-90 + tilt, hd:-90 + tilt, a, l:[90 + tilt, 180] });
 const ANKLE = BOX(24, 80, 36, 88);
+// beginner ladders: forearm planks rest the elbows on the floor; prone holds lie face down; bench dips use a chair behind you
+const FPLANK = { an:"w", at:[20,90], t:192, hd:190, a:[90,180], l:[17,17] };
+const KPLANK = { an:"w", at:[20,90], t:195, hd:190, a:[90,180], l:[35,-15] };
+const LLPLANK = { an:"w", at:[12,90], t:188, hd:188, a:[125,180], l:[12,12] };
+const QUAD = { an:"w", at:[30,90], t:202, hd:195, a:[90,90], l:[90,0] };
+const PRONE = (t, a, l) => ({ an:"p", at:[54,87], t, hd:t + 6, a:[a,a], l:[l,l] });
+const CHAIR = BOX(62, 66, 92, 90);
+const BDIP_T = l => ({ an:"w", at:[64,66], t:-92, hd:-92, a:[85,85], l });
+const BDIP_B = l => ({ an:"w", at:[64,66], t:-96, hd:-96, a:[10,150], l });
 const SP = {
   push: [
     { A:{ an:"f", at:[62,90], t:-105.5, hd:-105, a:[180,180], l:[74.5,74.5] }, B:{ an:"f", at:[62,90], t:-117.7, hd:-118, a:[146.5,255], l:[62.3,62.3] }, pr:[FLOOR, WALL(22)] },
@@ -1053,6 +1091,37 @@ const SP = {
     { A:{ an:"p", at:[36,74], t:5, hd:15, a:[-40,-150], l:[90,180] }, pr:[FLOOR, BOX(64,68,92,90)] },
     { A:M(STAND, { a:[-100,-100] }), pr:[FLOOR, WALL(45)] },
     { A:M(STAND, { a:[70,70] }), B:M(STAND, { a:[-250,-250] }), pr:[FLOOR], ic:"A" },
+  ],
+  plank: [
+    { A:KPLANK, pr:[FLOOR] },
+    { A:FPLANK, pr:[FLOOR] },
+    { A:M(PU_T, { a2:[90,90] }), B:M(PU_T, { a2:[150,-30] }), pr:[FLOOR] },
+    { A:FPLANK, B:M(PU_T, { at:[22,90] }), pr:[FLOOR] },
+    { A:LLPLANK, pr:[FLOOR] },
+    { A:FPLANK, B:LLPLANK, pr:[FLOOR] },
+  ],
+  back: [
+    { A:QUAD, B:M(QUAD, { a2:[188,188], l2:[-5,-5] }), pr:[FLOOR] },
+    { A:PRONE(188, 195, -8), pr:[FLOOR] },
+    { A:PRONE(180, 182, 0), B:PRONE(190, 198, -10), pr:[FLOOR] },
+    { A:PRONE(194, 205, -14), pr:[FLOOR] },
+    { A:M(PRONE(192, 200, -12), { a2:[170,170], l2:[-2,-2] }), B:M(PRONE(192, 200, -2), { a:[170,170], a2:[205,205], l2:[-14,-14] }), pr:[FLOOR] },
+    { A:PRONE(192, 200, -12), B:M(PRONE(192, 200, -12), { a:[-15,-15] }), pr:[FLOOR] },
+  ],
+  dip: [
+    { A:BDIP_T([150,90]), pr:[FLOOR, CHAIR] },
+    { A:BDIP_T([160,90]), B:BDIP_B([150,80]), pr:[FLOOR, CHAIR] },
+    { A:BDIP_T([168,168]), B:BDIP_B([158,158]), pr:[FLOOR, CHAIR] },
+    { A:BDIP_T([182,182]), B:BDIP_B([172,172]), pr:[FLOOR, CHAIR, BOX(2,64,20,90)] },
+    { A:M(BDIP_T([168,168]), { l2:[195,195] }), B:M(BDIP_B([158,158]), { l2:[185,185] }), pr:[FLOOR, CHAIR] },
+  ],
+  jump: [
+    { A:M(STAND, { a:[95,95] }), B:M(STAND, { at:[50,86], a:[95,95] }), pr:[FLOOR, WALL(78)] },
+    { A:M(SQB, { a:[30,30] }), B:M(STAND, { at:[50,72], a:[-75,-75] }), pr:[FLOOR] },
+    { A:M(STAND, { a:[95,95], l2:[70,150] }), B:M(STAND, { at:[50,86], a:[95,95], l2:[70,150] }), pr:[FLOOR, WALL(78)] },
+    { A:M(SQB, { a:[30,30] }), B:{ an:"p", at:[50,50], t:-95, hd:-95, a:[20,70], l:[-25,95] }, pr:[FLOOR] },
+    { A:{ an:"f", at:[30,90], t:-45, hd:-40, a:[60,60], l:[-20,125] }, B:{ an:"p", at:[60,58], t:-60, hd:-50, a:[-35,-35], l:[20,110] }, pr:[FLOOR] },
+    { A:M(SQB, { at:[28,90], a:[30,30] }), B:M(STAND, { at:[70,68], a:[60,60] }), pr:[FLOOR, BOX(56,68,92,90)] },
   ],
 };
 
@@ -1277,7 +1346,7 @@ function qualities(logs) { const q = {}; for (const l of logs) { const k = l.tr 
 function xpOf(levels, q, strengthOnly) {
   let x = 0;
   TRACKS.forEach(t => {
-    if (strengthOnly && t.mob) return;
+    if (strengthOnly && (t.mob || t.basic)) return;
     const L = Math.min(levels[t.id] || 0, t.steps.length);
     for (let i = 0; i < L; i++) x += stepXp(t.id, i);
     if (L < t.steps.length) x += PART * stepXp(t.id, L) * (q[t.id + ":" + L] || 0);
@@ -1304,7 +1373,7 @@ const stepQ = (tid, i) => xpState().q[tid + ":" + i] || 0;
 const masterGain = (tid, i) => Math.round(stepXp(tid, i) * (1 - PART * stepQ(tid, i)));
 // athlete level: each one costs 30 XP more than the last (120, 150, 180 …)
 function athleteLevel(x) { let n = 1, need = 120; while (x >= need) { x -= need; n++; need = 120 + 30 * (n - 1); } return { n, into: x, need }; }
-// ranks are measured against the strength ladders only, so adding mobility ladders never lowers anyone's rank
+// ranks are measured against the strength ladders only, so adding mobility or beginner ladders never lowers anyone's rank
 let strengthMax = 0;
 function rankRaw(x) {
   strengthMax ||= xpOf(Object.fromEntries(TRACKS.map(t => [t.id, t.steps.length])), {}, true);
@@ -1313,7 +1382,7 @@ function rankRaw(x) {
 // the rank as XP used to work it out, so nobody's rank drops with the update
 function oldRank() {
   const f = i => (i + 1) * 10; let x = 0, m = 0;
-  TRACKS.filter(t => !t.mob).forEach(t => t.steps.forEach((_, i) => { m += f(i); if (i < lvl(t.id)) x += f(i); }));
+  TRACKS.filter(t => !t.mob && !t.basic).forEach(t => t.steps.forEach((_, i) => { m += f(i); if (i < lvl(t.id)) x += f(i); }));
   let r = 0; RANKS.forEach((k, i) => { if (x / m >= k[1]) r = i; }); return r;
 }
 function rankInfo() {
@@ -1514,6 +1583,7 @@ const GOAL_SUPPORT = {
   mu: ["pull", "push", "lsit"], fl: ["pull", "df", "lsit"], bl: ["pull", "lsit", "shoulder"],
   legs: ["nordic", "lsit"], nordic: ["legs", "pike"],
   pike: ["lsit", "legs"], bridge: ["shoulder", "nordic"], shoulder: ["bridge", "hs"],
+  plank: ["back", "lsit"], back: ["plank", "bridge"], dip: ["push", "plank"], jump: ["legs", "nordic"],
 };
 const BALANCE = ["push", "pull", "legs", "lsit", "df", "nordic"];
 // Equipment the plan can count on: hanging ladders need a bar or rings
@@ -1789,7 +1859,7 @@ function renderRings() {
 
 // ---- Skill tree map: each ladder is a branch; advanced ladders sprout from the step that unlocks them
 const LOCK = `<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>`;
-const TREE_COLS = ["push","pl","hspu","hs","lsit","df","flag","pull","mu","fl","bl","legs","nordic","pike","bridge","shoulder"];
+const TREE_COLS = ["dip","push","pl","hspu","hs","plank","back","lsit","df","flag","pull","mu","fl","bl","jump","legs","nordic","pike","bridge","shoulder"];
 const TG = { colW: 88, unit: 172, minGap: 86, padL: 70, padR: 16, hubY: 70, row0: 210 };
 // Difficulty of every step on one shared 1–10 scale (roughly the levels coaches use); the tree places each node this far from Start
 const LEVEL = {
@@ -1809,6 +1879,10 @@ const LEVEL = {
   pike: [1, 1.5, 2, 3, 4, 5],
   bridge: [1, 1.5, 2.5, 3.5, 5, 6],
   shoulder: [1, 1.5, 2, 2.5, 3.5, 4.5],
+  plank: [1, 1, 1.5, 2, 2.5, 3],
+  back: [1, 1, 1.5, 2, 2.5, 3],
+  dip: [1, 1.5, 2, 2.5, 3],
+  jump: [1, 1.5, 2, 2.5, 3, 3.5],
 };
 const TIERS = [[1, "Beginner"], [3, "Novice"], [5, "Intermediate"], [7, "Advanced"], [9, "Elite"]];
 const tierOf = L => TIERS.reduce((n, t) => L >= t[0] ? t[1] : n, "Beginner");
