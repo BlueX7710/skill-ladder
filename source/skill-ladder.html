@@ -2389,6 +2389,29 @@ function runClock() {
   }, 250);
 }
 
+// Reset workout: back to the plan's ladders (or the starter routine) and clears numbers typed but not logged; logged sets stay
+let wkArmed = false, wkTimer = null;
+function workoutDefault() {
+  if (!state.plan) return blank().routine;
+  const inPlan = new Set(state.plan.days.flatMap(d => buildWeek(state.plan)[d].map(it => it.id)));
+  return TRACKS.filter(t => inPlan.has(t.id)).map(t => t.id);
+}
+function resetWorkout() {
+  clearTimeout(wkTimer);
+  if (!wkArmed) {
+    wkArmed = true;
+    wkTimer = setTimeout(() => { wkArmed = false; renderToday(); restoreDrafts(); }, 4000);
+    renderToday();
+    return restoreDrafts();
+  }
+  wkArmed = false;
+  const planned = planToday();
+  if (!(planned && planned.length)) state.routine = workoutDefault();
+  Object.keys(drafts).forEach(k => { if (k.startsWith("today:")) delete drafts[k]; });
+  saveDrafts(); save(); renderToday();
+  const names = todayIds().map(id => T[id].name).filter((n, i, a) => a.indexOf(n) === i).join(", ");
+  toast(`Workout reset${state.plan ? " to your plan" : ""}: ${names}. Logged sets are kept.`);
+}
 function renderToday() {
   renderTimer();
   // with a plan, today's session comes from it; on rest days (or without a plan) you pick ladders yourself
@@ -2408,7 +2431,8 @@ function renderToday() {
   }
   const ids = todayIds();
   banner += `<div class="flow-row"><button type="button" class="btn alt" data-w="warm">Warm up · about ${flowMins("warm", ids)} min</button>
-    <button type="button" class="btn alt" data-w="cool">Cool down · ${flowMins("cool", ids)} min</button></div>`;
+    <button type="button" class="btn alt" data-w="cool">Cool down · ${flowMins("cool", ids)} min</button>
+    <button type="button" class="btn alt" data-wreset>${wkArmed ? "Tap again to reset" : "Reset workout"}</button></div>`;
   $("routine").innerHTML = challengeCard() + arcadeCard() + banner + (usePlan ? "" : chips);
   const list = usePlan ? planned.map(it => T[it.id]) : TRACKS.filter(t => state.routine.includes(t.id));
   if (!list.length) { $("today").innerHTML = `<div class="empty">Tap ladders above to add them to today's workout.</div>`; return; }
@@ -3120,6 +3144,7 @@ document.addEventListener("click", e => {
   if (el.hasAttribute("data-mascot")) return repTap();
   if (el.dataset.trophy) { trophyPick = trophyPick === el.dataset.trophy ? null : el.dataset.trophy; return renderLog(); }
   if (el.dataset.open) { const id = el.dataset.open; sel = { t: id, i: lvl(id) }; view = "tree"; window.scrollTo(0, 0); return render(); }
+  if (el.hasAttribute("data-wreset")) return resetWorkout();
   if (el.dataset.routine) { const id = el.dataset.routine; state.routine = state.routine.includes(id) ? state.routine.filter(x => x !== id) : [...state.routine, id]; save(); renderToday(); return restoreDrafts(); }
   if (el.dataset.rest) { clock = { mode:"rest", start: Date.now(), dur: +el.dataset.rest * 1000 }; return runClock(); }
   if (el.hasAttribute("data-hold")) { clock = clock.mode === "hold" ? { mode:null } : { mode:"hold", start: Date.now() }; return runClock(); }
