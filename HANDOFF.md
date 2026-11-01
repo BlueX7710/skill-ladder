@@ -62,6 +62,11 @@ A single-page calisthenics trainer:
     - Each stage makes Rep taller and wider, with thicker arms and bigger biceps.
     - From Buff, Rep gets determined brows and abs. Beast adds a gold aura and a star on the sweatband.
     - Crossing a stage shows a "Rep got stronger!" card after the level-up card.
+- **Rep's Arcade** (`arcOpen()`, `#arcade-host`): three games on the Workout tab and the guided rest screen, with no network use, so they work offline.
+  - Rep Hop (`hopStart()`, jump height grows with `repStage()`), Name that move (`quizStart()`) and Flex reflex (`reactStart()`).
+  - Opened from rest, it shows the countdown and stops when rest ends (`arcTick()`).
+  - Bests are in `state.games` (`setBest()`; lower is better for `react`). They aren't in backups, and sync keeps the better score per game.
+  - Three trophies come from the games.
 - A day streak, and a celebration when a step is mastered.
 
 ## Where it lives

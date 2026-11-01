@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="20261030123625">
+<meta name="app-version" content="20261101114550">
 <meta name="theme-color" content="#15232A">
 <meta name="description" content="Calisthenics skill tree with guided workouts and progress tracking.">
 <meta name="mobile-web-app-capable" content="yes">
@@ -124,6 +124,49 @@ button { cursor: pointer; touch-action: manipulation; }
 .m-bubble.show { opacity: 1; transform: none; }
 .rep-party { width: 76px; height: 76px; margin-bottom: -4px; }
 .rep-glow { width: 130px; height: 130px; animation: pop .7s cubic-bezier(.2,1.5,.4,1); }
+/* Rep's Arcade: full screen above everything, same dark look as guided mode */
+.arc { position: fixed; inset: 0; z-index: 96; color: #F2F5F3; color-scheme: dark; animation: fade .25s;
+  background: radial-gradient(130% 75% at 50% 0%, #3A3216, #0B1216 72%);
+  display: grid; grid-template-rows: auto 1fr; align-content: start; gap: 12px; overflow-y: auto;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 16px) max(16px, env(safe-area-inset-left, 0px)); }
+.arc-body { width: 100%; max-width: 520px; margin: 0 auto; display: grid; gap: 14px; justify-items: center; align-content: start; text-align: center; }
+.arc-rep { width: 110px; height: 110px; }
+.arc-rep.big { width: 150px; height: 150px; }
+.arc-list { display: grid; gap: 10px; width: 100%; }
+.arc-card { display: grid; gap: 4px; text-align: left; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.07); color: inherit; font: inherit; }
+.arc-card:active { transform: scale(.98); }
+.arc-card b { font-family: var(--display); font-weight: 900; font-size: 1.5rem; text-transform: uppercase; line-height: 1; }
+.arc-card span { font-size: .84rem; opacity: .8; }
+.arc-card em { font-style: normal; font-size: .78rem; color: #F4B740; font-weight: 700; }
+.hop-hud { display: flex; align-items: center; gap: 12px; width: 100%; }
+.hop-hud b { font-family: var(--display); font-weight: 900; font-size: 2.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.hop-hud span { opacity: .75; font-size: .85rem; flex: 1; text-align: left; }
+.hop-hud .f-alt { min-height: 38px; }
+.hop-field { position: relative; width: 100%; height: min(56vh, 420px); border-radius: 20px; overflow: hidden; cursor: pointer;
+  touch-action: none; user-select: none; -webkit-user-select: none; background: linear-gradient(#1E3440, #12212A); }
+.hop-ground { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; border-top: 3px solid rgba(255,255,255,.4);
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 20px, transparent 20px 40px); }
+.hop-rep { position: absolute; left: 44px; bottom: 56px; width: 60px; height: 60px; will-change: transform; }
+.hop-ob { position: absolute; left: 0; bottom: 56px; will-change: transform; }
+.hop-ob svg { display: block; width: 100%; height: 100%; }
+.hop-msg { position: absolute; left: 12px; right: 12px; top: 26%; margin: 0; text-align: center; font-weight: 700; font-size: 1.05rem; pointer-events: none; }
+.hop-msg b, .re-pad .f-msg b { color: #F4B740; }
+.quiz-fig { width: min(52vw, 220px); height: min(52vw, 220px); }
+.quiz-fig .f-fig { width: 100%; height: 100%; }
+.quiz-opts { display: grid; gap: 8px; width: 100%; }
+.quiz-opt { min-height: 52px; border-radius: 14px; border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.06); color: inherit; font: inherit; font-weight: 700; padding: 0 14px; }
+.quiz-opt.right { background: #2E9E5B; border-color: #2E9E5B; }
+.quiz-opt.wrong { background: #C0392B; border-color: #C0392B; }
+.arc-end { display: grid; gap: 10px; justify-items: center; width: 100%; padding: 14px; border-radius: 18px; background: rgba(0,0,0,.35); }
+.re-pad { width: 100%; display: grid; justify-items: center; gap: 10px; padding: 22px 12px; border-radius: 22px; background: rgba(255,255,255,.05); cursor: pointer;
+  touch-action: manipulation; user-select: none; -webkit-user-select: none; transition: background .08s; }
+.re-pad.go { background: rgba(244,183,64,.35); }
+.arc-entry { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; text-align: left; margin-bottom: 10px;
+  background: var(--hero); color: var(--hero-ink); border: 0; border-radius: 14px; padding: 8px 14px 8px 8px; font: inherit; }
+.arc-entry-rep { display: block; width: 52px; height: 52px; }
+.arc-entry b { display: block; font-family: var(--display); font-weight: 900; font-size: 1.3rem; text-transform: uppercase; line-height: 1; }
+.arc-entry span span { font-size: .78rem; opacity: .8; }
+.arc-entry em { font-style: normal; font-weight: 700; color: #F4B740; }
 .rep-pop { position: absolute; right: 16px; bottom: 120px; width: 84px; height: 84px; z-index: 3; pointer-events: none; animation: rep-pop 1.9s ease-out forwards; }
 @keyframes rep-pop { 0% { transform: translateY(40px) scale(.4); opacity: 0; } 18% { transform: none; opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-20px); opacity: 0; } }
 .rank { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; }
@@ -739,6 +782,7 @@ li.ready .dot::after { content: "★"; position: absolute; top: -7px; right: -7p
 <div id="focus-host"></div>
 <div id="flow-host"></div>
 <div id="party-host"></div>
+<div id="arcade-host"></div>
 
 <script>
 // ---- Progressions: [name, sets, target, unit, cues] — unit r=reps, rs=reps/side, s=seconds, ss=seconds/side
@@ -1239,10 +1283,12 @@ function setSync(t) { document.getElementById("sync").textContent = t; }
       // snapshot data arrives frozen; copy it so later edits (mastering, logging) actually apply
       if (snap.exists) {
         // keep the higher level-up marks, so a stale copy from another device can't celebrate twice
-        const seen = { lvSeen: state.lvSeen, rkSeen: state.rkSeen, chSeen: state.chSeen, tSeen: state.tSeen };
+        const seen = { lvSeen: state.lvSeen, rkSeen: state.rkSeen, chSeen: state.chSeen, tSeen: state.tSeen, games: state.games };
         state = { ...blank(), ...JSON.parse(JSON.stringify(snap.data())) };
         ["lvSeen", "rkSeen", "chSeen"].forEach(k => { if (seen[k] != null) state[k] = Math.max(seen[k], state[k] || 0); });
         if (seen.tSeen) state.tSeen = [...new Set([...(state.tSeen || []), ...seen.tSeen])];
+        // game bests: the better score wins on each game (lower for reaction time)
+        if (seen.games) { const g = { ...(state.games || {}) }; Object.entries(seen.games).forEach(([k, v]) => { g[k] = !g[k] ? v : k === "react" ? Math.min(g[k], v) : Math.max(g[k], v); }); state.games = g; }
         xpCheck(true); try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {} render(); setSync("Synced to your account"); }
       else if (first && (state.logs.length || Object.keys(state.levels).length)) { dirty = true; flush(); }
       else setSync("Synced to your account");
@@ -1488,7 +1534,10 @@ const TROPHIES = [
   ["mob", "🧘", "Bendy", "Log a mobility session", F => [Math.min(1, F.mob), 1]],
   ["hold", "⏱️", "Iron hold", "Hold one timed set for 60 seconds", F => [Math.min(60, F.hold), 60]],
   ["lv10", "🔟", "Double digits", "Reach level 10", F => [Math.min(10, F.level), 10]],
-  ["ch3", "🏆", "Challenger", "Complete 3 weekly challenges", F => [Math.min(3, F.chDone), 3]]
+  ["ch3", "🏆", "Challenger", "Complete 3 weekly challenges", F => [Math.min(3, F.chDone), 3]],
+  ["hop20", "🦘", "Hop star", "Score 20 in Rep Hop", F => [Math.min(20, gameBest("hop")), 20]],
+  ["quiz10", "🧠", "Know your moves", "Get a streak of 10 in Name that move", F => [Math.min(10, gameBest("quiz")), 10]],
+  ["fast", "🏎️", "Lightning reflex", "React in under 300 ms in Flex reflex", F => [gameBest("react") && gameBest("react") < 300 ? 1 : 0, 1]]
 ];
 let funCache = null;
 function funState() {
@@ -2312,7 +2361,7 @@ function renderToday() {
   const ids = todayIds();
   banner += `<div class="flow-row"><button type="button" class="btn alt" data-w="warm">Warm up · about ${flowMins("warm", ids)} min</button>
     <button type="button" class="btn alt" data-w="cool">Cool down · ${flowMins("cool", ids)} min</button></div>`;
-  $("routine").innerHTML = challengeCard() + banner + (usePlan ? "" : chips);
+  $("routine").innerHTML = challengeCard() + arcadeCard() + banner + (usePlan ? "" : chips);
   const list = usePlan ? planned.map(it => T[it.id]) : TRACKS.filter(t => state.routine.includes(t.id));
   if (!list.length) { $("today").innerHTML = `<div class="empty">Tap ladders above to add them to today's workout.</div>`; return; }
   $("today").innerHTML = list.map(t => {
@@ -2636,6 +2685,7 @@ function renderFocus() {
       <div class="f-sets">${pills}</div>
       <div class="f-chips">${[60, 90, 120, 180].map(d => `<button data-f="rest" data-d="${d}" class="${fo.restDur === d ? "on" : ""}">${d}s</button>`).join("")}<button data-f="rest30">+30s</button></div>
       <div class="f-ctrl"><button class="f-main" data-f="skip">Start next set</button></div>
+      <button class="f-alt" data-g="open" data-rest="1">Play a game while you rest</button>
       <button class="f-alt" data-f="undo">Undo last set (${fo.sets[fo.sets.length - 1]}${timed ? "s" : ""})</button>
       ${canNotify() && Notification.permission === "default" ? `<button class="f-alt" data-f="notify">Alert me when rest ends, even if I switch apps</button>` : ""}`;
   } else if (fo.phase === "done") {
@@ -2976,6 +3026,7 @@ try { navigator.storage && navigator.storage.persist && navigator.storage.persis
 // ---- Events
 document.addEventListener("click", e => {
   const el = e.target.closest("button, .scrim"); if (!el) return;
+  if (el.dataset.g) return arcAction(el.dataset.g, el);
   if (el.dataset.f && fo) return focusAction(el.dataset.f, el);
   if (el.dataset.w) return flowAction(el.dataset.w, el);
   if ((el.dataset.goal || el.dataset.pdays || el.dataset.pday || el.dataset.pmin || el.dataset.pequip || el.dataset.pdayView || el.dataset.plan) && planClick(el)) return;
@@ -3113,6 +3164,7 @@ function repTalk() {
   const s = repStage();
   out.push([s + 1 < REP_STAGES.length ? `I'm ${REP_STAGES[s][1]} Rep right now. Reach level ${REP_STAGES[s + 1][0]} and I get even buffer!` : "Beast mode! You made me as buff as I can get.", "flex"]);
   out.push(["Tip: stop a rep or two before failure. Clean reps build skills faster.", "think"]);
+  out.push(["Need a break? Rep's Arcade is on the Workout tab, and you can play it during rest too.", "cheer"]);
   out.push([`${F.earned.length} of ${TROPHIES.length} trophies. The shelf is on the Log tab!`, "happy"]);
   return out;
 }
@@ -3128,6 +3180,188 @@ function repTap() {
   repSay(t, mood, 5200);
 }
 function renderRep() { const m = $("mascot"); if (m && !$("m-bubble").classList.contains("show")) m.innerHTML = repSvg(repMood()); }
+
+// ---- Rep's Arcade: three quick games built from the app's own drawings, so they work offline like the rest of it.
+// Rep Hop (jump the gym gear; buffer Rep jumps higher), Name that move (a form quiz) and Flex reflex (reaction time).
+// Opened from a rest screen, it shows the countdown and stops when rest is over.
+const blip = (f, len = .08, v = .15) => { try { unlockAudio(); if (audioCtx) tone(f, audioCtx.currentTime + .01, len, v); } catch (e) {} };
+const GAMES = [
+  ["hop", "Rep Hop", "Tap to jump the gym gear. The buffer Rep is, the higher Rep jumps.", b => b ? `Best ${b} hops` : "No score yet"],
+  ["quiz", "Name that move", "Which exercise is this? One miss ends the run.", b => b ? `Best streak ${b}` : "No score yet"],
+  ["react", "Flex reflex", "Tap the moment Rep flexes. Too early doesn't count.", b => b ? `Best ${b} ms` : "No score yet"]
+];
+let arc = null, arcTimer = 0;
+const gameBest = k => (state.games || {})[k] || 0;
+// react is timed, so lower is better there
+function setBest(k, v, lower) {
+  const g = { ...(state.games || {}) }, old = g[k];
+  if (old && (lower ? v >= old : v <= old)) return false;
+  if (!v) return false;
+  g[k] = v; state.games = g; save(); funCache = null; funCheck(); return true;
+}
+function arcOpen(fromRest) {
+  arc = { fromRest: !!(fromRest && fo && fo.phase === "rest"), game: null };
+  document.body.style.overflow = "hidden";
+  $("arcade-host").innerHTML = `<div class="arc" role="dialog" aria-label="Rep's Arcade">
+    <div class="f-top"><button class="f-x" data-g="x" aria-label="Close the arcade">✕</button><div class="f-eyebrow" id="arc-title">Rep's Arcade</div>
+      <span class="f-setlbl" id="arc-rest" style="margin-left:auto"${arc.fromRest ? "" : " hidden"}></span></div>
+    <div class="arc-body" id="arc-body"></div></div>`;
+  arcMenu(); clearInterval(arcTimer); arcTimer = setInterval(arcTick, 250); arcTick();
+}
+function arcStop() { if (!arc) return; if (arc.react) clearTimeout(arc.react.timer); arc.game = null; }
+function arcClose() {
+  arcStop(); arc = null; clearInterval(arcTimer); $("arcade-host").innerHTML = "";
+  document.body.style.overflow = fo && !fo.min ? "hidden" : sel && !wide() ? "hidden" : "";
+}
+function arcTick() {
+  if (!arc || !arc.fromRest) return;
+  if (fo && fo.phase === "rest") { const r = $("arc-rest"); if (r) r.textContent = `Rest ${mmss(restLeft())}`; return; }
+  // rest is over: stop the game and send you back to your set
+  arcStop(); arc.fromRest = false; $("arc-rest").hidden = true;
+  $("arc-body").innerHTML = `<div class="arc-rep big">${repSvg("flex")}</div><h2 class="f-name">Rest's over!</h2>
+    <p class="f-msg">${fo ? `Next: set ${fo.sets.length + 1} of ${esc(step(fo.tid, fo.i).name)}` : "Time for your next set"}</p>
+    <div class="f-ctrl"><button class="f-main go" data-g="x">Back to my set</button></div>`;
+}
+function arcMenu() {
+  arcStop(); $("arc-title").innerHTML = "Rep's Arcade";
+  $("arc-body").innerHTML = `<div class="arc-rep">${repSvg("cheer")}</div>
+    <p class="f-hint">Pick a game${arc.fromRest ? " while you rest" : ""}. They all work offline.</p>
+    <div class="arc-list">${GAMES.map(([k, n, d, b]) => `<button type="button" class="arc-card" data-g="${k}"><b>${n}</b><span>${d}</span><em>${b(gameBest(k))}</em></button>`).join("")}</div>`;
+}
+function arcAction(g, el) {
+  if (g === "open") return arcOpen(el.dataset.rest === "1");
+  if (!arc) return;
+  if (g === "x") return arcClose();
+  if (g === "menu") return arcMenu();
+  if (g === "hop") return hopStart();
+  if (g === "quiz") return quizStart();
+  if (g === "react") return reactStart();
+  if (g === "qa") return quizAnswer(el);
+}
+
+// Rep Hop: an endless runner. Gear scrolls in faster and faster; tap to jump it.
+const HOP_GEAR = [
+  [26, 36, `<svg viewBox="0 0 26 36"><rect x="1" y="3" width="24" height="6" rx="2" fill="#E8544E"/><rect x="3" y="3" width="3.5" height="33" fill="#CFE3EA"/><rect x="19.5" y="3" width="3.5" height="33" fill="#CFE3EA"/></svg>`],
+  [44, 22, `<svg viewBox="0 0 44 22"><rect x="6" y="9" width="32" height="4" fill="#CFE3EA"/><rect x="2" y="2" width="8" height="18" rx="2" fill="#6F96FF"/><rect x="34" y="2" width="8" height="18" rx="2" fill="#6F96FF"/></svg>`],
+  [28, 30, `<svg viewBox="0 0 28 30"><path d="M8 9a6 6 0 0 1 12 0" fill="none" stroke="#CFE3EA" stroke-width="3.5"/><circle cx="14" cy="19" r="11" fill="#45CFC6"/></svg>`]
+];
+function hopStart() {
+  arcStop(); arc.game = "hop"; $("arc-title").innerHTML = "Rep's Arcade<br>Rep Hop";
+  $("arc-body").innerHTML = `<div class="hop-hud"><b id="hop-n">0</b><span>Best ${gameBest("hop")}</span><button type="button" class="f-alt" data-g="menu">Games</button></div>
+    <div class="hop-field" id="hop-field"><div class="hop-ground" id="hop-ground"></div><div class="hop-rep" id="hop-rep">${repSvg("happy")}</div>
+      <p class="hop-msg" id="hop-msg">Tap to jump</p></div>`;
+  arc.hop = { y: 0, vy: 0, obs: [], t: 0, next: 1, score: 0, run: false, over: false, last: 0, off: 0, jump: 620 + 25 * repStage() };
+  $("hop-field").addEventListener("pointerdown", e => { e.preventDefault(); hopTap(); });
+}
+function hopTap() {
+  const h = arc && arc.game === "hop" && arc.hop; if (!h) return;
+  if (h.over) { if (performance.now() - h.overAt > 450) { hopStart(); hopTap(); } return; }
+  if (!h.run) { h.run = true; h.last = performance.now(); $("hop-msg").textContent = ""; $("hop-rep").innerHTML = repSvg("cheer"); requestAnimationFrame(hopFrame); }
+  if (h.y <= 0) { h.vy = h.jump; blip(660); }
+}
+function hopFrame(now) {
+  const h = arc && arc.game === "hop" && arc.hop, fld = $("hop-field"); if (!h || !h.run || h.over || !fld) return;
+  const dt = Math.min(.04, (now - h.last) / 1000), speed = 230 + h.t * 9; h.last = now; h.t += dt;
+  h.vy -= 1900 * dt; h.y = Math.max(0, h.y + h.vy * dt); if (!h.y && h.vy < 0) h.vy = 0;
+  if ((h.next -= dt) <= 0) {
+    const [w, ht, svg] = HOP_GEAR[Math.floor(Math.random() * HOP_GEAR.length)], el = document.createElement("div");
+    el.className = "hop-ob"; el.style.width = w + "px"; el.style.height = ht + "px"; el.innerHTML = svg; fld.appendChild(el);
+    h.obs.push({ x: fld.clientWidth + 10, w, h: ht, el });
+    h.next = Math.max(.75, .9 + Math.random() * .9 - h.t * .006);
+  }
+  const RX = 44, RW = 60;
+  for (const o of h.obs) {
+    o.x -= speed * dt; o.el.style.transform = `translateX(${o.x}px)`;
+    if (!o.passed && o.x + o.w < RX + 14) { o.passed = true; h.score++; $("hop-n").textContent = h.score; if (h.score % 10 === 0) blip(990, .12); }
+    // a forgiving hitbox: only Rep's middle counts
+    if (o.x < RX + RW - 16 && o.x + o.w > RX + 16 && h.y < o.h - 6) return hopOver();
+  }
+  h.obs = h.obs.filter(o => o.x > -60 || (o.el.remove(), false));
+  h.off = (h.off + speed * dt) % 40;
+  $("hop-ground").style.backgroundPositionX = -h.off + "px";
+  $("hop-rep").style.transform = `translateY(${-h.y}px)`;
+  requestAnimationFrame(hopFrame);
+}
+function hopOver() {
+  const h = arc.hop; h.over = true; h.run = false; h.overAt = performance.now();
+  try { navigator.vibrate && navigator.vibrate(80); } catch (e) {}
+  blip(180, .25, .2);
+  const best = setBest("hop", h.score);
+  $("hop-rep").innerHTML = repSvg(best ? "flex" : "think");
+  $("hop-msg").innerHTML = `${best ? "<b>New best!</b> " : ""}${h.score} hop${h.score === 1 ? "" : "s"} · tap to go again`;
+}
+
+// Name that move: a stick figure from the app, four names to pick from; wrong answers mostly come from the same group
+function quizStart() { arcStop(); arc.game = "quiz"; arc.quiz = { n: 0, seen: new Set() }; $("arc-title").innerHTML = "Rep's Arcade<br>Name that move"; quizNext(); }
+function quizNext() {
+  const q = arc.quiz, all = TRACKS.flatMap(t => t.steps.map((_, i) => [t.id, i])), name = s => T[s[0]].steps[s[1]][0];
+  let pick; do { pick = all[Math.floor(Math.random() * all.length)]; } while (q.seen.has(pick.join()) && q.seen.size < all.length - 1);
+  q.seen.add(pick.join());
+  const same = all.filter(s => T[s[0]].group === T[pick[0]].group && name(s) !== name(pick)), opts = [pick];
+  while (opts.length < 4) { const pool = opts.length < 3 && same.length > 3 ? same : all, s = pool[Math.floor(Math.random() * pool.length)]; if (!opts.some(o => name(o) === name(s))) opts.push(s); }
+  opts.sort(() => Math.random() - .5);
+  q.answer = name(pick); q.locked = false;
+  $("arc-body").innerHTML = `<div class="hop-hud"><b>${q.n}</b><span>Best streak ${gameBest("quiz")}</span><button type="button" class="f-alt" data-g="menu">Games</button></div>
+    <div class="quiz-fig">${figStep(pick[0], pick[1], "fig f-fig")}</div>
+    <p class="f-msg">Which move is this?</p>
+    <div class="quiz-opts">${opts.map(o => `<button type="button" class="quiz-opt" data-g="qa" data-v="${esc(name(o))}">${esc(name(o))}</button>`).join("")}</div>`;
+}
+function quizAnswer(el) {
+  const q = arc.quiz; if (!q || q.locked) return; q.locked = true;
+  document.querySelectorAll(".quiz-opt").forEach(b => { if (b.dataset.v === q.answer) b.classList.add("right"); });
+  if (el.dataset.v === q.answer) { q.n++; blip(880); setTimeout(() => arc && arc.game === "quiz" && quizNext(), 650); return; }
+  el.classList.add("wrong"); blip(200, .25, .2);
+  const best = setBest("quiz", q.n);
+  setTimeout(() => {
+    if (!arc || arc.game !== "quiz") return;
+    $("arc-body").insertAdjacentHTML("beforeend", `<div class="arc-end"><div class="arc-rep">${repSvg(best ? "flex" : "think")}</div>
+      <p class="f-msg">${best ? "New best! " : ""}Streak of ${q.n}. That one was <b>${esc(q.answer)}</b>.</p>
+      <div class="f-ctrl"><button type="button" class="f-main go" data-g="quiz">Play again</button><button type="button" class="f-alt" data-g="menu">Games</button></div></div>`);
+    document.querySelector(".arc-end").scrollIntoView({ behavior: RM ? "auto" : "smooth", block: "nearest" });
+  }, 700);
+}
+
+// Flex reflex: Rep waits a random moment, then flexes; five tries, the fastest counts
+function reactStart() {
+  arcStop(); arc.game = "react"; arc.react = { tries: [], state: "wait" }; $("arc-title").innerHTML = "Rep's Arcade<br>Flex reflex";
+  const b = gameBest("react");
+  $("arc-body").innerHTML = `<div class="hop-hud"><b id="re-n">–</b><span>Best ${b ? b + " ms" : "–"}</span><button type="button" class="f-alt" data-g="menu">Games</button></div>
+    <div class="re-pad" id="re-pad"><div class="arc-rep big" id="re-rep">${repSvg("happy")}</div><p class="f-msg" id="re-msg">Tap here to start, then wait for Rep to flex</p></div>
+    <p class="f-hint" id="re-list">5 tries · your fastest counts</p>`;
+  $("re-pad").addEventListener("pointerdown", e => { e.preventDefault(); reactTap(); });
+}
+function reactArm() {
+  const r = arc.react; r.state = "armed"; $("re-pad").className = "re-pad"; $("re-rep").innerHTML = repSvg("think"); $("re-msg").textContent = "Wait for it…";
+  clearTimeout(r.timer);
+  r.timer = setTimeout(() => {
+    if (!arc || arc.game !== "react") return;
+    r.state = "go"; r.t0 = performance.now(); $("re-pad").className = "re-pad go"; $("re-rep").innerHTML = repSvg("flex"); $("re-msg").textContent = "TAP!";
+  }, 1200 + Math.random() * 2600);
+}
+function reactTap() {
+  const r = arc && arc.game === "react" && arc.react; if (!r) return;
+  if (r.state === "done") return reactStart();
+  if (r.state === "wait") return reactArm();
+  if (r.state === "armed") {
+    clearTimeout(r.timer); r.state = "wait"; blip(200, .2);
+    $("re-rep").innerHTML = repSvg("sleepy"); $("re-msg").textContent = "Too soon! Rep wasn't flexing yet. Tap to try again."; return;
+  }
+  const ms = Math.round(performance.now() - r.t0); r.tries.push(ms); blip(880);
+  $("re-n").textContent = ms + " ms"; $("re-list").textContent = r.tries.map(t => t + " ms").join(" · ");
+  $("re-pad").className = "re-pad";
+  if (r.tries.length < 5) { r.state = "wait"; $("re-rep").innerHTML = repSvg("cheer"); $("re-msg").textContent = `${ms} ms! Tap for try ${r.tries.length + 1} of 5.`; return; }
+  const b = Math.min(...r.tries), best = setBest("react", b, true);
+  r.state = "done"; $("re-rep").innerHTML = repSvg(best ? "flex" : "cheer");
+  $("re-msg").innerHTML = `${best ? "<b>New best!</b> " : ""}Fastest ${b} ms, average ${Math.round(r.tries.reduce((a, c) => a + c, 0) / r.tries.length)} ms. Tap to play again.`;
+}
+document.addEventListener("keydown", e => {
+  if (!arc || !(e.key === " " || e.key === "ArrowUp")) return;
+  if (arc.game === "hop") { e.preventDefault(); hopTap(); } else if (arc.game === "react") { e.preventDefault(); reactTap(); }
+});
+function arcadeCard() {
+  return `<button type="button" class="arc-entry" data-g="open"><span class="arc-entry-rep">${repSvg("cheer")}</span>
+    <span><b>Rep's Arcade</b><span>3 quick games · works offline</span></span><em>Play ›</em></button>`;
+}
 
 // ---- Boot
 const h = (location.hash || "").slice(1);
