@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="app-version" content="20261101114550">
+<meta name="app-version" content="20261101115132">
 <meta name="theme-color" content="#15232A">
 <meta name="description" content="Calisthenics skill tree with guided workouts and progress tracking.">
 <meta name="mobile-web-app-capable" content="yes">
@@ -918,6 +918,32 @@ const TRACKS = [
   ["Tuck jumps",3,8,"r","Jump and pull the knees toward the chest|Land softly on the balls of the feet|Arms drive up"],
   ["Broad jumps",3,6,"r","Swing the arms and jump forward as far as you can|Stick the landing without stepping|Walk back and reset"],
   ["Box jumps",3,8,"r","Jump onto a sturdy step, bench or box|Land quietly in a squat, then stand up|Step down, don't jump down"]]},
+ { id:"elbow", name:"Elbow lever", group:"Balance", basic:true, steps:[
+  ["Wrist lean",3,20,"s","Kneel with fingers pointing back toward your knees|Lean gently until the wrists feel a stretch|Ease off if anything feels sharp"],
+  ["Toes-down elbow lean",3,15,"s","Hands on the floor, fingers pointing back|Rest your belly on your bent elbows|Keep your toes on the floor for support"],
+  ["One-leg elbow lever",3,8,"ss","Lean forward until one foot lifts|Keep the other toes lightly touching|Switch legs between sets"],
+  ["Tuck elbow lever",3,8,"s","Lift both feet with the knees bent|Press the elbows into your belly|Look forward, not down"],
+  ["Elbow lever",3,15,"s","Body straight and level with the floor|Balance by leaning from the wrists|Squeeze your legs together"],
+  ["One-arm elbow lever",3,5,"ss","Master the two-arm hold first|Shift over one hand, then lift the other|Practise on a soft surface"]]},
+ { id:"head", name:"Headstand", group:"Balance", basic:true, steps:[
+  ["Tripod setup",3,20,"s","Hands and the top of the head form a triangle|Feet stay on the floor, hips walk in|Most of your weight goes through your hands"],
+  ["Knees-on-elbows tripod",3,15,"s","Rest one knee, then the other, on your upper arms|Push the floor away to protect the neck|Come down the way you went up"],
+  ["Tuck headstand",3,15,"s","Lift the knees off the arms and over the hips|Keep the knees tucked|Practise near a wall or on a mat"],
+  ["Wall headstand",3,30,"s","Set up a hand's width from the wall|Extend the legs slowly, heels near the wall|Stop if you feel any neck pain"],
+  ["Freestanding headstand",3,30,"s","Stack hips and feet over the head|Squeeze glutes and legs|Learn to tuck and roll out safely first"],
+  ["Forearm stand",3,15,"s","Forearms down, elbows under the shoulders|Kick up to a wall at first|Press the shoulders up, away from your ears"]]},
+ { id:"tumble", name:"Tumbling", group:"Balance", basic:true, steps:[
+  ["Forward roll",3,5,"r","Use a mat or soft grass|Tuck your chin and roll over your shoulders, not your head|Stand up without using your hands"],
+  ["Backward roll",3,5,"r","Sit back and roll with your chin tucked|Hands by your ears push the floor away|Go over one shoulder if that feels easier"],
+  ["Cartwheel",3,5,"rs","Hand, hand, foot, foot in a straight line|Kick the legs up high and wide|Start small and build height"],
+  ["Kip-up rock",3,10,"r","Lie on your back, roll onto your shoulders|Hands by your ears, knees over your face|Rock back and forth to build rhythm"],
+  ["Kip-up",3,3,"r","Roll back, then kick up and forward hard|Push off with your hands and arch your hips|Land with your feet under you"]]},
+ { id:"bars", name:"Bar basics", group:"Pull", basic:true, steps:[
+  ["Hanging knee raise",3,10,"r","Hang with the shoulders active|Lift the knees to hip height|Lower slowly without swinging"],
+  ["Chin-over-bar hold",3,15,"s","Jump or step up to the top position|Hold the chin clearly above the bar|Squeeze your shoulder blades down"],
+  ["L-hang",3,10,"s","Hang and lift straight legs to hip height|Point the toes|Bend the knees a little if you need to"],
+  ["Toes-to-bar",3,6,"r","Press down on the bar with straight arms|Bring the toes up to touch it|Control the way down"],
+  ["Bar pullover",3,3,"r","Pull your chest to the bar|Kick your legs up and over it|Finish in a support on top of the bar"]]},
  // Mobility ladders (mob: true) unlock range for skills like the V-sit, handstand and back lever; they don't count toward rank
  { id:"pike", name:"Pike flexibility", group:"Mobility", mob:true, steps:[
   ["Standing toe reach",3,30,"s","Legs straight, fold from the hips|Let the head and arms hang|Breathe out and sink a little lower each time"],
@@ -994,6 +1020,9 @@ const PRONE = (t, a, l) => ({ an:"p", at:[54,87], t, hd:t + 6, a:[a,a], l:[l,l] 
 const CHAIR = BOX(62, 66, 92, 90);
 const BDIP_T = l => ({ an:"w", at:[64,66], t:-92, hd:-92, a:[85,85], l });
 const BDIP_B = l => ({ an:"w", at:[64,66], t:-96, hd:-96, a:[10,150], l });
+// elbow levers balance on bent arms with the elbows in the belly; headstands pin the shoulder above the floor
+const ELB = (t, l, x) => ({ an:"w", at:[42,90], t, hd:t, a:[20,90], l, ...x });
+const TRI = (t, l) => ({ an:"s", at:[50,75], t, hd:90, a:[160,90], l });
 const SP = {
   push: [
     { A:{ an:"f", at:[62,90], t:-105.5, hd:-105, a:[180,180], l:[74.5,74.5] }, B:{ an:"f", at:[62,90], t:-117.7, hd:-118, a:[146.5,255], l:[62.3,62.3] }, pr:[FLOOR, WALL(22)] },
@@ -1135,6 +1164,36 @@ const SP = {
     { A:{ an:"p", at:[36,74], t:5, hd:15, a:[-40,-150], l:[90,180] }, pr:[FLOOR, BOX(64,68,92,90)] },
     { A:M(STAND, { a:[-100,-100] }), pr:[FLOOR, WALL(45)] },
     { A:M(STAND, { a:[70,70] }), B:M(STAND, { a:[-250,-250] }), pr:[FLOOR], ic:"A" },
+  ],
+  elbow: [
+    { A:QUAD, B:M(QUAD, { a:[70,70] }), pr:[FLOOR] },
+    { A:ELB(195, [22,22]), pr:[FLOOR] },
+    { A:ELB(185, [0,0], { l2:[40,40] }), pr:[FLOOR] },
+    { A:ELB(180, [150,30]), pr:[FLOOR] },
+    { A:ELB(180, [0,0]), pr:[FLOOR] },
+    { A:ELB(180, [0,0], { a2:[-140,-140] }), pr:[FLOOR] },
+  ],
+  head: [
+    { A:TRI(125, [78,78]), pr:[FLOOR] },
+    { A:TRI(100, [165,60]), pr:[FLOOR] },
+    { A:TRI(90, [150,-60]), pr:[FLOOR] },
+    { A:TRI(90, [-90,-90]), pr:[FLOOR, WALL(62)] },
+    { A:TRI(90, [-90,-90]), pr:[FLOOR] },
+    { A:{ an:"w", at:[36,90], t:90, hd:90, a:[90,180], l:[-90,-90] }, pr:[FLOOR] },
+  ],
+  tumble: [
+    { A:M(SQB, { a:[150,150] }), B:{ an:"s", at:[40,84], t:125, hd:150, a:[90,90], l:[-20,110] }, pr:[FLOOR] },
+    { A:{ an:"s", at:[40,84], t:125, hd:150, a:[-110,60], l:[-20,110] }, B:M(SQB, { a:[150,150] }), pr:[FLOOR], ic:"A" },
+    { A:M(STAND, { a:[-80,-80], a2:[-100,-100] }), B:M(HS, { l:[-60,-60], l2:[-120,-120], a2:[90,90] }), pr:[FLOOR], front:true },
+    { A:GB(180, [-55,80]), B:{ an:"s", at:[40,84], t:125, hd:170, a:[-110,60], l:[170,-70] }, pr:[FLOOR] },
+    { A:{ an:"s", at:[40,84], t:125, hd:170, a:[-110,60], l:[170,-70] }, B:M(SQB, { a:[20,20] }), pr:[FLOOR] },
+  ],
+  bars: [
+    { A:HANG, B:M(HANG, { l:[-5,90] }), pr:[BAR(10)] },
+    { A:PTOP, pr:[BAR(10)] },
+    { A:M(HANG, { l:[0,0] }), pr:[BAR(10)] },
+    { A:HANG, B:M(HANG, { t:-115, hd:-100, l:[-65,-65] }), pr:[BAR(10)] },
+    { A:PTOP, B:SUP(10), pr:[BAR(10)] },
   ],
   plank: [
     { A:KPLANK, pr:[FLOOR] },
@@ -1632,12 +1691,13 @@ const GOAL_SUPPORT = {
   mu: ["pull", "push", "lsit"], fl: ["pull", "df", "lsit"], bl: ["pull", "lsit", "shoulder"],
   legs: ["nordic", "lsit"], nordic: ["legs", "pike"],
   pike: ["lsit", "legs"], bridge: ["shoulder", "nordic"], shoulder: ["bridge", "hs"],
+  elbow: ["plank", "push"], head: ["plank", "hs"], tumble: ["legs", "plank"], bars: ["pull", "lsit"],
   plank: ["back", "lsit"], back: ["plank", "bridge"], dip: ["push", "plank"], jump: ["legs", "nordic"],
 };
 const BALANCE = ["push", "pull", "legs", "lsit", "df", "nordic"];
 // Equipment the plan can count on: hanging ladders need a bar or rings
 const EQUIP = [["bar", "Pull-up bar"], ["rings", "Rings"], ["par", "Parallettes"], ["pole", "Vertical pole"]];
-const NEEDS = { pull: ["bar", "rings"], mu: ["bar", "rings"], fl: ["bar", "rings"], bl: ["bar", "rings"], flag: ["pole"] };
+const NEEDS = { pull: ["bar", "rings"], mu: ["bar", "rings"], fl: ["bar", "rings"], bl: ["bar", "rings"], flag: ["pole"], bars: ["bar"] };
 const NEED_TXT = { bar: "a pull-up bar", rings: "rings", pole: "a sturdy vertical pole" };
 const needsText = id => `Needs ${NEEDS[id].map(k => NEED_TXT[k]).join(" or ")}`;
 // plans made before the equipment question assume everything is at hand
@@ -1908,7 +1968,7 @@ function renderRings() {
 
 // ---- Skill tree map: each ladder is a branch; advanced ladders sprout from the step that unlocks them
 const LOCK = `<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>`;
-const TREE_COLS = ["dip","push","pl","hspu","hs","plank","back","lsit","df","flag","pull","mu","fl","bl","jump","legs","nordic","pike","bridge","shoulder"];
+const TREE_COLS = ["dip","push","pl","hspu","elbow","head","tumble","hs","plank","back","lsit","df","flag","bars","pull","mu","fl","bl","jump","legs","nordic","pike","bridge","shoulder"];
 const TG = { colW: 88, unit: 172, minGap: 86, padL: 70, padR: 16, hubY: 70, row0: 210 };
 // Difficulty of every step on one shared 1–10 scale (roughly the levels coaches use); the tree places each node this far from Start
 const LEVEL = {
@@ -1928,6 +1988,10 @@ const LEVEL = {
   pike: [1, 1.5, 2, 3, 4, 5],
   bridge: [1, 1.5, 2.5, 3.5, 5, 6],
   shoulder: [1, 1.5, 2, 2.5, 3.5, 4.5],
+  elbow: [2, 2.5, 3, 3.5, 4, 6],
+  head: [2, 2.5, 3, 3.5, 4.5, 5.5],
+  tumble: [1.5, 2, 3, 3.5, 5],
+  bars: [1.5, 2, 2.5, 3.5, 4.5],
   plank: [1, 1, 1.5, 2, 2.5, 3],
   back: [1, 1, 1.5, 2, 2.5, 3],
   dip: [1, 1.5, 2, 2.5, 3],

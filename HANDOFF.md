@@ -1,168 +1,38 @@
-# Skill Ladder — handoff for a new Claude session
+# Skill Ladder: handoff
 
-This file lives at the root of **github.com/BlueX7710/skill-ladder** as `HANDOFF.md`. In a new session, clone the repo (or point Claude at it), have it read this file, and say what you want changed.
-Everything below describes the project as of **2026-10-21**.
+Calisthenics skill-tree web app. Repo: github.com/BlueX7710/skill-ladder, branch `main`, no open PRs.
+The longer project guide (file layout, code map, design rules, testing tips) is in git: `git show 7d800da:HANDOFF.md`.
 
----
+## State
 
-## Prompt to start the new session
+- Live on the main artifact and GitHub Pages: skill-based XP, trophies, weekly challenges, Rep the mascot, Rep's Arcade, 4 beginner ladders, 4 simple-skill ladders (Elbow lever, Headstand, Tumbling, Bar basics).
 
-> I'm continuing work on **Skill Ladder**, my calisthenics skill-tree app. Clone https://github.com/BlueX7710/skill-ladder (the `gh` CLI is signed in as BlueX7710) and read `HANDOFF.md` first; it explains the files, how the app is built and how to publish updates. Then help me with: **[describe the change]**. After changing the app, test it, then publish to both places listed under "Publishing an update".
+## How to publish
 
----
+1. Publish `source/skill-ladder.html` to the main artifact, passing its `url` explicitly.
+2. Then, from the repo root in PowerShell:
+   `powershell -ExecutionPolicy Bypass -File source/build-github.ps1`
+   Don't pipe it through `Select-Object -First`, which stops the script before it copies the site.
+3. Commit and push to `main`. Pages takes about a minute; check that the `app-version` meta tag on https://bluex7710.github.io/skill-ladder/ changed.
 
-## What the app is
+## Only the user can do
 
-A single-page calisthenics trainer:
+- Approve publishing to the live app. Recent pattern: build, put on the preview, ask, then publish.
+- Play the games live. Their loops were stepped by hand in testing because the browser pane was hidden.
 
-- **20 ladders, 130 exercises**: 4 beginner ladders (Plank, Superman, Bench dip, Jump; `basic: true`, no equipment but a chair, they earn XP but don't count toward rank), 13 strength ladders (Push-up, Planche, Handstand push-up, Handstand, L-sit, Dragon flag, Human flag, Pull-up, Muscle-up, Front lever, Back lever, Pistol squat, Nordic curl) and 3 **Mobility** ladders (Pike flexibility, Bridge, Shoulder mobility; `mob: true`, teal). Mobility XP counts, but ranks are measured against the strength ladders only, so adding ladders never lowers a rank.
-- **Find my level:** a few yes/no questions per ladder (binary search over its steps; ladders an earlier answer leaves locked are skipped). Results screen, then "Save my levels". Offered prominently to new users on the Skills tab, as a small link afterwards, and in plan setup.
-- **Skills tab:** a zoomable, draggable **skill tree**. Nodes are placed by difficulty (Lv 1–10, Beginner → Elite bands), and advanced branches sprout from the step that unlocks them. A **List** view and progress rings are also available.
-- **Step details:** an animated stick figure for every exercise, a "Watch how on YouTube" link, a difficulty tag, **estimated time to learn**, a **mastery check** (requirement, set-by-set bars from your best session, what's missing, "Ready to master ★"), form cues, a progress chart and manual set logging.
-- **Workout tab:** today's exercises from the plan (or a chosen routine), a rest timer, cards with mastery progress, and quick fill ("All 15", "Today's aim", "Same as last time").
-- **Today's aim:** `nextTarget()` takes your last session of the step and nudges the weakest set up (+1 rep, or +10% of the target in seconds, at least 2). Shown on Workout cards, as a quick-fill chip and per set in guided mode (worked out when the session starts).
-- **Warm-up and cool-down:** guided, timed drill sequences (`DRILLS`, `drillsFor()`) picked for the day's ladders and equipment; each drill flows into the next with a chime. Buttons on the Workout tab and in the Plan tab's session.
-- **Guided mode** (full screen, "Start exercise"):
-  - Tap anywhere to count reps (tick and buzz), or hold timers for timed exercises.
-  - A **confirm panel** opens before any set is logged.
-  - Finished sets can be edited or erased, even after saving.
-  - Automatic rest countdown with a chime, vibration and an optional notification in the installed app.
-  - Minimize to a floating bar; the session is saved on every change and survives closing the app for 12 hours.
-  - The Cues button sits in the top bar.
-- **Plan tab:** pick your equipment (pull-up bar, rings, parallettes, vertical pole; none = floor only), up to 2 goal skills, training days and session length. Without a bar or rings, the hanging ladders (Pull-up, Muscle-up, Front lever, Back lever) can't be chosen as goals and are left out of the plan; the Human flag needs a pole. Without parallettes, L-sit and deficit HSPU rows show what to use instead. Plans saved before this setting existed count as having everything. It builds a weekly schedule (goal first, then unlock work, then support, then balance), shows a time-to-goal estimate, and moves up automatically when steps are mastered.
-- **Log tab:** a **This week** summary (days, sets, reps, hold time, steps mastered, each compared with last week), a 16-week heatmap and sessions by day. Tap the numbers to edit a session (no Edit button); clearing a box erases that set. Also has **Backup & restore** (code starting `SKILLLADDER1:`, merged on restore) and Reset.
-- **XP measures how close you are to your skills**, not how much you train:
-  - Each step is worth 50 × its difficulty level.
-  - The step you're on pays up to 80% of that as your best session closes in on the mastery target. Marking it mastered pays the rest.
-  - Extra sets or days earn nothing, so XP only moves when a set beats your best.
-  - It's all derived from `levels`, `logs` and `done` (`xpState()`, cached on those array references). There's no XP ledger to merge or sync.
-- **Hero card:** your athlete level and rank title, "+N XP this week", and a **Next unlock** card. The card shows the step closest to mastery from today's planned exercises (on a rest day, from your goals; otherwise from your routine), and tapping it opens the step.
-- **Rank titles** (Novice → Master) are still measured against the strength ladders only.
-- **One-time celebrations:** `state.lvSeen` and `state.rkSeen` are high-water marks, so a level-up is celebrated once and a rank never drops after an update. Find my level, jump, restore and sync raise them silently.
-- **Where XP shows:**
-  - A toast after a session that moved you closer, e.g. "+32 XP · Pike hold on box 0% → 40%".
-  - An XP line on mastery cards and Workout cards.
-  - An "XP earned" tile in the weekly summary.
-  - "+N XP" on the mastery buttons.
-- **Log trimming:** `trimLogs()` keeps each step's best session when logs pass 600.
-- **Interactive XP:**
-  - Tap the level to open the XP breakdown per ladder (`xpSheet()`).
-  - The next-unlock card flips through your 3 closest skills (`data-unlock`).
-  - XP gains animate: a fly-off chip, the bar glides and the number counts up.
-  - Guided mode shows live XP ("+16 XP this session · this set +16 · next rep +2", `xpLive()`). The first time a set passes your best, a **New best!** chime and flash plays (`fo.pb`).
-- **Fun layer** (`funState()`, derived from logs):
-  - 16 **trophies** (`TROPHIES`) on the Log tab. Tap one to see how to earn it.
-  - A rotating **weekly challenge** (`CHALLENGES`, picked by week number) on the Workout tab.
-  - Trophy and challenge unlocks celebrate through `queueParty()` and are tracked in `state.tSeen` and `state.chSeen`. The first run after the update stays silent.
-- **Rep, the mascot** (`repSvg(mood)`, `repTalk()`, `repSay()`): a gold buddy in a red sweatband who sits on the hero card.
-  - Moods: happy, cheer, flex, sleepy (3+ days without training) and think.
-  - Rep says hello once per visit with the most useful line, and tapping Rep cycles through tips: the next unlock, the challenge, level, trophies and form advice.
-  - Rep announces XP gains when the hero card is in view (a toast otherwise), flexes on every celebration card, and pops up in guided mode on a new best.
-  - **Rep gets buffer as you level up** (`REP_STAGES`, `repStage()`): Sprout (level 1), Toned (5), Strong (9), Buff (14) and Beast (20).
-    - Each stage makes Rep taller and wider, with thicker arms and bigger biceps.
-    - From Buff, Rep gets determined brows and abs. Beast adds a gold aura and a star on the sweatband.
-    - Crossing a stage shows a "Rep got stronger!" card after the level-up card.
-- **Rep's Arcade** (`arcOpen()`, `#arcade-host`): three games on the Workout tab and the guided rest screen, with no network use, so they work offline.
-  - Rep Hop (`hopStart()`, jump height grows with `repStage()`), Name that move (`quizStart()`) and Flex reflex (`reactStart()`).
-  - Opened from rest, it shows the countdown and stops when rest ends (`arcTick()`).
-  - Bests are in `state.games` (`setBest()`; lower is better for `react`). They aren't in backups, and sync keeps the better score per game.
-  - Three trophies come from the games.
-- A day streak, and a celebration when a step is mastered.
+## Where things are
 
-## Where it lives
+- Main artifact: https://claude.ai/artifact/451vnBYdQJVh2MRFVyBKQQ (keeps `db` and `user` capabilities; omit `capabilities` when publishing)
+- Preview artifact: https://claude.ai/artifact/1XaRVbbFZEYbrhFCyYsugV (no sync, starts empty)
+- Live app: https://bluex7710.github.io/skill-ladder/
+- Edit only `source/skill-ladder.html`. `index.html` at the root is generated.
+- Ladders: `TRACKS`, stick figures: `SP`, difficulty: `LEVEL`, tree order: `TREE_COLS`, plan links: `GOAL_SUPPORT`, equipment: `NEEDS`.
+- XP: `xpState()`. Trophies and challenge: `funState()`. Mascot: `repSvg()`. Games: `arcOpen()`.
 
-| Version | Address | Progress storage |
-|---|---|---|
-| Claude artifact | https://claude.ai/artifact/451vnBYdQJVh2MRFVyBKQQ | Synced to the Claude account (artifact `db` capability) plus localStorage |
-| **Android app (main)** | **https://bluex7710.github.io/skill-ladder/** — repo **github.com/BlueX7710/skill-ladder** (public, GitHub Pages from `main` /) | On the phone (localStorage) |
-| Old Android app | https://skill-ladder-app.netlify.app (Netlify project `skill-ladder-app`, site id `3843e79d-4e09-46fc-946d-607d94b2b3ed`) | On the phone. **No longer updated**; replaced by the GitHub version |
+## Rules
 
-Each address has its own separate storage. Use **Log → Backup & restore** to move progress between them.
-
-## Files (in the GitHub repo)
-
-```
-index.html, sw.js, manifest.webmanifest, icon-*.png, .nojekyll
-                         The PUBLISHED app at the repo root (served by GitHub Pages). Generated; don't edit.
-README.md                Short public description
-HANDOFF.md               This file
-source/
-  skill-ladder.html      THE app: all HTML, CSS and JS in one file (~162 KB). Edit this.
-                         The Claude artifact is published straight from it.
-  app-src/
-    app-shell.html       Extra code for the installable app only: service-worker registration,
-                         "Install app" button, "new version ready" notice, Netlify-badge clearance
-    sw.js                Offline worker: network-first page, cached icons and fonts,
-                         notification taps (cache name: skill-ladder-v2)
-    manifest.webmanifest App name, icons, standalone, launch_handler focus-existing
-    netlify.toml         Netlify headers only (no-cache for page and worker)
-    icon-192.png, icon-512.png, icon-maskable-512.png
-  build-app.ps1          skill-ladder.html + app-src  ->  source/app/  (adds <head>, manifest, version stamp; git-ignored)
-  build-github.ps1       runs build-app.ps1, then copies source/app/ to the repo root (minus netlify.toml)
-```
-
-The repo is the source of truth. The temporary folder from the first session is no longer needed.
-
-### Inside `skill-ladder.html` (search for these `// ---- ` markers)
-
-| Section | What it holds |
-|---|---|
-| `Progressions` | `TRACKS`: each ladder `{id, name, group, prereq?, steps:[[name, sets, target, unit, cues]]}`; unit `r` reps, `rs` reps/side, `s` sec, `ss` sec/side |
-| `Stick figures` | `SP` poses per step: `{A, B?, pr, front?, ic?}`. A pose is segment angles in degrees, pinned at the wrist (`an:"w"`), foot (`"f"`), hip (`"p"`) or shoulder (`"s"`). Two poses (A, B) animate the rep; one pose is a hold. `figStep(tid,i)` renders. |
-| `LEVEL`, `TIERS`, `etaWeeks` | Difficulty 1–10 per step; the time estimate is `max(.5, gap) × 3.57 × e^(0.231·L)` weeks |
-| `State`, `Persistence` | `state = {levels, routine, logs, plan, done}` (`done`: when each step was mastered, for the weekly summary; included in backups); `save()` writes localStorage and, in Claude, the db doc `data/users/<id>/progress` (snapshot data is frozen, so it's always deep-copied) |
-| `Mastery` | `requirement()`, `mastery()`, `masteryCard()` |
-| `Training plan` | `GOAL_SUPPORT`, `BALANCE`, `EQUIP`/`NEEDS`/`canDo()`/`parSwap()` (equipment filter; `plan.equip`), `buildWeek(plan)`, `goalEta()`, `renderPlan()`, `planClick()` |
-| `Skill tree map`, `Tree map` | `TREE_COLS` column order, `TG` layout, `renderSkillTree()`, zoom/pan: during a pinch, wheel or zoom-button glide only a GPU transform moves (`liveStart`/`liveSet`); `liveEnd()` then applies the real size and scroll in one step without a visible jump. `zoomTo()` animates the buttons; `markSel()` moves the selection highlight without rebuilding the map |
-| `Timer` | Workout-tab rest timer, `beep(kind)`, `restOver()`, the shared `audioCtx` (unlocked on first tap) |
-| `Backup & restore` | `makeBackup()`, `readBackup()`, `mergeBackup()` |
-| `Warm-up, cool-down and Find my level` | Full-screen flows in `#flow-host` using the guided-mode styles: `wu` (warm-up state), `pa` (assessment state), `flowAction()` handles `data-w` buttons |
-| `Guided exercise mode` | `fo` session object (saved to `skill-ladder-session`), `startFocus`, `renderFocus`, `sheetHTML` (confirm/edit panel), `updateReps`/`updateSheet` (in-place updates, no redraw), `focusAction` |
-| `Events`, `Boot` | One delegated click handler (actions use `data-*` attributes); boot restores the last tab and any running session |
-
-**localStorage keys:** `skill-ladder-v1` (state), `-session`, `-drafts`, `-view`, `-mode`, `-zoom`, `-pan`.
-
-## Design rules used so far
-
-- Dark hero card with a gold accent. Group colors: Push orange, Pull blue, Core violet, Legs green, Balance amber, Mobility teal.
-- Fonts: Big Shoulders Display (headings), Instrument Sans (body), IBM Plex Mono (numbers).
-- Colors are tokens on `:root` with dark-mode overrides. Phone first, with a bottom tab bar on narrow screens.
-- In guided mode: −/+ updates the number in place with no animation. Panels open instantly and only slide when closing.
-- Smoothness: animate only `transform` and `opacity` (the current-step pulse is a growing ring, not a box-shadow). Don't rebuild the tree for small changes like selecting a step; update classes in place.
-- Keep it one self-contained file. External scripts only from approved CDNs; the app currently uses none.
-
-## Publishing an update (both places)
-
-1. **Claude artifact:** publish `skill-ladder.html` with the Artifact tool, passing `url: https://claude.ai/artifact/451vnBYdQJVh2MRFVyBKQQ` so it updates the same link.
-2. **GitHub app (main):** from the repo root:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File source/build-github.ps1
-   git add -A
-   git commit -m "Describe the change" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
-   git push
-   ```
-   Pages redeploys in about a minute. Check that `https://bluex7710.github.io/skill-ladder/` shows the new `app-version` meta tag. The GitHub CLI (`gh`) is installed and signed in as **BlueX7710**; Node.js is installed too.
-
-
-**Do not deploy to Netlify anymore.** The Netlify site is frozen at version 20261021030938 (the equipment-filter update) and no longer gets updates, even though `build-app.ps1` still writes `netlify.toml` into `source/app/`.
-
-The installed app checks `app-version` on open and every 15 minutes, and shows **"A new version is ready · Update"**. If you change `sw.js`, bump the `CACHE` name.
-
-## Testing tips
-
-- Serve the folder locally (for example a tiny Node `http.createServer`) and open `skill-ladder.html` in the built-in browser. Drive it with `javascript_exec`; app globals like `state`, `render()`, `startFocus()`, `buildWeek()` and `figStep()` are reachable.
-- The built-in browser blocks service workers on `localhost`. They do work on the live HTTPS sites.
-- Screenshots of guided mode can look see-through if they catch the 0.25 s fade-in. Wait and take another.
-- Clear `localStorage` after tests so fake progress doesn't stick.
-
-## Known limits
-
-- The Netlify free plan adds a "Powered by Netlify" badge. The app keeps a strip clear for it; GitHub Pages has no badge.
-- Background notifications depend on Android not throttling the app. With the screen on in guided mode, the wake lock keeps timers exact.
-- Time estimates and difficulty levels are rough guides, not coaching advice.
-
-## Ideas not done yet
-
-- Retire the Netlify site once progress has been moved.
-- "Watch how" links open a YouTube search per step (no fixed videos to go stale); hand-picked videos could replace them.
-- Not planned: voice rep counting (unreliable mid-exercise), automatic phone/Claude sync (needs a server), training-day reminders (web apps can't schedule them reliably).
+- Do not deploy to Netlify (user's instruction).
+- Always pass `url` when publishing: re-publishing by file path goes to whichever artifact that path last went to. This once put work on the main artifact by mistake.
+- `basic: true` and `mob: true` ladders earn XP but stay out of rank, so adding ladders never lowers a rank.
+- XP is derived from `levels`, `logs` and `done`, with no ledger. Don't add per-set or daily XP: critics rejected it as gameable and a push toward overtraining.
+- Testing: serve `source/` locally and open `app/index.html` after `source/build-app.ps1`. The bare source file has no viewport tag. Clear localStorage afterwards.
